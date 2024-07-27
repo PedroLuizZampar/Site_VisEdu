@@ -1,0 +1,16 @@
+<table id="file-table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th>Nome</th>
+            <th>Data de registro</th>
+            <th>Turma</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for upload in uploads %}
+            {% include 'item_upload.html' %}
+        {% endfor %}
+    </tbody>
+</table>

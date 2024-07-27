@@ -8,4 +8,5 @@ app.register_blueprint(home_route) # prefix = "/"
 app.register_blueprint(upload_route, url_prefix = "/uploads")
 
 # execução
-app.run(debug=True) # Quando um arquivo for salvop após uma modificação, o servidor é instantaneamente reiniciado
+if __name__ == "__main__":
+    app.run(debug=True) # Quando um arquivo for salvop após uma modificação, o servidor é instantaneamente reiniciado

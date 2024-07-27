@@ -6,38 +6,18 @@ body {
     padding: 0;
 }
 
-header {
-    background-color: #1E314E;
-    padding: 10px 0;
-}
-
-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-}
-
-nav ul li {
-    margin: 0 20px;
-}
-
-nav ul li a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 18px;
-}
-
 main {
     padding: 20px;
 }
 
 .upload-section {
+    display: flex;
+    flex-direction: column;
     background-color: #fff;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    align-items: center;
 }
 
 .tab {
@@ -79,29 +59,23 @@ main {
     font-size: 16px;
 }
 
-.file-table {
+.div-table {
+    width: 100%;
+}
+
+#file-table {
+    width: 80%;
+    margin: auto;
     list-style: none;
-    padding: 0;
-}
-
-.file-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #E5F4FF;
+    background-color: #fff;
     border-radius: 8px;
-    padding: 10px 20px;
-    margin-bottom: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-collapse: collapse; /* Adicione isso para colapsar as bordas da tabela */
 }
 
-.file-actions button {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-.file-actions button:hover {
-    color: #1E314E;
+#file-table th, #file-table td {
+    text-align: center;
+    padding: 10px;
+    border: 0.1px solid #1E314E;
 }

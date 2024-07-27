@@ -7,17 +7,6 @@
     <link rel="stylesheet" href="../static/css/styles.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="#">Cadastro</a></li>
-                <li><a href="#">Relatórios</a></li>
-                <li><a href="#">Uploads</a></li>
-                <li><a href="#">Feedbacks</a></li>
-                <li><a href="#">Opções</a></li>
-            </ul>
-        </nav>
-    </header>
     <main>
         <section class="upload-section">
             <div class="tab">
@@ -28,45 +17,12 @@
                 <button class="upload-button">⬆️</button>
                 <button class="analyze-all-button">Analisar todos</button>
             </div>
-            <div class="file-table">
-                <div class="file-item">
-                    <span>exemplo1.mp4</span>
-                    <div class="file-actions">
-                        <button class="analyze-button">🤖</button>
-                        <button class="edit-button">✏️</button>
-                        <button class="play-button">▶️</button>
-                        <button class="delete-button">🗑️</button>
-                    </div>
-                </div>
-                <div class="file-item">
-                    <span>exemplo2.mp4</span>
-                    <div class="file-actions">
-                        <button class="analyze-button">🤖</button>
-                        <button class="edit-button">✏️</button>
-                        <button class="play-button">▶️</button>
-                        <button class="delete-button">🗑️</button>
-                    </div>
-                </div>
-                <div class="file-item">
-                    <span>exemplo3.mp4</span>
-                    <div class="file-actions">
-                        <button class="analyze-button">🤖</button>
-                        <button class="edit-button">✏️</button>
-                        <button class="play-button">▶️</button>
-                        <button class="delete-button">🗑️</button>
-                    </div>
-                </div>
-                <div class="file-item">
-                    <span>exemplo4.mp4</span>
-                    <div class="file-actions">
-                        <button class="analyze-button">🤖</button>
-                        <button class="edit-button">✏️</button>
-                        <button class="play-button">▶️</button>
-                        <button class="delete-button">🗑️</button>
-                    </div>
-                </div>
+            <div class="div-table" 
+                c-container="{{ url_for('upload.lista_uploads') }}">
+                <!-- Lista de uploads vai aqui -->
             </div>
         </section>
     </main>
+    <script src="{{ url_for('static', filename='cru.js') }}"></script>
 </body>
 </html>
