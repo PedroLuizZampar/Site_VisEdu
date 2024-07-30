@@ -4,11 +4,12 @@
             <th scope="col">#</th>
             <th>Nome</th>
             <th>Data de registro</th>
+            <th>Hora de registro</th>
             <th>Turma</th>
             <th>Ações</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="lista-uploads">
         {% for upload in uploads %}
             {% include 'item_upload.html' %}
         {% endfor %}

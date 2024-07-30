@@ -14,7 +14,7 @@
                 <button class="tablinks">Analisados</button>
             </div>
             <div class="upload-controls">
-                <button class="upload-button">⬆️</button>
+                <button id="enviar-upload" class="upload-button">⬆️</button>
                 <button class="analyze-all-button">Analisar todos</button>
             </div>
             <div class="div-table" 
@@ -22,7 +22,15 @@
                 <!-- Lista de uploads vai aqui -->
             </div>
         </section>
+
+        <!-- Modal form-upload -->
+        <dialog id="modal"
+            c-container="{{ url_for('upload.form_upload') }}">
+            <h1>Novo Upload</h1>
+        </dialog>
+
     </main>
+    <script src="../static/js/modal.js"></script>
     <script src="{{ url_for('static', filename='cru.js') }}"></script>
 </body>
 </html>

@@ -1,0 +1,38 @@
+<form class="c-form"
+    {% if upload %}
+        action="{{ url_for('upload.inserir_upload', upload_id=upload.id) }}"
+        method="PUT"
+        c-swap="#upload-{{ upload.id }}"
+    {% else %}
+        action="{{ url_for('upload.inserir_upload') }}"
+        method="POST"
+        c-append="#lista-uploads"
+    {% endif %}
+    >
+
+    <div class="bloco-informacoes">
+        <label for="nome_arquivo">Nome do arquivo: </label>
+        <input type="text" name="nome_arquivo" {% if upload %} value="{{ upload.nome_arquivo }}"{% endif %}>
+    </div>
+
+    <div class="bloco-informacoes">
+        <label for="turma">Turma: </label>
+        <input type="text" name="turma" {% if upload %} value="{{ upload.turma }}"{% endif %}>
+    </div>
+
+    <div class="bloco-informacoes">
+        <label for="data_registro">Data do registro: </label>
+        <input type="date" name="data_registro" {% if upload %} value="{{ upload.data_registro }}"{% endif %}>
+    </div>
+
+    <div class="bloco-informacoes">
+        <label for="hora_registro">Hora do registro: </label>
+        <input type="time" name="hora_registro" {% if upload %} value="{{ upload.hora_registro }}"{% endif %}>
+    </div>
+
+    <button type="button" onclick="document.getElementById('modal').close();">Cancelar</button>
+    <button type="submit">
+       {% if upload %} Atualizar upload {% else %} Adicionar upload {% endif %}
+    </button>
+
+</form>
