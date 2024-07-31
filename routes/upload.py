@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from database.upload import UPLOADS
+from database.models.upload import Upload
 
 upload_route = Blueprint("upload", __name__)
 
@@ -8,7 +8,8 @@ def lista_uploads():
 
     """ Renderiza a lista de uploads """
 
-    return render_template("lista_uploads.html", uploads=UPLOADS)
+    uploads = Upload.select()
+    return render_template("lista_uploads.html", uploads=uploads)
 
 @upload_route.route('/', methods=["POST"])
 def inserir_upload():
@@ -17,15 +18,12 @@ def inserir_upload():
 
     data = request.json
 
-    novo_upload = {
-        "id": len(UPLOADS) + 1,
-        "nome_arquivo": data['nome_arquivo'],
-        "turma": data['turma'],
-        "data_registro": data['data_registro'],
-        "hora_registro": data['hora_registro']
-    }
-
-    UPLOADS.append(novo_upload)
+    novo_upload = Upload.create(
+        nome_arquivo = data['nome_arquivo'],
+        turma = data['turma'],
+        data_registro = data['data_registro'],
+        hora_registro = data['hora_registro']
+    )
 
     return render_template('item_upload.html', upload=novo_upload)
 
@@ -40,11 +38,7 @@ def form_upload():
 def form_edit_upload(upload_id):
     """ Renderiza o formulário de uploads para editar um upload existente """
 
-    upload_selecionado = None
-
-    for u in UPLOADS:
-        if u['id'] == upload_id:
-            upload_selecionado = u
+    upload_selecionado = Upload.get_by_id(upload_id)
 
     return render_template("form_upload.html", upload=upload_selecionado)
 
@@ -52,18 +46,17 @@ def form_edit_upload(upload_id):
 def atualizar_upload(upload_id):
     """ Atualiza o upload com os novos dados informados no formulário """
 
-    upload_editado = None
-
     data = request.json
-    for u in UPLOADS:
-        if u['id'] == upload_id:
-            u['nome_arquivo'] = data['nome_arquivo']
-            u['turma'] = data['turma']
-            u['data_registro'] = data['data_registro']
-            u['hora_registro'] = data['hora_registro']
-
-            upload_editado = u
     
+    upload_editado = Upload.get_by_id(upload_id)
+
+    upload_editado.nome_arquivo = data['nome_arquivo']
+    upload_editado.turma = data['turma']
+    upload_editado.data_registro = data['data_registro']
+    upload_editado.hora_registro = data['hora_registro']
+
+    upload_editado.save() # Salva, no banco de dados, o registro feito através do formulário de edição
+
     return render_template('item_upload.html', upload=upload_editado)
 
 @upload_route.route('/<int:upload_id>/delete', methods=["DELETE"])
@@ -71,7 +64,7 @@ def deletar_upload(upload_id):
 
     """ Apaga um upload do sistema """
 
-    global UPLOADS
-    UPLOADS = [u for u in UPLOADS if u['id'] != upload_id]
+    upload = Upload.get_by_id(upload_id) # Quando estamos passando o valor de uma classe para uma variável, estamos instanciando ela
+    upload.delete_instance() # Aqui deletamos a instância
 
     return {"deleted": "ok"}

@@ -1,12 +1,12 @@
 from flask import Flask
-from routes.home import home_route
-from routes.upload import upload_route
+from configuration import configure_all
 
+# Inicialização
 app = Flask(__name__)
 
-app.register_blueprint(home_route) # prefix = "/"
-app.register_blueprint(upload_route, url_prefix = "/uploads")
+# Configuração das rotas e do banco de dados
+configure_all(app)
 
-# execução
+# Execução
 if __name__ == "__main__":
     app.run(debug=True) # Quando um arquivo for salvop após uma modificação, o servidor é instantaneamente reiniciado
