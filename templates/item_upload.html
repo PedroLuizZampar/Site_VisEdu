@@ -9,7 +9,9 @@
 
         <button id="edit-upload"
             class="edit-button"
-            c-get="{{ url_for('upload.form_edit_upload', upload_id=upload.id) }}">
+            c-get="{{ url_for('upload.form_edit_upload', upload_id=upload.id) }}"
+            onclick="document.getElementById('modal').showModal()"
+            c-target="#modal">
             ✏️
         </button>
 

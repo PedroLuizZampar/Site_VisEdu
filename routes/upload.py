@@ -48,6 +48,24 @@ def form_edit_upload(upload_id):
 
     return render_template("form_upload.html", upload=upload_selecionado)
 
+@upload_route.route('/<int:upload_id>/update', methods=["PUT"])
+def atualizar_upload(upload_id):
+    """ Atualiza o upload com os novos dados informados no formulário """
+
+    upload_editado = None
+
+    data = request.json
+    for u in UPLOADS:
+        if u['id'] == upload_id:
+            u['nome_arquivo'] = data['nome_arquivo']
+            u['turma'] = data['turma']
+            u['data_registro'] = data['data_registro']
+            u['hora_registro'] = data['hora_registro']
+
+            upload_editado = u
+    
+    return render_template('item_upload.html', upload=upload_editado)
+
 @upload_route.route('/<int:upload_id>/delete', methods=["DELETE"])
 def deletar_upload(upload_id):
 
