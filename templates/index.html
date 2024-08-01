@@ -14,7 +14,12 @@
                 <button class="tablinks">Analisados</button>
             </div>
             <div class="upload-controls">
-                <button id="enviar-upload" class="upload-button">⬆️</button>
+                <button class="upload-button"
+                    c-get="{{ url_for('upload.form_upload') }}"
+                    onclick="document.getElementById('modal').showModal()"
+                    c-target="#modal">
+                    ⬆️
+                </button>
                 <button class="analyze-all-button">Analisar todos</button>
             </div>
             <div class="div-table" 
