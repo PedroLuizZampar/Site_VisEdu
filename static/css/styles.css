@@ -48,7 +48,8 @@ main {
 }
 
 .upload-button,
-.analyze-all-button {
+.analyze-all-button,
+#modal button {
     background-color: #1E314E;
     color: #fff;
     border: none;
@@ -107,5 +108,11 @@ dialog form .bloco-informacoes input {
 
 dialog form button {
     margin: 15px 0;
-    width: 120px;
+    width: 165px;
+}
+
+.bloco-botoes-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

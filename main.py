@@ -9,4 +9,4 @@ configure_all(app)
 
 # Execução
 if __name__ == "__main__":
-    app.run(debug=True) # Quando um arquivo for salvop após uma modificação, o servidor é instantaneamente reiniciado
+    app.run(debug=True) # Quando um arquivo for salvo após uma modificação, o servidor é instantaneamente reiniciado

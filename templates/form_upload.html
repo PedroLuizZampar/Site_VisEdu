@@ -32,9 +32,11 @@
             <input type="time" name="hora_registro" {% if upload %} value="{{ upload.hora_registro }}"{% endif %} required>
         </div>
 
-        <button type="button" onclick="document.getElementById('modal').close();">Cancelar</button>
-        <button type="submit">
-           {% if upload %} Atualizar upload {% else %} Adicionar upload {% endif %}
-        </button>
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close();">Cancelar</button>
+            <button type="submit">
+               {% if upload %} Atualizar upload {% else %} Adicionar upload {% endif %}
+            </button>
+        </div>
 
     </form>
