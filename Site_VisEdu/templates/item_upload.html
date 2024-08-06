@@ -1,0 +1,26 @@
+<tr id="upload-{{upload.id }}">
+    <th scope="row">{{ upload.id }}</th>
+    <td>{{ upload.nome_arquivo }}</td>
+    <td>{{ upload.data_registro }}</td>
+    <td>{{ upload.hora_registro }}</td>
+    <td>{{ upload.turma }}</td>
+    <td>
+        <button class="analyze-button">🤖</button>
+
+        <button id="edit-upload"
+            class="edit-button"
+            c-get="{{ url_for('upload.form_edit_upload', upload_id=upload.id) }}"
+            onclick="document.getElementById('modal').showModal()"
+            c-target="#modal">
+            ✏️
+        </button>
+
+        <button class="play-button">▶️</button>
+
+        <button class="delete-button"
+            c-delete="{{ url_for('upload.deletar_upload', upload_id=upload.id) }}"
+            c-remove-closest="tr">
+            🗑️
+        </button>
+    </td>
+</tr>
