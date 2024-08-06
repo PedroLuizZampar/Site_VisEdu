@@ -1,7 +1,11 @@
-from flask import Blueprint, render_template, request
+import os
+from flask import Blueprint, url_for, render_template, redirect, request
+from werkzeug.utils import secure_filename
 from database.models.upload import Upload
 
 upload_route = Blueprint("upload", __name__)
+
+UPLOAD_FOLDER = os.path.abspath(os.path.join(os.getcwd(), os.pardir, 'uploads'))
 
 @upload_route.route('/')
 def lista_uploads():
@@ -15,17 +19,21 @@ def lista_uploads():
 def inserir_upload():
 
     """ Insere um upload """
+    f = request.files['file']
+    basepath = os.path.dirname(__file__)
+    filepath = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', secure_filename(f.filename)))
+    f.save(filepath)
 
-    data = request.json
+    data = request.form
 
-    novo_upload = Upload.create(
+    Upload.create(
         nome_arquivo = data['nome_arquivo'],
         turma = data['turma'],
         data_registro = data['data_registro'],
         hora_registro = data['hora_registro']
     )
 
-    return render_template('item_upload.html', upload=novo_upload)
+    return redirect(url_for('home.home'))
 
 @upload_route.route('new')
 def form_upload():
@@ -36,6 +44,7 @@ def form_upload():
 
 @upload_route.route('/<int:upload_id>/edit')
 def form_edit_upload(upload_id):
+
     """ Renderiza o formulário de uploads para editar um upload existente """
 
     upload_selecionado = Upload.get_by_id(upload_id)
@@ -44,6 +53,7 @@ def form_edit_upload(upload_id):
 
 @upload_route.route('/<int:upload_id>/update', methods=["PUT"])
 def atualizar_upload(upload_id):
+
     """ Atualiza o upload com os novos dados informados no formulário """
 
     data = request.json
