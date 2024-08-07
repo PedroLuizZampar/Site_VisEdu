@@ -1,11 +1,16 @@
 import os
-from flask import Blueprint, url_for, render_template, redirect, request
+from flask import Blueprint, url_for, render_template, redirect, flash, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
 
 upload_route = Blueprint("upload", __name__)
 
 UPLOAD_FOLDER = os.path.abspath(os.path.join(os.getcwd(), os.pardir, 'uploads'))
+ALLOWED_EXTENSIONS = {'asf', 'avi', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv', 'webm'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @upload_route.route('/')
 def lista_uploads():
@@ -20,20 +25,31 @@ def inserir_upload():
 
     """ Insere um upload """
     f = request.files['file']
-    basepath = os.path.dirname(__file__)
-    filepath = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', secure_filename(f.filename)))
-    f.save(filepath)
 
-    data = request.form
+    if f.filename == '':
+        return "Nenhum arquivo selecionado!"
 
-    Upload.create(
-        nome_arquivo = data['nome_arquivo'],
-        turma = data['turma'],
-        data_registro = data['data_registro'],
-        hora_registro = data['hora_registro']
-    )
+    if f and allowed_file(f.filename):
+        basepath = os.path.dirname(__file__)
+        data = request.form
+        
+        # Usa o nome fornecido pelo usuário no formulário
+        filename = secure_filename(data['nome_arquivo'])
+        filepath = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
+        
+        f.save(filepath)
 
-    return redirect(url_for('home.home'))
+        Upload.create(
+            nome_arquivo = data['nome_arquivo'],
+            turma = data['turma'],
+            data_registro = data['data_registro'],
+            hora_registro = data['hora_registro'],
+            caminho_arquivo = filepath
+        )
+
+        return redirect(url_for('home.home'))
+    else:
+        return "Arquivo não permitido!"
 
 @upload_route.route('new')
 def form_upload():

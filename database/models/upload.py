@@ -6,6 +6,7 @@ class Upload(Model): # O Peewee já cria um ID automático, por isso não criamo
     turma = CharField()
     data_registro = DateField()
     hora_registro = TimeField()
+    caminho_arquivo = CharField()
 
     class Meta:
         database = db
