@@ -35,23 +35,23 @@ def inserir_upload():
         
         # Usa o nome fornecido pelo usuário no formulário
         filename = secure_filename(data['nome_arquivo'])
-        filepath = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
+        caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
         
-        f.save(filepath)
+        f.save(caminho_arquivo)
 
         Upload.create(
             nome_arquivo = data['nome_arquivo'],
             turma = data['turma'],
             data_registro = data['data_registro'],
             hora_registro = data['hora_registro'],
-            caminho_arquivo = filepath
+            caminho_arquivo = caminho_arquivo
         )
 
         return redirect(url_for('home.home'))
     else:
         return "Arquivo não permitido!"
 
-@upload_route.route('new')
+@upload_route.route('/new')
 def form_upload():
 
     """ Renderiza o formulário de uploads """
@@ -67,23 +67,35 @@ def form_edit_upload(upload_id):
 
     return render_template("form_upload.html", upload=upload_selecionado)
 
-@upload_route.route('/<int:upload_id>/update', methods=["PUT"])
+@upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
 
-    """ Atualiza o upload com os novos dados informados no formulário """
+    """ Atualiza o upload """
 
-    data = request.json
-    
-    upload_editado = Upload.get_by_id(upload_id)
+    if request.form.get('_method') == 'PUT': # Transforma a requisição em um método PUT
+        
+        basepath = os.path.dirname(__file__)
+        
+        data = request.form
+        f = request.files['file']
 
-    upload_editado.nome_arquivo = data['nome_arquivo']
-    upload_editado.turma = data['turma']
-    upload_editado.data_registro = data['data_registro']
-    upload_editado.hora_registro = data['hora_registro']
+        filename = secure_filename(data['nome_arquivo'])
+        caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename)) # Cria o caminho relativo para salvar o arquivo na pasta uploads com o nome informado no formulário
 
-    upload_editado.save() # Salva, no banco de dados, o registro feito através do formulário de edição
+        upload_editado = Upload.get_by_id(upload_id)
 
-    return render_template('item_upload.html', upload=upload_editado)
+        upload_editado.nome_arquivo = data['nome_arquivo']
+        upload_editado.turma = data['turma']
+        upload_editado.data_registro = data['data_registro']
+        upload_editado.hora_registro = data['hora_registro']
+        upload_editado.caminho_arquivo = caminho_arquivo
+
+        os.remove(Upload.get_by_id(upload_id).caminho_arquivo) # Apaga o arquivo antigo
+        
+        f.save(caminho_arquivo) # Salva o novo upload no servidor
+        upload_editado.save() # Salva o novo registro no banco
+
+        return redirect(url_for('home.home'))
 
 @upload_route.route('/<int:upload_id>/delete', methods=["DELETE"])
 def deletar_upload(upload_id):
@@ -91,6 +103,13 @@ def deletar_upload(upload_id):
     """ Apaga um upload do sistema """
 
     upload = Upload.get_by_id(upload_id) # Quando estamos passando o valor de uma classe para uma variável, estamos instanciando ela
+    caminho_arquivo = upload.caminho_arquivo
+
+    if os.path.exists(caminho_arquivo):
+        os.remove(caminho_arquivo) # Deleta o arquivo salvo na pasta
+    else:
+        pass
+
     upload.delete_instance() # Aqui deletamos a instância
 
     return {"deleted": "ok"}

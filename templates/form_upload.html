@@ -1,10 +1,15 @@
 <h1>Novo Upload</h1>
-        <form class="c-form"
-        action="{% if upload %}{{ url_for('upload.atualizar_upload', upload_id=upload.id) }}{% else %}{{ url_for('upload.inserir_upload') }}{% endif %}"
-        method="POST"
-        enctype="multipart/form-data"
+<form class="c-form" enctype="multipart/form-data" method="POST"
+    {% if upload %}
+        action="{{ url_for('upload.atualizar_upload', upload_id=upload.id) }}"
+        c-swap="#upload-{{ upload.id }}"
+    {% else %}
+        action="{{ url_for('upload.inserir_upload') }}"
+        c-append="#lista-uploads"
+    {% endif %}
         c-callback="fecharModal"
     >
+    <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
 
     <input type="file" name="file" accept="video/*" required>
 
