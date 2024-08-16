@@ -1,6 +1,6 @@
 import os
 import re
-from flask import Blueprint, url_for, render_template, redirect, send_from_directory, request
+from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
 
@@ -27,9 +27,6 @@ def inserir_upload():
     """ Insere um upload """
     f = request.files['file']
 
-    if f.filename == '':
-        return "Nenhum arquivo selecionado!"
-
     if f and allowed_file(f.filename):
         basepath = os.path.dirname(__file__)
         data = request.form
@@ -37,24 +34,25 @@ def inserir_upload():
         # Substituir espaços por underlines
         nome_arquivo = data['nome_arquivo'].replace(' ', '_')
 
-        if not re.match(r'^[a-zA-Z0-9_]+$', nome_arquivo):
-            return "O nome do arquivo só pode conter letras, números e underlines!"
-        
-        # Usa o nome fornecido pelo usuário no formulário
-        filename = secure_filename(data['nome_arquivo'])
-        caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
-        
-        f.save(caminho_arquivo)
+        if re.match(r'^[a-zA-Z0-9_]+$', nome_arquivo):
+            # Usa o nome fornecido pelo usuário no formulário
+            filename = secure_filename(data['nome_arquivo'])
+            caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
+            
+            f.save(caminho_arquivo)
 
-        Upload.create(
-            nome_arquivo = nome_arquivo,
-            turma = data['turma'],
-            data_registro = data['data_registro'],
-            hora_registro = data['hora_registro'],
-            caminho_arquivo = caminho_arquivo
-        )
+            Upload.create(
+                nome_arquivo = nome_arquivo,
+                turma = data['turma'],
+                data_registro = data['data_registro'],
+                hora_registro = data['hora_registro'],
+                caminho_arquivo = caminho_arquivo
+            )
 
-        return redirect(url_for('home.home'))
+            return redirect(url_for('home.home'))
+        else:
+            flash("O nome do arquivo só pode conter letras, números e underlines!")
+            return redirect(request.referrer)
     else:
         return "Arquivo não permitido!"
 

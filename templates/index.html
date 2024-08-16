@@ -37,8 +37,29 @@
         <dialog id="video">
         </dialog>
 
+        <!-- Modal Erro no nome do upload -->
+        <dialog id="error" {% if get_flashed_messages() %}open{% endif %}>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            <button onclick="document.getElementById('error').close()">Fechar</button>
+        </dialog>
+
+
     </main>
-    <script src="../static/js/modal.js"></script>
     <script src="{{ url_for('static', filename='cru.js') }}"></script>
+    
+    <script>
+        // Se há mensagens flash, mostrar o modal de erro
+        if (document.querySelector('#error[open]')) {
+            document.getElementById('error').showModal();
+        }
+    </script>
 </body>
 </html>
