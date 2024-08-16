@@ -15,7 +15,12 @@
             ✏️
         </button>
 
-        <button class="play-button">▶️</button>
+        <button class="play-button"
+            c-get="{{ url_for('upload.reproduzir_video', upload_id=upload.id) }}"
+            onclick="document.getElementById('video').showModal()"
+            c-target="#video">
+            ▶️
+        </button>
 
         <button class="delete-button"
             c-delete="{{ url_for('upload.deletar_upload', upload_id=upload.id) }}"
