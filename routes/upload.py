@@ -13,6 +13,17 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def gerar_nome_unico(directory, filename):
+    base, extension = os.path.splitext(filename)
+    counter = 1 # Define um contador
+    new_filename = filename
+
+    while os.path.exists(os.path.join(directory, new_filename)):
+        new_filename = f"{base}[{counter}]{extension}" # define um novo nome para o arquivo (EX: já tinha 'teste'. Novo arquivo: 'teste[1]')
+        counter += 1 # soma 1 ao contador
+
+    return new_filename
+
 @upload_route.route('/')
 def lista_uploads():
 
@@ -34,27 +45,32 @@ def inserir_upload():
         # Substituir espaços por underlines
         nome_arquivo = data['nome_arquivo'].replace(' ', '_')
 
-        if re.match(r'^[a-zA-Z0-9_]+$', nome_arquivo):
-            # Usa o nome fornecido pelo usuário no formulário
-            filename = secure_filename(data['nome_arquivo'])
-            caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
-            
-            f.save(caminho_arquivo)
+        # Usa o nome fornecido pelo usuário no formulário
+        filename = secure_filename(data['nome_arquivo'])
+        old_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
 
-            Upload.create(
-                nome_arquivo = nome_arquivo,
-                turma = data['turma'],
-                data_registro = data['data_registro'],
-                hora_registro = data['hora_registro'],
-                caminho_arquivo = caminho_arquivo
-            )
+        base, extension = os.path.splitext(filename) # Separa o nome do arquivo da sua extensão (usa-se isso para remover acentos e caracteres especias que podem comprometer o registro do arquivo)
 
-            return redirect(url_for('home.home'))
-        else:
-            flash("O nome do arquivo só pode conter letras, números e underlines!")
-            return redirect(request.referrer)
+        nome_arquivo = f"{base}{extension}" # Renomeia o arquivo com os caracteres especiais substituídos
+
+        nome_arquivo = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), nome_arquivo) # Cria um nome único para evitar conflitos
+
+        caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', nome_arquivo))
+        
+        f.save(caminho_arquivo) # Salva o arquivo
+
+        Upload.create(
+            nome_arquivo = nome_arquivo,
+            turma = data['turma'],
+            data_registro = data['data_registro'],
+            hora_registro = data['hora_registro'],
+            caminho_arquivo = caminho_arquivo
+        )
+
+        return redirect(url_for('home.home'))
     else:
-        return "Arquivo não permitido!"
+        flash("Arquivo não permitido!")
+        return redirect(request.referrer)
 
 @upload_route.route('/new')
 def form_upload():
@@ -77,15 +93,14 @@ def atualizar_upload(upload_id):
 
     """ Atualiza o upload """
 
-    if request.form.get('_method') == 'PUT': # Transforma a requisição em um método PUT
+    if request.form.get('_method') == 'PUT':
         
         basepath = os.path.dirname(__file__)
-        
         data = request.form
         f = request.files['file']
 
         filename = secure_filename(data['nome_arquivo'])
-        caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename)) # Cria o caminho relativo para salvar o arquivo na pasta uploads com o nome informado no formulário
+        caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
 
         upload_editado = Upload.get_by_id(upload_id)
 
@@ -93,17 +108,29 @@ def atualizar_upload(upload_id):
         upload_editado.turma = data['turma']
         upload_editado.data_registro = data['data_registro']
         upload_editado.hora_registro = data['hora_registro']
-        upload_editado.caminho_arquivo = caminho_arquivo
 
-        os.remove(Upload.get_by_id(upload_id).caminho_arquivo) # Apaga o arquivo antigo
+        new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', upload_editado.nome_arquivo))
+
+        if not f:  # Se não há arquivo novo sendo enviado
+            # Gera um nome de arquivo único, se necessário
+            new_filename = gerar_nome_unico(os.path.dirname(caminho_arquivo), filename)
+            new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', new_filename))
+            os.rename(upload_editado.caminho_arquivo, new_caminho_arquivo)
+            upload_editado.caminho_arquivo = new_caminho_arquivo
+            upload_editado.nome_arquivo = new_filename
+
+        if f: # Se houver arquivo
+            # Apaga o anterior e salva o novo com o nome informado no formulário
+            os.remove(upload_editado.caminho_arquivo) # Apaga o arquivo antigo
+            upload_editado.caminho_arquivo = new_caminho_arquivo
+            f.save(upload_editado.caminho_arquivo)
         
-        f.save(caminho_arquivo) # Salva o novo upload no servidor
-        upload_editado.save() # Salva o novo registro no banco
+        upload_editado.save()  # Salva o novo registro no banco
 
         return redirect(url_for('home.home'))
 
 @upload_route.route('/<int:upload_id>/view')
-def reproduzir_video (upload_id):
+def reproduzir_video(upload_id):
 
     """ Reproduz o vídeo """
 

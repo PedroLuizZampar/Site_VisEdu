@@ -82,6 +82,7 @@ main {
 }
 
 dialog {
+    max-height: 90%;
     width: 50%;
     text-align: center;
 }
@@ -109,6 +110,10 @@ dialog form .bloco-informacoes input {
 dialog form button {
     margin: 15px 0;
     width: 165px;
+}
+
+.input_file {
+    margin: 10px 0;
 }
 
 .bloco-botoes-modal {
