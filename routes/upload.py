@@ -1,5 +1,4 @@
 import os
-import re
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
@@ -11,26 +10,48 @@ ALLOWED_EXTENSIONS = {'asf', 'avi', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', '
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def gerar_nome_unico(directory, filename):
     base, extension = os.path.splitext(filename)
-    counter = 1 # Define um contador
+    counter = 1
     new_filename = filename
 
     while os.path.exists(os.path.join(directory, new_filename)):
         new_filename = f"{base}[{counter}]{extension}" # define um novo nome para o arquivo (EX: já tinha 'teste'. Novo arquivo: 'teste[1]')
-        counter += 1 # soma 1 ao contador
+        counter += 1
 
     return new_filename
 
-@upload_route.route('/')
-def lista_uploads():
+@upload_route.route('/nao_analisados')
+def lista_uploads_nao_analisados():
 
-    """ Renderiza a lista de uploads """
+    """ Renderiza a lista de uploads NÃO ANALISADOS """
 
     uploads = Upload.select()
-    return render_template("lista_uploads.html", uploads=uploads)
+
+    uploads_nao_analisados = []
+
+    for upload in uploads:
+        if upload.is_analisado == 0:
+            uploads_nao_analisados.append(upload)
+
+    return render_template("lista_uploads.html", uploads=uploads_nao_analisados)
+
+@upload_route.route('/analisados')
+def lista_uploads_analisados():
+
+    """ Renderiza a lista de uploads ANALISADOS """
+
+    uploads = Upload.select()
+
+    uploads_analisados = []
+
+    for upload in uploads:
+        if upload.is_analisado == 1:
+            uploads_analisados.append(upload)
+
+    return render_template("lista_uploads.html", uploads=uploads_analisados)
 
 @upload_route.route('/', methods=["POST"])
 def inserir_upload():
@@ -162,3 +183,15 @@ def deletar_upload(upload_id):
     upload.delete_instance() # Aqui deletamos a instância
 
     return {"deleted": "ok"}
+
+@upload_route.route('/<int:upload_id>/new_status', methods=["PUT"])
+def atualizar_status(upload_id):
+
+    """ Atualiza o status do upload """
+
+    upload = Upload.get_by_id(upload_id)
+
+    upload.is_analisado = 0 if upload.is_analisado == 1 else 1
+
+    upload.save()
+    return {"changed": "ok"}

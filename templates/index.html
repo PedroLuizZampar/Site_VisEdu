@@ -10,8 +10,16 @@
     <main>
         <section class="upload-section">
             <div class="tab">
-                <button class="tablinks active">Não Analisados</button>
-                <button class="tablinks">Analisados</button>
+                <button class="tablinks active"
+                    c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
+                    c-target=".div-table">
+                    Não Analisados
+                </button>
+                <button class="tablinks"
+                    c-get="{{ url_for('upload.lista_uploads_analisados') }}"
+                    c-target=".div-table">
+                    Analisados
+                </button>
             </div>
             <div class="upload-controls">
                 <button class="upload-button"
@@ -23,14 +31,13 @@
                 <button class="analyze-all-button">Analisar todos</button>
             </div>
             <div class="div-table" 
-                c-container="{{ url_for('upload.lista_uploads') }}">
+                c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}">
                 <!-- Lista de uploads vai aqui -->
             </div>
         </section>
 
         <!-- Modal form-upload -->
-        <dialog id="modal"
-            c-container="{{ url_for('upload.form_upload') }}">
+        <dialog id="modal">
         </dialog>
 
         <!-- Modal video -->

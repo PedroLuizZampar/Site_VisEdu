@@ -1,3 +1,5 @@
+// Docs -> https://github.com/Iazzetta/cru.js
+
 const $cru = e => document.querySelector(e),
     $crus = e => document.querySelectorAll(e),
     $cruConfig = {
@@ -119,19 +121,3 @@ const $cru = e => document.querySelector(e),
     $cruTypeResponse = async (e, t) => "html" == e ? await t.text() : await t.json();
 
 $C();
-
-
-
-// Parte personalizada
-function fecharModal(response, form) {
-    if (response.status === 200) {
-        document.getElementById('modal').close();
-    }
-}
-
-// Inicializando a biblioteca com o callback personalizado
-$C({
-    callbacks: {
-        fecharModal
-    }
-});

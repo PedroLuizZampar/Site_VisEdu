@@ -5,15 +5,28 @@
     <td>{{ upload.hora_registro }}</td>
     <td>{{ upload.turma }}</td>
     <td>
-        <button class="analyze-button">🤖</button>
 
-        <button id="edit-upload"
-            class="edit-button"
-            c-get="{{ url_for('upload.form_edit_upload', upload_id=upload.id) }}"
-            onclick="document.getElementById('modal').showModal()"
-            c-target="#modal">
-            ✏️
-        </button>
+        {% if upload.is_analisado == 0 %}
+            <button class="analyze-button"
+                c-put="{{ url_for('upload.atualizar_status', upload_id=upload.id) }}"
+                c-remove-closest="tr">
+                🤖
+            </button>
+
+            <button class="edit-button"
+                c-get="{{ url_for('upload.form_edit_upload', upload_id=upload.id) }}"
+                onclick="document.getElementById('modal').showModal()"
+                c-target="#modal">
+                ✏️
+            </button>
+        {% endif %}
+
+        {% if upload.is_analisado == 1 %}
+
+            <button class="results-button">📋</button>
+
+        {% endif %}
+            
 
         <button class="play-button"
             c-get="{{ url_for('upload.reproduzir_video', upload_id=upload.id) }}"
@@ -22,10 +35,23 @@
             ▶️
         </button>
 
-        <button class="delete-button"
-            c-delete="{{ url_for('upload.deletar_upload', upload_id=upload.id) }}"
-            c-remove-closest="tr">
-            🗑️
-        </button>
+        {% if upload.is_analisado == 0 %}
+
+            <button class="delete-button"
+                c-put="{{ url_for('upload.atualizar_status', upload_id=upload.id) }}"
+                c-remove-closest="tr">
+                🗑️
+            </button>
+
+        {% else %}
+
+            <button class="delete-button"
+                c-put="{{ url_for('upload.atualizar_status', upload_id=upload.id) }}"
+                c-remove-closest="tr">
+                🗑️
+            </button>
+        
+        {% endif %}
+
     </td>
 </tr>
