@@ -1,4 +1,4 @@
-import os
+import os, time
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
@@ -111,47 +111,48 @@ def form_edit_upload(upload_id):
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
-
     """ Atualiza o upload """
-
+    
     if request.form.get('_method') == 'PUT':
-        
         basepath = os.path.dirname(__file__)
         data = request.form
         f = request.files['file']
 
-        filename = secure_filename(data['nome_arquivo'])
-        caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
-
+        # Obtém o upload a ser atualizado
         upload_editado = Upload.get_by_id(upload_id)
-
+        old_caminho_arquivo = upload_editado.caminho_arquivo
         old_name = upload_editado.nome_arquivo
 
-        upload_editado.nome_arquivo = data['nome_arquivo']
+        # Aplica secure_filename no novo nome do arquivo
+        novo_nome_arquivo = secure_filename(data['nome_arquivo'])
+        new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', novo_nome_arquivo))
+
+        if not f:  # Se não há arquivo novo sendo enviado
+            # Se o nome do arquivo mudou, renomeie o arquivo antigo
+            if old_name != novo_nome_arquivo:
+                new_filename = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), novo_nome_arquivo)
+                new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', new_filename))
+                os.rename(old_caminho_arquivo, new_caminho_arquivo)
+                upload_editado.nome_arquivo = new_filename
+                upload_editado.caminho_arquivo = new_caminho_arquivo
+
+        elif f:  # Se há um novo arquivo
+
+            # Apaga o arquivo antigo
+            if os.path.exists(old_caminho_arquivo):
+                os.remove(old_caminho_arquivo)
+
+            new_filename = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), novo_nome_arquivo)
+            new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', new_filename))
+            f.save(new_caminho_arquivo)
+            upload_editado.nome_arquivo = new_filename
+            upload_editado.caminho_arquivo = new_caminho_arquivo
+
+        # Atualiza os demais campos
         upload_editado.turma = data['turma']
         upload_editado.data_registro = data['data_registro']
         upload_editado.hora_registro = data['hora_registro']
 
-        new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', upload_editado.nome_arquivo))
-
-        if not f:  # Se não há arquivo novo sendo enviado
-            # Gera um nome de arquivo único, se necessário
-            new_filename = gerar_nome_unico(os.path.dirname(caminho_arquivo), filename)
-            new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', new_filename))
-            os.rename(upload_editado.caminho_arquivo, new_caminho_arquivo)
-            upload_editado.caminho_arquivo = new_caminho_arquivo
-            upload_editado.nome_arquivo = new_filename
-
-        if f and old_name == upload_editado.nome_arquivo: # Se houver arquivo
-            # Apaga o anterior e salva o novo com o nome informado no formulário
-            os.remove(upload_editado.caminho_arquivo) # Apaga o arquivo antigo
-            new_filename = old_name
-            new_filename += "[1]"
-            new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', new_filename))
-            upload_editado.nome_arquivo = new_filename
-            upload_editado.caminho_arquivo = new_caminho_arquivo
-            f.save(upload_editado.caminho_arquivo)
-        
         upload_editado.save()  # Salva o novo registro no banco
 
         return redirect(url_for('home.home'))
@@ -163,16 +164,14 @@ def reproduzir_video(upload_id):
 
     upload = Upload.get_by_id(upload_id)
     nome_arquivo = upload.nome_arquivo
+    timestamp = int(time.time())  # Adiciona um timestamp como parâmetro de consulta (Isso evita um bug na reprodução do vídeo e não sei o porquê. NÃO REMOVER)
 
-    return render_template('video.html', nome_arquivo=nome_arquivo)
+    return render_template('video.html', nome_arquivo=nome_arquivo, timestamp=timestamp)
 
-@upload_route.route('/uploads/<filename>')
+@upload_route.route('/<filename>')
 def uploaded_file(filename):
 
     basepath = os.path.dirname(__file__)
-
-    print(filename)
-    print(os.path.join(basepath, os.pardir, 'uploads'), filename)
     
     return send_from_directory(os.path.join(basepath, os.pardir, 'uploads'), filename)
 
