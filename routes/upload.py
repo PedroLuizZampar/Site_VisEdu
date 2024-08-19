@@ -125,6 +125,8 @@ def atualizar_upload(upload_id):
 
         upload_editado = Upload.get_by_id(upload_id)
 
+        old_name = upload_editado.nome_arquivo
+
         upload_editado.nome_arquivo = data['nome_arquivo']
         upload_editado.turma = data['turma']
         upload_editado.data_registro = data['data_registro']
@@ -140,9 +142,13 @@ def atualizar_upload(upload_id):
             upload_editado.caminho_arquivo = new_caminho_arquivo
             upload_editado.nome_arquivo = new_filename
 
-        if f: # Se houver arquivo
+        if f and old_name == upload_editado.nome_arquivo: # Se houver arquivo
             # Apaga o anterior e salva o novo com o nome informado no formulário
             os.remove(upload_editado.caminho_arquivo) # Apaga o arquivo antigo
+            new_filename = old_name
+            new_filename += "[1]"
+            new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', new_filename))
+            upload_editado.nome_arquivo = new_filename
             upload_editado.caminho_arquivo = new_caminho_arquivo
             f.save(upload_editado.caminho_arquivo)
         
@@ -164,6 +170,9 @@ def reproduzir_video(upload_id):
 def uploaded_file(filename):
 
     basepath = os.path.dirname(__file__)
+
+    print(filename)
+    print(os.path.join(basepath, os.pardir, 'uploads'), filename)
     
     return send_from_directory(os.path.join(basepath, os.pardir, 'uploads'), filename)
 

@@ -35,7 +35,7 @@
             ▶️
         </button>
 
-        {% if upload.is_analisado == 0 %}
+        {% if upload.is_analisado == 1 %}
 
             <button class="delete-button"
                 c-put="{{ url_for('upload.atualizar_status', upload_id=upload.id) }}"
@@ -46,7 +46,7 @@
         {% else %}
 
             <button class="delete-button"
-                c-put="{{ url_for('upload.atualizar_status', upload_id=upload.id) }}"
+                c-delete="{{ url_for('upload.deletar_upload', upload_id=upload.id) }}"
                 c-remove-closest="tr">
                 🗑️
             </button>
