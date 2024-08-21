@@ -92,6 +92,13 @@ def inserir_upload():
     else:
         flash("Arquivo não permitido!")
         return redirect(request.referrer)
+    
+@upload_route.route('/actions_lista')
+def actions_lista():
+
+    """ Renderiza os botões de ação da lista """
+
+    return render_template("actions_lista_upload.html")
 
 @upload_route.route('/new')
 def form_upload():

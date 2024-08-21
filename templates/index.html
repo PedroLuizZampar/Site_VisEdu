@@ -8,32 +8,28 @@
 </head>
 <body>
     <main>
+
+        <div class="tab">
+            <button class="active"
+                c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
+                c-target=".div-table">
+                Uploads
+            </button>
+
+            <button class="active"
+                c-get="{{ url_for('turma.lista_turmas') }}"
+                c-target=".div-table">
+                Turmas
+            </button>
+        </div>
+
         <section class="upload-section">
-            <div class="tab">
-                <button class="tablinks active"
-                    c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
-                    c-target=".div-table">
-                    Não Analisados
-                </button>
-                <button class="tablinks"
-                    c-get="{{ url_for('upload.lista_uploads_analisados') }}"
-                    c-target=".div-table">
-                    Analisados
-                </button>
-            </div>
-            <div class="upload-controls">
-                <button class="upload-button"
-                    c-get="{{ url_for('upload.form_upload') }}"
-                    onclick="document.getElementById('modal').showModal()"
-                    c-target="#modal">
-                    ⬆️
-                </button>
-                <button class="analyze-all-button">Analisar todos</button>
-            </div>
+
             <div class="div-table" 
                 c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}">
                 <!-- Lista de uploads vai aqui -->
             </div>
+
         </section>
 
         <!-- Modal form-upload -->

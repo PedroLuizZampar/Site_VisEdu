@@ -41,7 +41,7 @@ main {
     color: #fff;
 }
 
-.upload-controls {
+.actions-list {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
@@ -120,4 +120,8 @@ dialog form button {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+dialog video {
+    max-height: 650px;
 }
