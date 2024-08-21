@@ -1,5 +1,9 @@
 <div class="actions-list">
-    <button>+</button>
+    <button c-get="{{ url_for('turma.form_turma') }}"
+        onclick="document.getElementById('modal').showModal()"
+        c-target="#modal">
+        +
+    </button>
 </div>
 
 <table id="file-table">

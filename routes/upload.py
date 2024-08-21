@@ -1,7 +1,8 @@
 import os, time
-from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, request
+from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, session, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
+from funcoes_extras import alterando_sessions_para_false
 
 upload_route = Blueprint("upload", __name__)
 
@@ -30,6 +31,9 @@ def lista_uploads_nao_analisados():
 
     uploads = Upload.select()
 
+    alterando_sessions_para_false()
+    session['visualizando_uploads_nao_analisados'] = True
+
     uploads_nao_analisados = []
 
     for upload in uploads:
@@ -44,6 +48,9 @@ def lista_uploads_analisados():
     """ Renderiza a lista de uploads ANALISADOS """
 
     uploads = Upload.select()
+
+    alterando_sessions_para_false()
+    session['visualizando_uploads_analisados'] = True
 
     uploads_analisados = []
 

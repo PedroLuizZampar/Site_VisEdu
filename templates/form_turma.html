@@ -1,0 +1,15 @@
+<h1>Nova Turma</h1>
+<form class="c-form" enctype="multipart/form-data" method="POST"
+    action="{{ url_for('turma.inserir_turma') }}"
+    c-callback="fecharModal">
+
+    <div class="bloco-informacoes">
+        <label for="nome_turma">Nome: </label>
+        <input type="text" name="nome_turma" required>
+    </div>
+
+    <div class="bloco-botoes-modal">
+        <button type="button" onclick="document.getElementById('modal').close()">Cancelar</button>
+        <button type="submit">Adicionar Turma</button>
+    </div>
+</form>

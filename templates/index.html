@@ -25,14 +25,28 @@
 
         <section class="upload-section">
 
+            <!-- Precisa validar a última sessão aberta!!! -->
             <div class="div-table" 
+
+                {% if visualizando_turmas %}
+                    c-container="{{ url_for('turma.lista_turmas') }}"
+                {% endif %}
+
+                {% if visualizando_uploads_nao_analisados %}
+                    c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}"
+                {% endif %}
+
+                {% if visualizando_uploads_analisados %}
+                    c-container="{{ url_for('upload.lista_uploads_analisados') }}"
+                {% endif %}
+
                 c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}">
                 <!-- Lista de uploads vai aqui -->
             </div>
 
         </section>
 
-        <!-- Modal form-upload -->
+        <!-- Modal formulários -->
         <dialog id="modal">
         </dialog>
 
@@ -54,9 +68,41 @@
             <button onclick="document.getElementById('error').close()">Fechar</button>
         </dialog>
 
-
     </main>
     <script src="{{ url_for('static', filename='cru.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector('form'); // Seleciona o formulário na página do modal ou outro
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Impede o envio padrão do formulário
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    const newTableBody = doc.querySelector('#lista-turmas');
+
+                    if (newTableBody) {
+                        document.querySelector('#lista-turmas').innerHTML = newTableBody.innerHTML;
+                    } else {
+                        console.error("Tabela de turmas não encontrada no retorno HTML");
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar formulário:', error);
+                });
+            });
+        });
+    </script>
     
     <script>
         // Se há mensagens flash, mostrar o modal de erro
