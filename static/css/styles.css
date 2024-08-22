@@ -10,7 +10,7 @@ main {
     padding: 20px;
 }
 
-.upload-section {
+.content {
     display: flex;
     flex-direction: column;
     background-color: #fff;
