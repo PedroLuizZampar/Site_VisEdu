@@ -34,7 +34,9 @@
             {% elif visualizando_uploads_analisados %}
                 c-container="{{ url_for('upload.lista_uploads_analisados') }}"
             
-            {% endif %}>
+            {% endif %}
+            
+            c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}">
         </section>
 
         <!-- Modal formulários -->

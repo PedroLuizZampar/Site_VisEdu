@@ -41,7 +41,7 @@ def lista_uploads_nao_analisados():
         if upload.is_analisado == 0:
             uploads_nao_analisados.append(upload)
 
-    has_nao_analisado = any(upload.is_analisado == 0 for upload in uploads_nao_analisados) # Passa como parâmetro se é upload analisado ou não, para renderizar o conteúdo da maneira correta
+    has_nao_analisado = True # Passa como parâmetro True para renderizar o conteúdo da maneira correta, ou seja, são uploads não analisados
     
     return render_template("lista_uploads.html", uploads=uploads_nao_analisados, has_nao_analisado=has_nao_analisado)
 
@@ -66,7 +66,8 @@ def lista_uploads_analisados():
 @upload_route.route('/', methods=["POST"])
 def inserir_upload():
 
-    """ Insere um upload """
+    """ Adiciona um upload """
+
     f = request.files['file']
 
     if f and allowed_file(f.filename):
@@ -80,22 +81,25 @@ def inserir_upload():
         filename = secure_filename(data['nome_arquivo'])
         old_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
 
-        base, extension = os.path.splitext(filename) # Separa o nome do arquivo da sua extensão (usa-se isso para remover acentos e caracteres especias que podem comprometer o registro do arquivo)
+        base, extension = os.path.splitext(filename)
 
-        nome_arquivo = f"{base}{extension}" # Renomeia o arquivo com os caracteres especiais substituídos
+        nome_arquivo = f"{base}{extension}"
 
-        nome_arquivo = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), nome_arquivo) # Cria um nome único para evitar conflitos
+        nome_arquivo = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), nome_arquivo)
 
         caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', nome_arquivo))
         
-        f.save(caminho_arquivo) # Salva o arquivo
+        f.save(caminho_arquivo)  # Salva o arquivo
+
+        # Recuperar a instância de Turma com base no nome fornecido no formulário
+        turma = Turma.get(Turma.nome_turma == data['turma'])
 
         Upload.create(
-            nome_arquivo = nome_arquivo,
-            turma = data['turma'],
-            data_registro = data['data_registro'],
-            hora_registro = data['hora_registro'],
-            caminho_arquivo = caminho_arquivo
+            nome_arquivo=nome_arquivo,
+            turma=turma,  # Passar a instância de Turma aqui
+            data_registro=data['data_registro'],
+            hora_registro=data['hora_registro'],
+            caminho_arquivo=caminho_arquivo
         )
 
         return redirect(url_for('home.home'))
@@ -131,6 +135,7 @@ def form_edit_upload(upload_id):
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
+    
     """ Atualiza o upload """
     
     if request.form.get('_method') == 'PUT':
@@ -169,13 +174,17 @@ def atualizar_upload(upload_id):
             upload_editado.caminho_arquivo = new_caminho_arquivo
 
         # Atualiza os demais campos
-        upload_editado.turma = data['turma']
         upload_editado.data_registro = data['data_registro']
         upload_editado.hora_registro = data['hora_registro']
 
-        upload_editado.save()  # Salva o novo registro no banco
+        # Recuperar a instância de Turma com base no nome fornecido no formulário
+        turma = Turma.get(Turma.nome_turma == data['turma'])
+        upload_editado.turma = turma  # Associa a turma ao upload
+
+        upload_editado.save()  # Salva as alterações no banco
 
         return redirect(url_for('home.home'))
+
 
 @upload_route.route('/<int:upload_id>/view')
 def reproduzir_video(upload_id):
@@ -190,6 +199,8 @@ def reproduzir_video(upload_id):
 
 @upload_route.route('/<filename>')
 def uploaded_file(filename):
+
+    """ Busca o arquivo que foi salvo no servidor """
 
     basepath = os.path.dirname(__file__)
     

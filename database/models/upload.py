@@ -1,9 +1,10 @@
-from peewee import Model, CharField, DateField, TimeField, BooleanField
+from peewee import Model, CharField, DateField, TimeField, BooleanField, ForeignKeyField
 from database.database import db
+from database.models.turma import Turma
 
-class Upload(Model): # O Peewee já cria um ID automático, por isso não criamos um
+class Upload(Model):
     nome_arquivo = CharField()
-    turma = CharField()
+    turma = ForeignKeyField(Turma, backref='uploads', on_delete='CASCADE')  # Adiciona a chave estrangeira
     data_registro = DateField()
     hora_registro = TimeField()
     caminho_arquivo = CharField()

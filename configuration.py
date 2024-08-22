@@ -16,5 +16,5 @@ def configure_routes(app):
 
 def configure_db():
     db.connect()
-    db.create_tables([Upload])
     db.create_tables([Turma])
+    db.create_tables([Upload])
