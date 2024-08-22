@@ -37,3 +37,32 @@ def inserir_turma():
     session['visualizando_turmas'] = True
 
     return redirect(url_for('home.home'))
+
+@turma_route.route('<int:turma_id>/edit')
+def form_edit_turma(turma_id):
+
+    turma_selecionada = Turma.get_by_id(turma_id)
+
+    return render_template("form_turma.html", turma=turma_selecionada)
+
+@turma_route.route('/<int:turma_id>/update', methods=["POST"])
+def atualizar_turma(turma_id):
+    if request.form.get('_method') == "PUT":
+        data = request.form
+
+        turma_editada = Turma.get_by_id(turma_id)
+
+        turma_editada.nome_turma = data['nome_turma']
+
+        turma_editada.save()
+
+    return redirect(url_for('home.home'))
+
+@turma_route.route('/<int:turma_id>/delete', methods=["DELETE"])
+def deletar_turma(turma_id):
+
+    turma = Turma.get_by_id(turma_id)
+
+    turma.delete_instance()
+
+    return {"deleted": "ok"}

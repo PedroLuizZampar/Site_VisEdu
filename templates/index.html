@@ -23,27 +23,18 @@
             </button>
         </div>
 
-        <section class="content">
+        <!-- Valida a última sessão aberta e busca o conteúdo. Caso não ache, renderiza por padrão a lista de uploads não analisados -->
+        <section class="content"
+            {% if visualizando_turmas %}
+                c-container="{{ url_for('turma.lista_turmas') }}"
 
-            <!-- Valida a última sessão aberta e busca o conteúdo. Caso não ache, renderiza por padrão a lista de uploads não analisados -->
-            <div class="div-table" 
+            {% elif visualizando_uploads_nao_analisados %}
+                c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}"
 
-                {% if visualizando_turmas %}
-                    c-container="{{ url_for('turma.lista_turmas') }}"
-                {% endif %}
-
-                {% if visualizando_uploads_nao_analisados %}
-                    c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}"
-                {% endif %}
-
-                {% if visualizando_uploads_analisados %}
-                    c-container="{{ url_for('upload.lista_uploads_analisados') }}"
-                {% endif %}
-
-                c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}">
-                <!-- Lista de uploads vai aqui -->
-            </div>
-
+            {% elif visualizando_uploads_analisados %}
+                c-container="{{ url_for('upload.lista_uploads_analisados') }}"
+            
+            {% endif %}>
         </section>
 
         <!-- Modal formulários -->

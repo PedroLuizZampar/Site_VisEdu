@@ -1,39 +1,44 @@
-<div class="tab">
-    <button class="tablinks active"
-        c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
-        c-target=".div-table">
-        Não Analisados
-    </button>
-    <button class="tablinks"
-        c-get="{{ url_for('upload.lista_uploads_analisados') }}"
-        c-target=".div-table">
-        Analisados
-    </button>
-</div>
-<div class="actions-list">
-    <button class="upload-button"
-        c-get="{{ url_for('upload.form_upload') }}"
-        onclick="document.getElementById('modal').showModal()"
-        c-target="#modal">
-        ⬆️
-    </button>
-    <button class="analyze-all-button">Analisar todos</button>
-</div>
+<div class="div-table">
+    <div class="tab">
+        <button class="tablinks active"
+            c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
+            c-target=".content">
+            Não Analisados
+        </button>
+        <button class="tablinks"
+            c-get="{{ url_for('upload.lista_uploads_analisados') }}"
+            c-target=".content">
+            Analisados
+        </button>
+    </div>
 
-<table id="file-table">
-    <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th>Nome</th>
-            <th>Data de registro</th>
-            <th>Hora de registro</th>
-            <th>Turma</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody id="lista-uploads">
-        {% for upload in uploads %}
-            {% include 'item_upload.html' %}
-        {% endfor %}
-    </tbody>
-</table>
+    {% if has_nao_analisado %} <!-- Verifica se os uploads recebidos não foram analisados para renderizar o conteúdo corretamente -->
+        <div class="actions-list">
+            <button class="upload-button"
+                c-get="{{ url_for('upload.form_upload') }}"
+                onclick="document.getElementById('modal').showModal()"
+                c-target="#modal">
+                ⬆️
+            </button>
+            <button class="analyze-all-button">Analisar todos</button>
+        </div>
+    {% endif %}
+
+    <table id="file-table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th>Nome</th>
+                <th>Data de registro</th>
+                <th>Hora de registro</th>
+                <th>Turma</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-uploads">
+            {% for upload in uploads %}
+                {% include 'item_upload.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -2,6 +2,7 @@ import os, time
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, session, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
+from database.models.turma import Turma
 from funcoes_extras import alterando_sessions_para_false
 
 upload_route = Blueprint("upload", __name__)
@@ -40,7 +41,9 @@ def lista_uploads_nao_analisados():
         if upload.is_analisado == 0:
             uploads_nao_analisados.append(upload)
 
-    return render_template("lista_uploads.html", uploads=uploads_nao_analisados)
+    has_nao_analisado = any(upload.is_analisado == 0 for upload in uploads_nao_analisados) # Passa como parâmetro se é upload analisado ou não, para renderizar o conteúdo da maneira correta
+    
+    return render_template("lista_uploads.html", uploads=uploads_nao_analisados, has_nao_analisado=has_nao_analisado)
 
 @upload_route.route('/analisados')
 def lista_uploads_analisados():
@@ -111,8 +114,10 @@ def actions_lista():
 def form_upload():
 
     """ Renderiza o formulário de uploads """
+    
+    turmas = Turma.select()
 
-    return render_template("form_upload.html")
+    return render_template("form_upload.html", turmas=turmas)
 
 @upload_route.route('/<int:upload_id>/edit')
 def form_edit_upload(upload_id):
@@ -120,8 +125,9 @@ def form_edit_upload(upload_id):
     """ Renderiza o formulário de uploads para editar um upload existente """
 
     upload_selecionado = Upload.get_by_id(upload_id)
+    turmas = Turma.select()
 
-    return render_template("form_upload.html", upload=upload_selecionado)
+    return render_template("form_upload.html", upload=upload_selecionado, turmas=turmas)
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):

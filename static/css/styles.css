@@ -102,6 +102,13 @@ dialog form .bloco-informacoes input {
     text-align: left;
 }
 
+dialog form .bloco-informacoes select {
+    width: 30%;
+    margin: 5px 0;
+    text-align: center;
+    height: 30px;
+}
+
 dialog form .bloco-informacoes input {
     padding: 10px;
     box-sizing: border-box;
