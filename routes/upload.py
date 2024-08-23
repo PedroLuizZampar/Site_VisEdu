@@ -2,7 +2,7 @@ import os, time
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, session, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
-from database.models.turma import Turma
+from database.models.sala import Sala
 from funcoes_extras import alterando_sessions_para_false
 
 upload_route = Blueprint("upload", __name__)
@@ -91,12 +91,12 @@ def inserir_upload():
         
         f.save(caminho_arquivo)  # Salva o arquivo
 
-        # Recuperar a instância de Turma com base no nome fornecido no formulário
-        turma = Turma.get(Turma.nome_turma == data['turma'])
+        # Recuperar a instância de Sala com base no nome fornecido no formulário
+        sala = Sala.get(Sala.nome_sala == data['sala'])
 
         Upload.create(
             nome_arquivo=nome_arquivo,
-            turma=turma,  # Passar a instância de Turma aqui
+            sala=sala,  # Passar a instância de Sala aqui
             data_registro=data['data_registro'],
             hora_registro=data['hora_registro'],
             caminho_arquivo=caminho_arquivo
@@ -119,9 +119,9 @@ def form_upload():
 
     """ Renderiza o formulário de uploads """
     
-    turmas = Turma.select()
+    salas = Sala.select()
 
-    return render_template("form_upload.html", turmas=turmas)
+    return render_template("form_upload.html", salas=salas)
 
 @upload_route.route('/<int:upload_id>/edit')
 def form_edit_upload(upload_id):
@@ -129,9 +129,9 @@ def form_edit_upload(upload_id):
     """ Renderiza o formulário de uploads para editar um upload existente """
 
     upload_selecionado = Upload.get_by_id(upload_id)
-    turmas = Turma.select()
+    salas = Sala.select()
 
-    return render_template("form_upload.html", upload=upload_selecionado, turmas=turmas)
+    return render_template("form_upload.html", upload=upload_selecionado, salas=salas)
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
@@ -177,9 +177,9 @@ def atualizar_upload(upload_id):
         upload_editado.data_registro = data['data_registro']
         upload_editado.hora_registro = data['hora_registro']
 
-        # Recuperar a instância de Turma com base no nome fornecido no formulário
-        turma = Turma.get(Turma.nome_turma == data['turma'])
-        upload_editado.turma = turma  # Associa a turma ao upload
+        # Recuperar a instância de Sala com base no nome fornecido no formulário
+        sala = Sala.get(Sala.nome_sala == data['sala'])
+        upload_editado.sala = sala  # Associa a sala ao upload
 
         upload_editado.save()  # Salva as alterações no banco
 

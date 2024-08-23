@@ -31,14 +31,14 @@
     </div>
 
     <div class="bloco-informacoes">
-        <label for="turma">Turma: </label>
-        <select name="turma" id="turma" >
+        <label for="sala">Sala: </label>
+        <select name="sala" id="sala" >
             {% if not upload %}
                 {% set upload = None %}
-            {% endif %} <!-- Se não tiver upload, cria uma variável upload vazia pra não dar erro na opção da turma -->
+            {% endif %} <!-- Se não tiver upload, cria uma variável upload vazia pra não dar erro na opção da sala -->
 
-            {% for turma in turmas %}
-                {% include 'option_turma.html' %}
+            {% for sala in salas %}
+                {% include 'option_sala.html' %}
             {% endfor %}
         </select>
     </div>

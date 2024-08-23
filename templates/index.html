@@ -17,16 +17,16 @@
             </button>
 
             <button class="active"
-                c-get="{{ url_for('turma.lista_turmas') }}"
+                c-get="{{ url_for('sala.lista_salas') }}"
                 c-target=".div-table">
-                Turmas
+                Salas
             </button>
         </div>
 
         <!-- Valida a última sessão aberta e busca o conteúdo. Caso não ache, renderiza por padrão a lista de uploads não analisados -->
         <section class="content"
-            {% if visualizando_turmas %}
-                c-container="{{ url_for('turma.lista_turmas') }}"
+            {% if visualizando_salas %}
+                c-container="{{ url_for('sala.lista_salas') }}"
 
             {% elif visualizando_uploads_nao_analisados %}
                 c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}"
@@ -82,12 +82,12 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
-                    const newTableBody = doc.querySelector('#lista-turmas');
+                    const newTableBody = doc.querySelector('#lista-salas');
 
                     if (newTableBody) {
-                        document.querySelector('#lista-turmas').innerHTML = newTableBody.innerHTML;
+                        document.querySelector('#lista-salas').innerHTML = newTableBody.innerHTML;
                     } else {
-                        console.error("Tabela de turmas não encontrada no retorno HTML");
+                        console.error("Tabela de salas não encontrada no retorno HTML");
                     }
                 })
                 .catch(error => {

@@ -1,6 +1,6 @@
 <div class="div-table">
     <div class="actions-list">
-        <button c-get="{{ url_for('turma.form_turma') }}"
+        <button c-get="{{ url_for('sala.form_sala') }}"
             onclick="document.getElementById('modal').showModal()"
             c-target="#modal">
             +
@@ -15,9 +15,9 @@
                 <th>Ações</th>
             </tr>
         </thead>
-        <tbody id="lista-turmas">
-            {% for turma in turmas %}
-                {% include 'item_turma.html' %}
+        <tbody id="lista-salas">
+            {% for sala in salas %}
+                {% include 'item_sala.html' %}
             {% endfor %}
         </tbody>
     </table>
