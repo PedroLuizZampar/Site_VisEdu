@@ -1,9 +1,11 @@
 <div class="div-table">
     <div class="actions-list">
-        <button c-get="{{ url_for('sala.form_sala') }}"
+        <button class="add-sala"
             onclick="document.getElementById('modal').showModal()"
+            c-get="{{ url_for('sala.form_sala') }}"
             c-target="#modal">
-            +
+            ➕
+            <span class="tooltip-text">Adicionar uma nova sala</span>
         </button>
     </div>
 

@@ -2,3 +2,7 @@ Flask==3.0.3
 peewee==3.17.6
 PyMySQL==1.1.1
 python-dotenv==1.0.1
+Werkzeug==3.0.1
+ultralytics==8.1.20
+opencv-python==4.8.1.78
+Flask-SocketIO==5.3.6

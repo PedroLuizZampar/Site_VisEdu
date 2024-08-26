@@ -4,6 +4,7 @@ from routes.sala import sala_route
 from database.database import db
 from database.models.upload import Upload
 from database.models.sala import Sala
+from database.models.analise import Analise
 
 def configure_all(app):
     configure_routes(app)
@@ -18,3 +19,4 @@ def configure_db():
     db.connect()
     db.create_tables([Sala])
     db.create_tables([Upload])
+    db.create_tables([Analise])

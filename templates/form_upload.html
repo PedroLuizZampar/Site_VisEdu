@@ -1,5 +1,5 @@
 <h1>Novo Upload</h1>
-<form class="c-form" enctype="multipart/form-data" method="POST"
+<form enctype="multipart/form-data" method="POST"
     {% if upload %}
         action="{{ url_for('upload.atualizar_upload', upload_id=upload.id) }}"
         c-swap="#upload-{{ upload.id }}"
@@ -21,7 +21,7 @@
 
     {% if upload %}
     
-        <div c-container="{{ url_for('upload.reproduzir_video', upload_id=upload.id) }}"></div> <!-- Busca o upload salvo no servidor -->
+        <div c-container="{{ url_for('upload.reproduzir_video_form', upload_id=upload.id) }}"></div> <!-- Busca o upload salvo no servidor -->
 
     {% endif %}
 

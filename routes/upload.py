@@ -1,14 +1,29 @@
 import os, time
+import cv2
+from ultralytics import YOLO
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, session, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
 from database.models.sala import Sala
+from database.models.analise import Analise
 from funcoes_extras import alterando_sessions_para_false
 
 upload_route = Blueprint("upload", __name__)
 
-UPLOAD_FOLDER = os.path.abspath(os.path.join(os.getcwd(), os.pardir, 'uploads'))
+cancelado = False
+
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+AI_FOLDER = os.path.join(os.getcwd(), 'static', 'ai_models')
+
 ALLOWED_EXTENSIONS = {'asf', 'avi', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv', 'webm'}
+
+# Verifica se a pasta de uploads existe, se não, cria a pasta
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+# Verifica se a pasta de modelos de IA existe, se não, cria a pasta
+if not os.path.exists(AI_FOLDER):
+    os.makedirs(AI_FOLDER)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -186,16 +201,27 @@ def atualizar_upload(upload_id):
         return redirect(url_for('home.home'))
 
 
-@upload_route.route('/<int:upload_id>/view')
-def reproduzir_video(upload_id):
+@upload_route.route('/<int:upload_id>/view_on_form')
+def reproduzir_video_form(upload_id):
 
-    """ Reproduz o vídeo """
+    """ Reproduz o vídeo no formulário """
 
     upload = Upload.get_by_id(upload_id)
     nome_arquivo = upload.nome_arquivo
     timestamp = int(time.time())  # Adiciona um timestamp como parâmetro de consulta (Isso evita um bug na reprodução do vídeo e não sei o porquê. NÃO REMOVER)
 
     return render_template('video.html', nome_arquivo=nome_arquivo, timestamp=timestamp)
+
+@upload_route.route('/<int:upload_id>/view')
+def reproduzir_video_modal(upload_id):
+
+    """ Reproduz o vídeo no modal """
+
+    upload = Upload.get_by_id(upload_id)
+    nome_arquivo = upload.nome_arquivo
+    timestamp = int(time.time())  # Adiciona um timestamp como parâmetro de consulta (Isso evita um bug na reprodução do vídeo e não sei o porquê. NÃO REMOVER)
+
+    return render_template('video.html', nome_arquivo=nome_arquivo, timestamp=timestamp, modal=True)
 
 @upload_route.route('/<filename>')
 def uploaded_file(filename):
@@ -234,3 +260,120 @@ def atualizar_status(upload_id):
 
     upload.save()
     return {"changed": "ok"}
+
+@upload_route.route('/<int:upload_id>/analise', methods=["POST"])
+def analisar_upload(upload_id):
+    global cancelado
+
+    cancelado = False
+    
+    basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
+    model_path = os.path.abspath(os.path.join(basepath, 'ai_models', 'best.onnx'))
+    upload = Upload.get_by_id(upload_id)
+    video_path = os.path.expanduser(upload.caminho_arquivo)
+
+    # Carrega o modelo pré-treinado
+    model = YOLO(model_path)
+    cap = cv2.VideoCapture(video_path)
+
+    # Função para processar cada frame do vídeo
+    def identificar(frame, frame_count):
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = model.predict(frame_rgb)[0]  # Obtem apenas o primeiro resultado
+        high_conf_boxes = []
+        
+        # Variáveis para contar as detecções
+        qtde_objetos = 0
+        qtde_objeto_prestando_atencao = 0
+        qtde_objeto_copiando = 0
+        qtde_objeto_conversando = 0
+        qtde_objeto_distraido = 0
+        qtde_objeto_mexendo_celular = 0
+        qtde_objeto_dormindo = 0
+
+        if results.boxes:  # Se há detecções
+            for box in results.boxes:
+                obj_class = box.cls.item()
+                conf = box.conf.item()
+                if conf >= 0.5:
+                    high_conf_boxes.append(box)
+                    qtde_objetos += 1
+
+                    # Incrementa as contagens com base na classe do objeto
+                    if obj_class == 0:
+                        qtde_objeto_prestando_atencao += 1
+                    elif obj_class == 1:
+                        qtde_objeto_copiando += 1
+                    elif obj_class == 2:
+                        qtde_objeto_conversando += 1
+                    elif obj_class == 3:
+                        qtde_objeto_distraido += 1
+                    elif obj_class == 4:
+                        qtde_objeto_mexendo_celular += 1
+                    elif obj_class == 5:
+                        qtde_objeto_dormindo += 1
+
+        # Salva a análise no banco de dados
+        Analise.create(
+            nome_analise=f"Análise do Frame {frame_count}",
+            upload=upload,
+            qtde_objetos=qtde_objetos,
+            qtde_objeto_prestando_atencao=qtde_objeto_prestando_atencao,
+            qtde_objeto_copiando=qtde_objeto_copiando,
+            qtde_objeto_conversando=qtde_objeto_conversando,
+            qtde_objeto_distraido=qtde_objeto_distraido,
+            qtde_objeto_mexendo_celular=qtde_objeto_mexendo_celular,
+            qtde_objeto_dormindo=qtde_objeto_dormindo
+        )
+
+    if not cap.isOpened():
+        flash("Erro ao abrir o vídeo!")
+        return redirect(request.referrer)
+
+    frame_count = 0
+    frame_interval = 1800
+
+    while not cancelado and cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        frame_count += 1
+        if frame_count % frame_interval == 0:
+            identificar(frame, frame_count)
+
+    cap.release()
+
+    if not cancelado:
+        atualizar_status(upload_id)
+        flash("Análise concluída!")
+    else:
+        flash("Análise interrompida pelo usuário.")
+
+    return redirect(url_for('home.home'))
+
+
+@upload_route.route('<int:upload_id>/cancelar_analise', methods=["POST"])
+def cancelar_analise(upload_id):
+
+    global cancelado
+
+    cancelado = True
+
+    deletar_analise(upload_id)
+
+    return redirect(url_for('home.home'))
+
+@upload_route.route('<int:upload_id>/deletar_analise', methods=["DELETE"])
+def deletar_analise(upload_id):
+    analises = Analise.select()
+    upload = Upload.get_by_id(upload_id)
+
+    for analise in analises:
+        if analise.upload.id == upload_id:
+            analise.delete_instance()
+
+    if upload.is_analisado == 1:
+        atualizar_status(upload_id)
+
+    return {"analise_deletada": "ok"}

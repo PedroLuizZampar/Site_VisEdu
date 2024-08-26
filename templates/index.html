@@ -37,7 +37,7 @@
             {% endif %}
             
             c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}">
-        </section>
+        </section>    
 
         <!-- Modal formulários -->
         <dialog id="modal">
@@ -47,61 +47,18 @@
         <dialog id="video">
         </dialog>
 
-        <!-- Modal Erro no nome do upload -->
-        <dialog id="error" {% if get_flashed_messages() %}open{% endif %}>
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <ul>
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
-            <button onclick="document.getElementById('error').close()">Fechar</button>
-        </dialog>
-
     </main>
-    <script src="{{ url_for('static', filename='cru.js') }}"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const form = document.querySelector('form'); // Seleciona o formulário na página do modal ou outro
-
-            form.addEventListener('submit', function(event) {
-                event.preventDefault(); // Impede o envio padrão do formulário
-
-                const formData = new FormData(form);
-
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-
-                    const newTableBody = doc.querySelector('#lista-salas');
-
-                    if (newTableBody) {
-                        document.querySelector('#lista-salas').innerHTML = newTableBody.innerHTML;
-                    } else {
-                        console.error("Tabela de salas não encontrada no retorno HTML");
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao enviar formulário:', error);
-                });
-            });
+        // Prevenir o fechamento do diálogo com a tecla Esc
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                event.preventDefault(); // Impede o comportamento padrão
+            }
         });
     </script>
-    
-    <script>
-        // Se há mensagens flash, mostrar o modal de erro
-        if (document.querySelector('#error[open]')) {
-            document.getElementById('error').showModal();
-        }
-    </script>
+
+    <script src="{{ url_for('static', filename='cru.js') }}"></script>
+
 </body>
 </html>

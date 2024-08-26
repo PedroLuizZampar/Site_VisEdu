@@ -7,51 +7,118 @@
     <td>
 
         {% if upload.is_analisado == 0 %}
-            <button class="analyze-button"
-                c-put="{{ url_for('upload.atualizar_status', upload_id=upload.id) }}"
-                c-remove-closest="tr">
+            <button class="action-button" 
+                onclick="document.getElementById('mensagem_analise').showModal(), showMessageAnaliseModal()"
+                c-remove-closest="tr"
+                c-post="{{ url_for('upload.analisar_upload', upload_id=upload.id) }}">
                 🤖
+                <span class="tooltip-text">Iniciar análise</span>
             </button>
 
-            <button class="edit-button"
+            <button class="action-button" 
                 c-get="{{ url_for('upload.form_edit_upload', upload_id=upload.id) }}"
                 onclick="document.getElementById('modal').showModal()"
                 c-target="#modal">
                 ✏️
+                <span class="tooltip-text">Editar upload</span>
             </button>
         {% endif %}
 
         {% if upload.is_analisado == 1 %}
 
-            <button class="results-button">📋</button>
+            <button class="action-button" >
+                📋
+                <span class="tooltip-text">Ver análise</span>
+            </button>
 
         {% endif %}
             
 
-        <button class="play-button"
-            c-get="{{ url_for('upload.reproduzir_video', upload_id=upload.id) }}"
+        <button class="action-button" 
+            c-get="{{ url_for('upload.reproduzir_video_modal', upload_id=upload.id) }}"
             onclick="document.getElementById('video').showModal()"
             c-target="#video">
             ▶️
+            <span class="tooltip-text">Reproduzir vídeo</span>
         </button>
 
         {% if upload.is_analisado == 1 %}
 
-            <button class="delete-button"
-                c-put="{{ url_for('upload.atualizar_status', upload_id=upload.id) }}"
+            <button class="action-button" 
+                c-delete="{{ url_for('upload.deletar_analise', upload_id=upload.id) }}"
                 c-remove-closest="tr">
                 🗑️
+                <span class="tooltip-text">Deletar análise</span>
             </button>
 
         {% else %}
 
-            <button class="delete-button"
+            <button class="action-button" 
                 c-delete="{{ url_for('upload.deletar_upload', upload_id=upload.id) }}"
                 c-remove-closest="tr">
                 🗑️
+                <span class="tooltip-text">Deletar upload</span>
             </button>
         
         {% endif %}
 
     </td>
 </tr>
+
+<!-- Modal aviso de análise em andamento -->
+<dialog id="mensagem_analise">
+    <p>O vídeo está sendo analisado, isso pode demorar alguns minutos!</p>
+    <button onclick="document.getElementById('mensagem_analise').close(), location.reload();"
+        c-post="{{ url_for('upload.cancelar_analise', upload_id=upload.id) }}">
+        Cancelar análise
+    </button>
+</dialog>
+
+<script>
+
+    // Função para abrir o modal se ele estiver marcado no localStorage
+    function openMessageAnaliseModal() {
+        if (localStorage.getItem('modal_analise_aberto') === 'true') {
+            document.getElementById('mensagem_analise').showModal();
+        }
+    }
+
+    // Mostrar o modal e marcar o localStorage quando a análise começa
+    function showMessageAnaliseModal() {
+        document.getElementById('mensagem_analise').showModal();
+        localStorage.setItem('modal_analise_aberto', 'true');
+    }
+</script>
+
+<script>
+    // Força o reload da página quando a análise é cancelada
+    document.getElementById('mensagem_analise').addEventListener('close', function () {
+        fetch("{{ url_for('upload.lista_uploads_nao_analisados') }}")
+            .then(response => response.text())
+            .then(html => {
+                document.querySelector('.div-table').innerHTML = html;
+                localStorage.removeItem('modal_analise_aberto'); // Remove a permanência do modal do local storage
+            })
+            .catch(error => console.error('Erro ao carregar a lista:', error));
+    });
+</script>
+
+<script>
+    // Mostrar o modal quando a página carrega, se estiver marcado no localStorage
+    window.addEventListener('load', () => {
+        openMessageAnaliseModal();
+    });
+    
+    // Função para abrir o modal se ele estiver marcado no localStorage
+    function openMessageAnaliseModal() {
+        if (localStorage.getItem('modal_analise_aberto') === 'true') {
+            document.getElementById('mensagem_analise').showModal();
+        }
+    }
+
+    // Mostrar o modal e marcar o localStorage quando a análise começa
+    function showMessageAnaliseModal() {
+        document.getElementById('mensagem_analise').showModal();
+        localStorage.setItem('modal_analise_aberto', 'true');
+    }
+</script>

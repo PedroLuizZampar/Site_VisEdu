@@ -18,9 +18,21 @@
                 c-get="{{ url_for('upload.form_upload') }}"
                 onclick="document.getElementById('modal').showModal()"
                 c-target="#modal">
+                <span class="tooltip-text">Adicionar um novo upload</span>
                 ⬆️
             </button>
-            <button class="analyze-all-button">Analisar todos</button>
+            <button class="reload-button"
+                c-reload="True">
+                <span class="tooltip-text">Não está vendo o upload? Recarregue a lista aqui!</span>
+                🔄
+            </button>
+        </div>
+    {% else %}
+        <div class="actions-list">
+            <button class="reload-button">
+                <span class="tooltip-text">Não está vendo o upload? Recarregue a lista aqui!</span>
+                🔄
+            </button>
         </div>
     {% endif %}
 

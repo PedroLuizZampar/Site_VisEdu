@@ -1,5 +1,5 @@
 <h1>Nova Sala</h1>
-<form class="c-form" enctype="multipart/form-data" method="POST"
+<form enctype="multipart/form-data" method="POST"
     {% if sala %}
         action="{{ url_for('sala.atualizar_sala', sala_id=sala.id) }}"
         c-swap="#sala-{{ sala.id }}"

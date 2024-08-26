@@ -48,8 +48,11 @@ main {
 }
 
 .upload-button,
-.analyze-all-button,
-#modal button {
+.add-sala,
+.reload-button,
+.action-button,
+dialog button {
+    position: relative;
     background-color: #1E314E;
     color: #fff;
     border: none;
@@ -58,6 +61,12 @@ main {
     margin: 0 10px;
     cursor: pointer;
     font-size: 16px;
+}
+
+.action-button {
+    position: relative;
+    margin: 5px 5px;
+    padding: 5px 10px;
 }
 
 .div-table {
@@ -114,8 +123,8 @@ dialog form .bloco-informacoes input {
     box-sizing: border-box;
 }
 
-dialog form button {
-    margin: 15px 0;
+dialog button {
+    margin: 15px 10px;
     width: 165px;
 }
 
@@ -131,4 +140,84 @@ dialog form button {
 
 dialog video {
     max-height: 650px;
+}
+
+.upload-button .tooltip-text {
+    visibility: hidden;
+    width: 210px;
+    background-color: #1E314E;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 20%;
+    left: -250%;
+    margin-left: -80px;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none; /* Impede que o tooltip seja clicado */
+}
+
+.add-sala .tooltip-text {
+    visibility: hidden;
+    width: 210px;
+    background-color: #1E314E;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 20%;
+    left: 250%;
+    margin-left: -80px;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none; /* Impede que o tooltip seja clicado */
+}
+
+.reload-button .tooltip-text {
+    visibility: hidden;
+    width: 250px;
+    background-color: #1E314E;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: 250%;
+    margin-left: -80px;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none; /* Impede que o tooltip seja clicado */
+}
+
+.action-button .tooltip-text {
+    visibility: hidden;
+    width: 135px;
+    background-color: #07172e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 110%; /* Posiciona acima do botão */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none; /* Impede que o tooltip seja clicado */
+}
+
+.upload-button:hover .tooltip-text,
+.action-button:hover .tooltip-text,
+.reload-button:hover .tooltip-text,
+.add-sala:hover .tooltip-text {
+    visibility: visible;
+    opacity: 0.85;
 }
