@@ -50,6 +50,7 @@
         <!-- Modal aviso de análise em andamento -->
         <dialog id="mensagem_analise">
             <p>O vídeo está sendo analisado, isso pode demorar alguns minutos!</p>
+            <div class="loader"></div>
             <button onclick="document.getElementById('mensagem_analise').close(), localStorage.removeItem('modal_analise_aberto'), location.reload();"
                 c-post="{{ url_for('upload.cancelar_analise') }}">
                 Cancelar análise
@@ -73,20 +74,16 @@
                             .then(data => {
                                 if (data.status === 'concluido') {
                                     document.getElementById('mensagem_analise').close();
-                                    localStorage.removeItem('modal_analise_aberto');
-                                    localStorage.removeItem('upload_id');
-                                    fetch('{{ url_for("upload.lista_uploads_nao_analisados") }}')
-                                        .then(response => response.text())
-                                        .then(html => {
-                                            document.querySelector('.content').innerHTML = html;
-                                        });
+                                    localStorage.removeItem('modal_analise_aberto'); // Remove a informação do localstorage
+                                    localStorage.removeItem('upload_id'); // Remove a informação do localstorage
+                                    location.reload();
                                 }
                             })
                             .catch(error => console.error('Erro ao verificar o status da análise:', error));
                     }
                 }
 
-                setInterval(verificarStatusAnalise, 5000);
+                setInterval(verificarStatusAnalise, 5000); // Chama a função pra verificar o status a cada 5 segundos
             }
 
             document.addEventListener('keydown', (event) => {

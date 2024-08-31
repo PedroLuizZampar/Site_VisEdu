@@ -263,6 +263,9 @@ def atualizar_status(upload_id):
 
 @upload_route.route('/<int:upload_id>/analise', methods=["POST"])
 def analisar_upload(upload_id):
+
+    """ Passa o vídeo para a IA Fazer a análise """
+
     global cancelado
 
     cancelado = False
@@ -358,6 +361,8 @@ def analisar_upload(upload_id):
 @upload_route.route('/cancelar_analise', methods=["POST"])
 def cancelar_analise():
 
+    """ Interrompe a análise em andamento """
+
     global cancelado
 
     cancelado = True
@@ -380,6 +385,9 @@ def deletar_analise(upload_id):
 
 @upload_route.route('/status_analise/<int:upload_id>', methods=["GET"])
 def status_analise(upload_id):
+
+    """ Verifica se o upload já foi analisado ou se ainda está no processo de análise """
+
     upload = Upload.get_by_id(upload_id)
     status = "concluido" if upload.is_analisado else "em_progresso"
     if status:
