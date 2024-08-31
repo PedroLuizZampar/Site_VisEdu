@@ -61,7 +61,7 @@ def atualizar_sala(sala_id):
 @sala_route.route('/<int:sala_id>/delete', methods=["DELETE"])
 def deletar_sala(sala_id):
 
-    sala = sala.get_by_id(sala_id)
+    sala = Sala.get_by_id(sala_id)
 
     sala.delete_instance()
 

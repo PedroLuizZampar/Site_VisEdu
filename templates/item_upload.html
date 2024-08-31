@@ -8,7 +8,7 @@
 
         {% if upload.is_analisado == 0 %}
             <button class="action-button" 
-                onclick="document.getElementById('mensagem_analise').showModal(), showMessageAnaliseModal()"
+                onclick="document.getElementById('mensagem_analise').showModal(), localStorage.setItem('modal_analise_aberto', 'true'), localStorage.setItem('upload_id', '{{ upload.id }}', location.reload())"
                 c-remove-closest="tr"
                 c-post="{{ url_for('upload.analisar_upload', upload_id=upload.id) }}">
                 🤖
@@ -64,61 +64,3 @@
 
     </td>
 </tr>
-
-<!-- Modal aviso de análise em andamento -->
-<dialog id="mensagem_analise">
-    <p>O vídeo está sendo analisado, isso pode demorar alguns minutos!</p>
-    <button onclick="document.getElementById('mensagem_analise').close(), location.reload();"
-        c-post="{{ url_for('upload.cancelar_analise', upload_id=upload.id) }}">
-        Cancelar análise
-    </button>
-</dialog>
-
-<script>
-
-    // Função para abrir o modal se ele estiver marcado no localStorage
-    function openMessageAnaliseModal() {
-        if (localStorage.getItem('modal_analise_aberto') === 'true') {
-            document.getElementById('mensagem_analise').showModal();
-        }
-    }
-
-    // Mostrar o modal e marcar o localStorage quando a análise começa
-    function showMessageAnaliseModal() {
-        document.getElementById('mensagem_analise').showModal();
-        localStorage.setItem('modal_analise_aberto', 'true');
-    }
-</script>
-
-<script>
-    // Força o reload da página quando a análise é cancelada
-    document.getElementById('mensagem_analise').addEventListener('close', function () {
-        fetch("{{ url_for('upload.lista_uploads_nao_analisados') }}")
-            .then(response => response.text())
-            .then(html => {
-                document.querySelector('.div-table').innerHTML = html;
-                localStorage.removeItem('modal_analise_aberto'); // Remove a permanência do modal do local storage
-            })
-            .catch(error => console.error('Erro ao carregar a lista:', error));
-    });
-</script>
-
-<script>
-    // Mostrar o modal quando a página carrega, se estiver marcado no localStorage
-    window.addEventListener('load', () => {
-        openMessageAnaliseModal();
-    });
-    
-    // Função para abrir o modal se ele estiver marcado no localStorage
-    function openMessageAnaliseModal() {
-        if (localStorage.getItem('modal_analise_aberto') === 'true') {
-            document.getElementById('mensagem_analise').showModal();
-        }
-    }
-
-    // Mostrar o modal e marcar o localStorage quando a análise começa
-    function showMessageAnaliseModal() {
-        document.getElementById('mensagem_analise').showModal();
-        localStorage.setItem('modal_analise_aberto', 'true');
-    }
-</script>

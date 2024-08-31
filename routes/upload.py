@@ -1,7 +1,7 @@
 import os, time
 import cv2
 from ultralytics import YOLO
-from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, session, request
+from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, jsonify, session, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
 from database.models.sala import Sala
@@ -266,6 +266,8 @@ def analisar_upload(upload_id):
     global cancelado
 
     cancelado = False
+
+    deletar_analise(upload_id) # Apaga as análises anteriores caso tenha
     
     basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
     model_path = os.path.abspath(os.path.join(basepath, 'ai_models', 'best.onnx'))
@@ -347,20 +349,18 @@ def analisar_upload(upload_id):
     if not cancelado:
         atualizar_status(upload_id)
         flash("Análise concluída!")
+        return jsonify({"upload_id": upload_id})
     else:
         flash("Análise interrompida pelo usuário.")
+        return jsonify({"upload_id": upload_id})
 
-    return redirect(url_for('home.home'))
 
-
-@upload_route.route('<int:upload_id>/cancelar_analise', methods=["POST"])
-def cancelar_analise(upload_id):
+@upload_route.route('/cancelar_analise', methods=["POST"])
+def cancelar_analise():
 
     global cancelado
 
     cancelado = True
-
-    deletar_analise(upload_id)
 
     return redirect(url_for('home.home'))
 
@@ -377,3 +377,12 @@ def deletar_analise(upload_id):
         atualizar_status(upload_id)
 
     return {"analise_deletada": "ok"}
+
+@upload_route.route('/status_analise/<int:upload_id>', methods=["GET"])
+def status_analise(upload_id):
+    upload = Upload.get_by_id(upload_id)
+    status = "concluido" if upload.is_analisado else "em_progresso"
+    if status:
+        return jsonify({'status': status})
+    else:
+        return jsonify({'error': 'Análise não encontrada'}), 404

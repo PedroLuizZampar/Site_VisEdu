@@ -4,7 +4,7 @@ from database.models.sala import Sala
 
 class Upload(Model):
     nome_arquivo = CharField()
-    sala = ForeignKeyField(Sala, backref='uploads', on_delete='CASCADE')  # Adiciona a chave estrangeira
+    sala = ForeignKeyField(Sala, backref='uploads', on_delete='RESTRICT')  # Adiciona a chave estrangeira e evita deleção em cascata quando uma sala for deletada
     data_registro = DateField()
     hora_registro = TimeField()
     caminho_arquivo = CharField()
