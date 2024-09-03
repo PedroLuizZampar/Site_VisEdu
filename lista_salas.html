@@ -1,0 +1,26 @@
+<div class="div-table">
+    <div class="actions-list">
+        <button class="add-sala"
+            onclick="document.getElementById('modal').showModal()"
+            c-get="{{ url_for('sala.form_sala') }}"
+            c-target="#modal">
+            ➕
+            <span class="tooltip-text">Adicionar uma nova sala</span>
+        </button>
+    </div>
+
+    <table id="file-table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th>Nome</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-salas">
+            {% for sala in salas %}
+                {% include 'item_sala.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
