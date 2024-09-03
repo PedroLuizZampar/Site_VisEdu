@@ -6,6 +6,67 @@ body {
     padding: 0;
 }
 
+header {
+    width: 100vw;
+    height: 120px;
+}
+
+.NavBar{
+    width: 100%;
+    height: 100%;
+    background-color: #011f36;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.active {
+    border-bottom: 1px solid #4EB6FF;
+    padding: ;
+}
+
+.LogoArea{
+    width: 10%;
+    margin: 30%;
+}
+
+.logoArea img{
+    width: 80px;
+    height: 80px;
+    padding-left: 30px;
+}
+
+.tabArea{
+    width: 60%;
+    display: flex;
+}
+
+.NavBarSection{
+    font-size: 22px;
+    text-decoration: none;
+    text-transform: none;
+    color:#E5F4FF;
+    
+}
+
+.NavBarItem {
+    width: 80px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 50px;
+}
+
+.NavBarItem:hover {
+    border-bottom: 1px solid #4EB6FF;
+}
+
+.NavBarSection:hover {
+    color: #e5f4f5;
+}
+
 main {
     padding: 20px;
 }
@@ -34,11 +95,6 @@ main {
     border-radius: 20px;
     cursor: pointer;
     font-size: 16px;
-}
-
-.tab button.active {
-    background-color: #4EB6FF;
-    color: #fff;
 }
 
 .actions-list {
