@@ -1,8 +1,0 @@
-<video width="80%" controls>
-    <source src="{{ url_for('upload.uploaded_file', filename=nome_arquivo) }}?t={{ timestamp }}" controls type="video/mp4">
-    Seu navegador não suporta a tag de vídeo.
-</video>
-
-{% if modal %}
-    <button onclick="document.getElementById('video').close()">Fechar</button>
-{% endif %}
