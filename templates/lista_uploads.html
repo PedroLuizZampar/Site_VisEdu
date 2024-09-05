@@ -1,11 +1,11 @@
 <div class="div-table">
     <div class="tab">
-        <button class="tablinks active"
+        <button
             c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
             c-target=".content">
             Não Analisados
         </button>
-        <button class="tablinks"
+        <button
             c-get="{{ url_for('upload.lista_uploads_analisados') }}"
             c-target=".content">
             Analisados
@@ -39,12 +39,12 @@
     <table id="file-table">
         <thead>
             <tr>
-                <th scope="col">#</th>
+                <th scope="col" class="th-id">#</th>
                 <th>Nome</th>
                 <th>Data de registro</th>
                 <th>Hora de registro</th>
                 <th>Sala</th>
-                <th>Ações</th>
+                <th class="th-actions">Ações</th>
             </tr>
         </thead>
         <tbody id="lista-uploads">

@@ -14,29 +14,31 @@
                 <img src="../static/images/logoNavBar.svg" alt="">  
            </div>
            <div class="tabArea">
-                <div class="NavBarItem active">
-                    <a class="NavBarSection" href="">Cadastro</a>    
+                <div class="NavBarItem selected-item-menu">
+                    <a class="NavBarSection " href="">Cadastro</a>    
                 </div>
                 <div class="NavBarItem">
-                    <a class="NavBarSection" href="">Uploads</a>    
+                    <a class="NavBarSection " href="">Uploads</a>    
                 </div>
                 <div class="NavBarItem">
-                    <a class="NavBarSection" href="">Relatórios</a>    
+                    <a class="NavBarSection " href="">Relatórios</a>    
                 </div>
-                
+                <div class="NavBarItem">
+                    <a class="NavBarSection " href="">Opções</a>    
+                </div>
            </div>     
        </div>
-    </header>    
+    </header>
     <main>
 
         <div class="tab">
-            <button class="active"
+            <button id="uploads-button" {% if visualizando_uploads_nao_analisados %}class="active"{% endif %}
                 c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
                 c-target=".div-table">
                 Uploads
             </button>
 
-            <button class="active"
+            <button id="salas-button" {% if visualizando_salas %}class="active"{% endif %}
                 c-get="{{ url_for('sala.lista_salas') }}"
                 c-target=".div-table">
                 Salas
@@ -113,6 +115,30 @@
             });
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Obtenha os botões
+            
+            const uploadsButton = document.getElementById('uploads-button');
+            const salasButton = document.getElementById('salas-button');
+            // Função para ativar o botão clicado e desativar o outro
+            function activateButton(activeButton) {
+                // Remova a classe active de ambos os botões
+
+                uploadsButton.classList.remove('active');
+                salasButton.classList.remove('active');
+
+                // Adicione a classe active ao botão clicado
+                activeButton.classList.add('active');
+            }
+
+            // Adicione eventos de clique aos botões
+            uploadsButton.addEventListener('click', () => activateButton(uploadsButton));
+            salasButton.addEventListener('click', () => activateButton(salasButton));
+        });
+    </script>
+
 
     <script src="{{ url_for('static', filename='cru.js') }}"></script>
 

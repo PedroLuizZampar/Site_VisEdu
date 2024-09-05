@@ -21,11 +21,6 @@ header {
     justify-content: space-between;
 }
 
-.active {
-    border-bottom: 1px solid #4EB6FF;
-    padding: ;
-}
-
 .LogoArea{
     width: 10%;
     margin: 30%;
@@ -38,7 +33,7 @@ header {
 }
 
 .tabArea{
-    width: 60%;
+    height: 100%;
     display: flex;
 }
 
@@ -50,17 +45,28 @@ header {
     
 }
 
+
+
+.selected-item-menu {
+    border-bottom: 5px solid #4EB6FF;
+    
+}
+
+.selected-item-menu .NavBarSection{
+    color:#C7E9FF;    
+}
+
 .NavBarItem {
-    width: 80px;
-    height: 100%;
+    width: 100px;
+    height: 97%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 50px;
 }
 
-.NavBarItem:hover {
-    border-bottom: 1px solid #4EB6FF;
+.NavBarItem:hover{
+    border-bottom: 5px solid #4EB6FF;
 }
 
 .NavBarSection:hover {
@@ -69,6 +75,11 @@ header {
 
 main {
     padding: 20px;
+}
+
+.tab button.active {
+    background-color: #4EB6FF; /* Cor de fundo do botão ativo */
+    color: #fff; /* Cor do texto do botão ativo */
 }
 
 .content {
@@ -97,11 +108,11 @@ main {
     font-size: 16px;
 }
 
-.actions-list {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+.active {
+    border-bottom: 1px solid #4EB6FF
 }
+
+
 
 .upload-button,
 .add-sala,
@@ -125,31 +136,12 @@ dialog button {
     padding: 5px 10px;
 }
 
-.div-table {
-    width: 100%;
-}
-
-#file-table {
-    width: 80%;
-    margin: auto;
-    list-style: none;
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-collapse: collapse;
-}
-
-#file-table th, #file-table td {
-    text-align: center;
-    padding: 10px;
-    border: 0.1px solid #1E314E;
-}
-
 dialog {
     max-height: 90%;
     width: 50%;
     text-align: center;
+    border: none;
+    border-radius: 20px;
 }
 
 dialog form .bloco-informacoes {
@@ -165,6 +157,13 @@ dialog form .bloco-informacoes input {
     width: 100%;
     margin: 5px 0;
     text-align: left;
+    
+}
+
+dialog form .bloco-informacoes input, .bloco-informacoes select {
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
+    border: 0.1px solid rgb(179, 179, 179);
+    border-radius: 4px;
 }
 
 dialog form .bloco-informacoes select {
@@ -292,3 +291,48 @@ dialog video {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
+
+/* LISTAS */
+
+.div-table {
+    width: 100%;
+}
+
+#file-table {
+    width: 70%;
+    margin: auto;
+    list-style: none;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-collapse: collapse;
+}
+
+#file-table th, #file-table td {
+    text-align: center;
+    padding: 10px;
+    border: 0px solid #1E314E;
+}
+
+#file-table th {
+    background-color: #C7E9FF;
+}
+
+#file-table td {
+    border-top: 0.1px solid rgb(179, 179, 179);
+}
+
+.actions-list {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.th-actions {
+    border-radius: 0 8px 0 0;
+}
+
+.th-id {
+    border-radius: 8px 0 0 0 ;
+}
