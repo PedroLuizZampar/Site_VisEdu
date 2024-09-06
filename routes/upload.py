@@ -58,7 +58,7 @@ def lista_uploads_nao_analisados():
 
     has_nao_analisado = True # Passa como parâmetro True para renderizar o conteúdo da maneira correta, ou seja, são uploads não analisados
     
-    return render_template("lista_uploads.html", uploads=uploads_nao_analisados, has_nao_analisado=has_nao_analisado)
+    return render_template("lista_uploads_nao_analisados.html", uploads=uploads_nao_analisados, has_nao_analisado=has_nao_analisado)
 
 @upload_route.route('/analisados')
 def lista_uploads_analisados():
@@ -76,7 +76,7 @@ def lista_uploads_analisados():
         if upload.is_analisado == 1:
             uploads_analisados.append(upload)
 
-    return render_template("lista_uploads.html", uploads=uploads_analisados)
+    return render_template("lista_uploads_analisados.html", uploads=uploads_analisados)
 
 @upload_route.route('/', methods=["POST"])
 def inserir_upload():
@@ -136,7 +136,13 @@ def form_upload():
     
     salas = Sala.select()
 
-    return render_template("form_upload.html", salas=salas)
+    salas_ativas = []
+
+    for sala in salas:
+        if (sala.is_ativa == True):
+            salas_ativas.append(sala)
+
+    return render_template("form_upload.html", salas=salas_ativas)
 
 @upload_route.route('/<int:upload_id>/edit')
 def form_edit_upload(upload_id):
@@ -146,7 +152,13 @@ def form_edit_upload(upload_id):
     upload_selecionado = Upload.get_by_id(upload_id)
     salas = Sala.select()
 
-    return render_template("form_upload.html", upload=upload_selecionado, salas=salas)
+    salas_ativas = []
+
+    for sala in salas:
+        if (sala.is_ativa == True):
+            salas_ativas.append(sala)
+
+    return render_template("form_upload.html", upload=upload_selecionado, salas=salas_ativas)
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):

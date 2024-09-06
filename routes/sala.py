@@ -10,10 +10,16 @@ def lista_salas():
 
     salas = Sala.select()
 
+    salas_ativas = []
+
+    for sala in salas:
+        if (sala.is_ativa == True):
+            salas_ativas.append(sala)
+
     alterando_sessions_para_false()
     session['visualizando_salas'] = True
 
-    return render_template("lista_salas.html", salas=salas)
+    return render_template("lista_salas.html", salas=salas_ativas)
 
 @sala_route.route('/actions_lista')
 def actions_lista():
@@ -63,6 +69,8 @@ def deletar_sala(sala_id):
 
     sala = Sala.get_by_id(sala_id)
 
-    sala.delete_instance()
+    sala.is_ativa = False
 
-    return {"deleted": "ok"}
+    sala.save()
+
+    return {"Sala inativada": "ok"}
