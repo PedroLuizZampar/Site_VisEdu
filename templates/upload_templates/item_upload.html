@@ -1,0 +1,66 @@
+<tr id="upload-{{upload.id }}">
+    <td scope="row">{{ upload.id }}</td>
+    <td>{{ upload.nome_arquivo }}</td>
+    <td>{{ upload.data_registro }}</td>
+    <td>{{ upload.hora_registro }}</td>
+    <td>{{ upload.sala.nome_sala }}</td>
+    <td>
+
+        {% if upload.is_analisado == 0 %}
+            <button class="action-button" 
+                onclick="document.getElementById('mensagem_analise').showModal(), localStorage.setItem('modal_analise_aberto', 'true'), localStorage.setItem('upload_id', '{{ upload.id }}', location.reload())"
+                c-remove-closest="tr"
+                c-post="{{ url_for('upload.analisar_upload', upload_id=upload.id) }}">
+                🤖
+                <span class="tooltip-text">Iniciar análise</span>
+            </button>
+
+            <button class="action-button" 
+                c-get="{{ url_for('upload.form_edit_upload', upload_id=upload.id) }}"
+                onclick="document.getElementById('modal').showModal()"
+                c-target="#modal">
+                ✏️
+                <span class="tooltip-text">Editar upload</span>
+            </button>
+        {% endif %}
+
+        {% if upload.is_analisado == 1 %}
+
+            <button class="action-button" >
+                📋
+                <span class="tooltip-text">Ver análise</span>
+            </button>
+
+        {% endif %}
+            
+
+        <button class="action-button" 
+            c-get="{{ url_for('upload.reproduzir_video_modal', upload_id=upload.id) }}"
+            onclick="document.getElementById('video').showModal()"
+            c-target="#video">
+            ▶️
+            <span class="tooltip-text">Reproduzir vídeo</span>
+        </button>
+
+        {% if upload.is_analisado == 1 %}
+
+            <button class="action-button" 
+                c-delete="{{ url_for('upload.deletar_analise', upload_id=upload.id) }}"
+                c-remove-closest="tr">
+                🗑️
+                <span class="tooltip-text">Deletar análise</span>
+            </button>
+
+        {% else %}
+
+            <button class="action-button" 
+                c-delete="{{ url_for('upload.deletar_upload', upload_id=upload.id) }}"
+                c-remove-closest="tr">
+                🗑️
+                <span class="tooltip-text">Deletar upload</span>
+            </button>
+        
+        {% endif %}
+
+    </td>
+</tr>

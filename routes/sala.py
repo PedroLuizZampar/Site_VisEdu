@@ -19,17 +19,12 @@ def lista_salas():
     alterando_sessions_para_false()
     session['visualizando_salas'] = True
 
-    return render_template("lista_salas.html", salas=salas_ativas)
-
-@sala_route.route('/actions_lista')
-def actions_lista():
-
-    return render_template("actions_lista_sala.html")
+    return render_template("sala_templates/lista_salas.html", salas=salas_ativas)
 
 @sala_route.route('/new')
 def form_sala():
 
-    return render_template("form_sala.html")
+    return render_template("sala_templates/form_sala.html")
 
 @sala_route.route('/', methods=["POST"])
 def inserir_sala():
@@ -49,7 +44,7 @@ def form_edit_sala(sala_id):
 
     sala_selecionada = Sala.get_by_id(sala_id)
 
-    return render_template("form_sala.html", sala=sala_selecionada)
+    return render_template("sala_templates/form_sala.html", sala=sala_selecionada)
 
 @sala_route.route('/<int:sala_id>/update', methods=["POST"])
 def atualizar_sala(sala_id):

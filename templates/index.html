@@ -35,7 +35,7 @@
     <main>
 
         <div class="tab">
-            <button id="uploads-button" {% if visualizando_uploads_nao_analisados %}class="active"{% endif %}
+            <button id="uploads-button" {% if not visualizando_salas %}class="active"{% endif %}
                 c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
                 c-target=".div-table">
                 Uploads
@@ -105,7 +105,7 @@
                     const upload_id = localStorage.getItem('upload_id');
 
                     if (upload_id) {
-                        fetch(`/uploads/status_analise/${upload_id}`)
+                        fetch(`/upload/status_analise/${upload_id}`)
                             .then(response => response.json())
                             .then(data => {
                                 if (data.status === 'concluido') {

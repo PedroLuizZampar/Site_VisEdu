@@ -56,9 +56,7 @@ def lista_uploads_nao_analisados():
         if upload.is_analisado == 0:
             uploads_nao_analisados.append(upload)
 
-    has_nao_analisado = True # Passa como parâmetro True para renderizar o conteúdo da maneira correta, ou seja, são uploads não analisados
-    
-    return render_template("lista_uploads_nao_analisados.html", uploads=uploads_nao_analisados, has_nao_analisado=has_nao_analisado)
+    return render_template("upload_templates/lista_uploads_nao_analisados.html", uploads=uploads_nao_analisados)
 
 @upload_route.route('/analisados')
 def lista_uploads_analisados():
@@ -76,7 +74,7 @@ def lista_uploads_analisados():
         if upload.is_analisado == 1:
             uploads_analisados.append(upload)
 
-    return render_template("lista_uploads_analisados.html", uploads=uploads_analisados)
+    return render_template("upload_templates/lista_uploads_analisados.html", uploads=uploads_analisados)
 
 @upload_route.route('/', methods=["POST"])
 def inserir_upload():
@@ -121,13 +119,6 @@ def inserir_upload():
     else:
         flash("Arquivo não permitido!")
         return redirect(request.referrer)
-    
-@upload_route.route('/actions_lista')
-def actions_lista():
-
-    """ Renderiza os botões de ação da lista """
-
-    return render_template("actions_lista_upload.html")
 
 @upload_route.route('/new')
 def form_upload():
@@ -142,7 +133,7 @@ def form_upload():
         if (sala.is_ativa == True):
             salas_ativas.append(sala)
 
-    return render_template("form_upload.html", salas=salas_ativas)
+    return render_template("upload_templates/form_upload.html", salas=salas_ativas)
 
 @upload_route.route('/<int:upload_id>/edit')
 def form_edit_upload(upload_id):
@@ -158,7 +149,7 @@ def form_edit_upload(upload_id):
         if (sala.is_ativa == True):
             salas_ativas.append(sala)
 
-    return render_template("form_upload.html", upload=upload_selecionado, salas=salas_ativas)
+    return render_template("upload_templates/form_upload.html", upload=upload_selecionado, salas=salas_ativas)
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
