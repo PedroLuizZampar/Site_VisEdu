@@ -195,7 +195,7 @@ def atualizar_upload(upload_id):
         upload_editado.data_registro = data['data_registro']
         upload_editado.hora_registro = data['hora_registro']
 
-        # Recuperar a instância de Sala com base no nome fornecido no formulário
+        # Recuperar a instância da Sala com base no nome fornecido no formulário
         sala = Sala.get(Sala.nome_sala == data['sala'])
         upload_editado.sala = sala  # Associa a sala ao upload
 

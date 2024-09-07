@@ -1,0 +1,24 @@
+<tr id="turma-{{turma.id }}">
+    <td scope="row">{{ turma.id }}</td>
+    <td>{{ turma.nome_turma }}</td>
+    <td>{{ turma.sala.nome_sala }}</td>
+    <td>{{ turma.periodo.nome_periodo }}</td>
+    <td>{{ turma.qtde_alunos }}</td>
+    <td>
+        
+        <button class="action-button" 
+            c-get="{{ url_for('turma.form_edit_turma', turma_id=turma.id) }}"
+            onclick="document.getElementById('modal').showModal()"
+            c-target="#modal">
+            ✏️
+            <span class="tooltip-text">Editar turma</span>
+        </button>
+        <button class="action-button" 
+            c-delete="{{ url_for('turma.deletar_turma', turma_id=turma.id) }}"
+            c-remove-closest="tr">
+            🗑️
+            <span class="tooltip-text">Excluir turma</span>
+        </button>
+
+    </td>
+</tr>

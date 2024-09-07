@@ -1,0 +1,60 @@
+<h1>Nova Sala</h1>
+<form enctype="multipart/form-data" method="POST"
+    {% if turma %}
+        action="{{ url_for('turma.atualizar_turma', turma_id=turma.id) }}"
+        c-swap="#turma-{{ turma.id }}"
+    {% else %}
+        action="{{ url_for('turma.inserir_turma') }}"
+        c-append="#lista-turmas"
+    {% endif %}
+    c-callback="fecharModal"
+>
+
+    <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
+
+    <div class="bloco-informacoes">
+        <label for="nome_turma">Nome da turma: </label>
+        <input type="text" name="nome_turma" {% if turma %} value="{{ turma.nome_turma }}" {% endif %} required>
+    </div>
+
+    <div class="bloco-informacoes">
+        <label for="sala">Sala: </label>
+        <select name="sala" id="sala" required>
+
+            {% if not turma %}
+                {% set turma = None %}
+            {% endif %} <!-- Se não tiver turma, cria uma variável turma vazia pra não dar erro na opção da sala -->
+
+            {% for sala in salas %}
+                {% include 'option_sala.html' %}
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="bloco-informacoes">
+        <label for="periodo">Período: </label>
+        <select name="periodo" id="periodo" required>
+
+            {% if not turma %}
+                {% set turma = None %}
+            {% endif %} <!-- Se não tiver turma, cria uma variável turma vazia pra não dar erro na opção da sala -->
+
+            {% for periodo in periodos %}
+                {% include 'option_periodo.html' %}
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="bloco-informacoes">
+        <label for="qtde_alunos">Quantidade de alunos: </label>
+        <input type="number" name="qtde_alunos" {% if turma %} value="{{ turma.qtde_alunos }}" {% endif %} required>
+    </div>
+
+    <div class="bloco-botoes-modal">
+        <button type="button" onclick="document.getElementById('modal').close();">Cancelar</button>
+        <button type="submit">
+            {% if turma %}Atualizar turma{% else %}Adicionar turma{% endif %}
+        </button>
+    </div>
+
+</form>

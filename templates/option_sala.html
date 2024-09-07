@@ -1,4 +1,4 @@
 <option value="{{ sala.nome_sala }}"
-    {% if upload and upload.sala.nome_sala == sala.nome_sala %} selected {% else %}{% endif%}>
+    {% if upload and upload.sala.nome_sala == sala.nome_sala or turma and turma.sala.nome_sala == sala.nome_sala %} selected {% endif%}>
     {{ sala.nome_sala }}
 </option>

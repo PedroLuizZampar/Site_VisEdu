@@ -1,0 +1,29 @@
+<div class="div-table">
+    <div class="actions-list">
+        <button class="add-sala"
+            c-get="{{ url_for('turma.form_turma') }}"
+            onclick="document.getElementById('modal').showModal()"
+            c-target="#modal">
+            <span class="tooltip-text">Adicionar uma nova turma</span>
+            ➕
+        </button>
+    </div>
+
+    <table id="file-table">
+        <thead>
+            <tr>
+                <th scope="col" class="th-id">#</th>
+                <th>Turma</th>
+                <th>Sala</th>
+                <th>Período</th>
+                <th>Qtde. Alunos</th>
+                <th class="th-actions">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-turmas">
+            {% for turma in turmas %}
+                {% include 'turma_templates/item_turma.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
