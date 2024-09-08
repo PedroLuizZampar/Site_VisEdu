@@ -25,10 +25,10 @@ def configure_db():
     db.connect()
     db.create_tables([Periodo])
     db.create_tables([Sala])
-    db.create_tables([Upload])
-    db.create_tables([Analise])
     db.create_tables([Horario])
     db.create_tables([Turma])
+    db.create_tables([Upload])
+    db.create_tables([Analise])
 
 def create_periodos():
     # Verifica se já existe os períodos definidos, senão os cria

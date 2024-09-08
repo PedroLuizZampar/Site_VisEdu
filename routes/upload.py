@@ -1,11 +1,14 @@
 import os, time
 import cv2
+from peewee import DoesNotExist
 from ultralytics import YOLO
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, jsonify, session, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
 from database.models.sala import Sala
 from database.models.analise import Analise
+from database.models.periodo import Periodo
+from database.models.turma import Turma
 from funcoes_extras import alterando_sessions_para_false
 
 upload_route = Blueprint("upload", __name__)
@@ -104,15 +107,23 @@ def inserir_upload():
         
         f.save(caminho_arquivo)  # Salva o arquivo
 
-        # Recuperar a instância de Sala com base no nome fornecido no formulário
+        # Recuperar a instância de Sala e do Período com base no nome fornecido no formulário
         sala = Sala.get(Sala.nome_sala == data['sala'])
+        periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
+
+        try:
+            turma = Turma.get(Turma.sala == sala, Turma.periodo == periodo)
+        except DoesNotExist:
+            turma = None
 
         Upload.create(
-            nome_arquivo=nome_arquivo,
-            sala=sala,  # Passar a instância de Sala aqui
-            data_registro=data['data_registro'],
-            hora_registro=data['hora_registro'],
-            caminho_arquivo=caminho_arquivo
+        nome_arquivo=nome_arquivo,
+        sala=sala,  # Passar a instância de Sala aqui
+        periodo=periodo,
+        turma=turma,
+        data_registro=data['data_registro'],
+        hora_registro=data['hora_registro'],
+        caminho_arquivo=caminho_arquivo
         )
 
         return redirect(url_for('home.home'))
@@ -126,6 +137,7 @@ def form_upload():
     """ Renderiza o formulário de uploads """
     
     salas = Sala.select()
+    periodos = Periodo.select()
 
     salas_ativas = []
 
@@ -133,7 +145,7 @@ def form_upload():
         if (sala.is_ativa == True):
             salas_ativas.append(sala)
 
-    return render_template("upload_templates/form_upload.html", salas=salas_ativas)
+    return render_template("upload_templates/form_upload.html", salas=salas_ativas, periodos=periodos)
 
 @upload_route.route('/<int:upload_id>/edit')
 def form_edit_upload(upload_id):
@@ -142,6 +154,7 @@ def form_edit_upload(upload_id):
 
     upload_selecionado = Upload.get_by_id(upload_id)
     salas = Sala.select()
+    periodos = Periodo.select()
 
     salas_ativas = []
 
@@ -149,7 +162,7 @@ def form_edit_upload(upload_id):
         if (sala.is_ativa == True):
             salas_ativas.append(sala)
 
-    return render_template("upload_templates/form_upload.html", upload=upload_selecionado, salas=salas_ativas)
+    return render_template("upload_templates/form_upload.html", upload=upload_selecionado, salas=salas_ativas, periodos=periodos)
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
@@ -191,13 +204,21 @@ def atualizar_upload(upload_id):
             upload_editado.nome_arquivo = new_filename
             upload_editado.caminho_arquivo = new_caminho_arquivo
 
+        # Recuperar a instância da Sala e do Período com base no nome fornecido no formulário
+        sala = Sala.get(Sala.nome_sala == data['sala'])
+        periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
+
+        try:
+            turma = Turma.get(Turma.sala == sala, Turma.periodo == periodo)
+        except DoesNotExist:
+            turma = None
+
         # Atualiza os demais campos
+        upload_editado.sala = sala
+        upload_editado.periodo = periodo
+        upload_editado.turma = turma
         upload_editado.data_registro = data['data_registro']
         upload_editado.hora_registro = data['hora_registro']
-
-        # Recuperar a instância da Sala com base no nome fornecido no formulário
-        sala = Sala.get(Sala.nome_sala == data['sala'])
-        upload_editado.sala = sala  # Associa a sala ao upload
 
         upload_editado.save()  # Salva as alterações no banco
 

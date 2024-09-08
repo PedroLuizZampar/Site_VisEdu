@@ -2,7 +2,8 @@ from flask import Blueprint, url_for, render_template, redirect, session, reques
 from database.models.turma import Turma
 from database.models.sala import Sala
 from database.models.periodo import Periodo
-from funcoes_extras import alterando_sessions_para_false
+from database.models.upload import Upload
+from funcoes_extras import alterando_sessions_para_false, atualizando_turma_upload
 
 turma_route = Blueprint("turma", __name__)
 
@@ -69,20 +70,25 @@ def atualizar_turma(turma_id):
     if request.form.get('_method') == "PUT":
         data = request.form
 
+        # Recuperar a turma a ser editada
         turma_editada = Turma.get_by_id(turma_id)
 
-        # Recuperar a instância de Sala com base no nome fornecido no formulário
-        sala = Sala.get(Sala.nome_sala == data['sala'])
+        # Armazenar a sala e período antigos antes da atualização
+        sala_antiga = turma_editada.sala
+        periodo_antigo = turma_editada.periodo
 
-        # Recuperar a instância do Período com base no nome fornecido no formulário
-        periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
+        # Recuperar a instância de Sala e Período com base no novo formulário
+        nova_sala = Sala.get(Sala.nome_sala == data['sala'])
+        novo_periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
 
+        # Atualizar os campos da turma
         turma_editada.nome_turma = data['nome_turma']
-        turma_editada.sala = sala
-        turma_editada.periodo = periodo
+        turma_editada.sala = nova_sala
+        turma_editada.periodo = novo_periodo
         turma_editada.qtde_alunos = data['qtde_alunos']
-
         turma_editada.save()
+
+        atualizando_turma_upload()
 
     return redirect(url_for('home.home'))
 

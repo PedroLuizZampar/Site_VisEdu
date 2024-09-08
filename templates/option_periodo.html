@@ -1,4 +1,4 @@
 <option value="{{ periodo.nome_periodo }}"
-{% if turma and turma.periodo == periodo.nome_periodo %} selected {% endif %}>
+{% if upload and upload.periodo.nome_periodo == periodo.nome_periodo or turma and turma.periodo.nome_periodo == periodo.nome_periodo %} selected {% endif %}>
     {{ periodo.nome_periodo }}
 </option>

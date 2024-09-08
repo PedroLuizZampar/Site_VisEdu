@@ -305,10 +305,11 @@ dialog video {
     border-collapse: collapse;
 }
 
-#file-table th, #file-table td {
+#file-table th:not(.th-actions) { /* Todas exceto a .th-actions */
     text-align: center;
     padding: 10px;
     border: 0px solid #1E314E;
+    border-right: rgb(211, 211, 211) 0.1px solid;
 }
 
 #file-table th {
@@ -316,7 +317,14 @@ dialog video {
 }
 
 #file-table td {
-    border-top: 0.1px solid rgb(179, 179, 179);
+    text-align: center;
+    padding: 10px;
+    border-top: 0.1px solid rgb(211, 211, 211);
+    border-right: rgb(211, 211, 211) 0.1px solid;
+}
+
+#file-table td.td-actions {
+    border-right: none;
 }
 
 .actions-list {

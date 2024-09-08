@@ -1,10 +1,30 @@
 <tr id="upload-{{upload.id }}">
     <td scope="row">{{ upload.id }}</td>
     <td>{{ upload.nome_arquivo }}</td>
-    <td>{{ upload.data_registro }}</td>
-    <td>{{ upload.hora_registro }}</td>
     <td>{{ upload.sala.nome_sala }}</td>
     <td>
+        {% if upload.turma %}
+            {{ upload.turma.nome_turma }}
+        {% else %}
+            Turma não cadastrada!
+        {% endif %}
+    </td>
+    <td>{{ upload.periodo.nome_periodo }}</td>
+    <td>
+        {% if upload.data_registro %}
+            {{ upload.data_registro.strftime('%d/%m/%Y') }}
+        {% else %}
+            Data não disponível
+        {% endif %}
+    </td>    
+    <td>
+        {% if upload.hora_registro %}
+            {{ upload.hora_registro.strftime('%H:%M') }}
+        {% else %}
+            Hora não disponível
+        {% endif %}
+    </td>    
+    <td class="td-actions">
 
         {% if upload.is_analisado == 0 %}
             <button class="action-button" 

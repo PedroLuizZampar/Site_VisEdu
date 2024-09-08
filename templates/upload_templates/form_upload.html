@@ -44,6 +44,19 @@
     </div>
 
     <div class="bloco-informacoes">
+        <label for="periodo">Periodo: </label>
+        <select name="periodo" id="periodo" required>
+            {% if not upload %}
+                {% set upload = None %}
+            {% endif %} <!-- Se não tiver upload, cria uma variável upload vazia pra não dar erro na opção do período -->
+
+            {% for periodo in periodos %}
+                {% include 'option_periodo.html' %}
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="bloco-informacoes">
         <label for="data_registro">Data do registro: </label>
         <input type="date" name="data_registro" {% if upload %} value="{{ upload.data_registro }}"{% endif %} required>
     </div>
