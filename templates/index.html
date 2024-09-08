@@ -81,6 +81,24 @@
         <dialog id="video">
         </dialog>
 
+        <!-- Modal erro -->
+        <dialog id="error">
+
+            <!-- Mensagens de Flash -->
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                <script>
+                    modal_erro = document.getElementById('error')
+                    modal_erro.showModal()
+                </script>
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <button onclick="getElementById('error').close()">Ok</button>
+        </dialog>
+
         <!-- Modal aviso de análise em andamento -->
         <dialog id="mensagem_analise">
             <p>O vídeo está sendo analisado, isso pode demorar alguns minutos!</p>

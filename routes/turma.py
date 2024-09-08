@@ -1,4 +1,4 @@
-from flask import Blueprint, url_for, render_template, redirect, session, request
+from flask import Blueprint, url_for, render_template, redirect, flash, session, request
 from database.models.turma import Turma
 from database.models.sala import Sala
 from database.models.periodo import Periodo
@@ -37,15 +37,28 @@ def form_turma():
 
 @turma_route.route('/', methods=["POST"])
 def inserir_turma():
-
-    """ Adiciona uma turma """
-
     data = request.form
 
-    # Recuperar a instância de Sala e do Período com base no nome fornecido no formulário
+    # Verificar se já existe uma turma com o mesmo nome
+    turma_existente_nome = Turma.select().where(Turma.nome_turma == data['nome_turma']).first()
+
+    # Verificar se já existe uma turma com a mesma sala e período
     sala = Sala.get(Sala.nome_sala == data['sala'])
     periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
+    turma_existente_sala_periodo = Turma.select().where(
+        (Turma.sala == sala) & (Turma.periodo == periodo)
+    ).first()
 
+    # Se o nome ou a combinação de sala e período já existir, impedir a criação
+    if turma_existente_nome:
+        flash("Já existe uma turma cadastrada com esse nome!", "error")
+        return redirect(url_for('home.home'))
+
+    if turma_existente_sala_periodo:
+        flash("Já existe uma turma cadastrada na mesma sala e no mesmo período!", "error")
+        return redirect(url_for('home.home'))
+
+    # Se tudo estiver ok, cria a nova turma
     Turma.create(
         nome_turma=data['nome_turma'],
         sala=sala,
@@ -73,9 +86,26 @@ def atualizar_turma(turma_id):
         # Recuperar a turma a ser editada
         turma_editada = Turma.get_by_id(turma_id)
 
-        # Armazenar a sala e período antigos antes da atualização
-        sala_antiga = turma_editada.sala
-        periodo_antigo = turma_editada.periodo
+        # Verificar se já existe outra turma com o mesmo nome (excluindo a turma atual)
+        turma_existente_nome = Turma.select().where(
+            (Turma.nome_turma == data['nome_turma']) & (Turma.id != turma_id)
+        ).first()
+
+        # Verificar se já existe outra turma com a mesma sala e período (excluindo a turma atual)
+        nova_sala = Sala.get(Sala.nome_sala == data['sala'])
+        novo_periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
+        turma_existente_sala_periodo = Turma.select().where(
+            (Turma.sala == nova_sala) & (Turma.periodo == novo_periodo) & (Turma.id != turma_id)
+        ).first()
+
+        # Se houver duplicidade, exibir erro
+        if turma_existente_nome:
+            flash("Já existe uma turma cadastrada com esse nome!", "error")
+            return redirect(url_for('home.home'))
+        
+        if turma_existente_sala_periodo:
+            flash("Já existe uma turma cadastrada na mesma sala e no mesmo período!", "error")
+            return redirect(url_for('home.home'))
 
         # Recuperar a instância de Sala e Período com base no novo formulário
         nova_sala = Sala.get(Sala.nome_sala == data['sala'])
