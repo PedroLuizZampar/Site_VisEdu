@@ -13,20 +13,22 @@
         >
         <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
 
-        {% if upload %}
         
-            <p>Caso deseja alterar o arquivo, selecione um novo!</p>
-
-        {% endif %}
-        <div class="bloco-select-file">
-            <input id="file" class="input_file" type="file" name="file" accept="video/*" {% if upload %} {% else %} required {% endif %}>
-        </div>
     
         {% if upload %}
         
             <div c-container="{{ url_for('upload.reproduzir_video_form', upload_id=upload.id) }}"></div> <!-- Busca o upload salvo no servidor -->
 
         {% endif %}
+
+        {% if upload %}
+        
+            <h4>Caso deseja alterar o arquivo, selecione um novo!</h4>
+
+        {% endif %}
+        <div class="bloco-select-file">
+            <input id="file" class="input_file" type="file" name="file" accept="video/*" {% if upload %} {% else %} required {% endif %}>
+        </div>
 
         <div class="bloco-informacoes">
             <label for="nome_arquivo">Nome do arquivo: </label>
