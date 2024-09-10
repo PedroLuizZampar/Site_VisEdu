@@ -1,0 +1,482 @@
+/* Estilos globais */
+html {
+    max-width: 100%;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #E5F4FF;
+    margin: 0;
+    padding: 0;
+}
+
+html::-webkit-scrollbar, .modal-body::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+html::-webkit-scrollbar-track, .modal-body::-webkit-scrollbar-track {
+    background-color: none;
+}
+
+html::-webkit-scrollbar-thumb, .modal-body::-webkit-scrollbar-thumb {
+    background-color: #8dcfff;
+    border-radius: 5px;
+}
+
+header {
+    height: 120px;
+}
+
+.NavBar{
+    width: 100%;
+    height: 100%;
+    background-color: #011f36;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.LogoArea{
+    width: 10%;
+}
+
+.logoArea img{
+    width: 80px;
+    height: 80px;
+    padding-left: 30px;
+}
+
+.tabArea{
+    height: 100%;
+    display: flex;
+}
+
+.NavBarSection{
+    font-size: 22px;
+    text-decoration: none;
+    text-transform: none;
+    color:#E5F4FF;
+    
+}
+
+.selected-item-menu {
+    border-bottom: 5px solid #4EB6FF;
+    
+}
+
+.selected-item-menu .NavBarSection{
+    color:#C7E9FF;    
+}
+
+.NavBarItem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 50px;
+    border-bottom: 5px;
+}
+
+.NavBarItem:hover{
+    border-bottom: 5px solid #4EB6FF;
+}
+
+.NavBarSection:hover {
+    color: #e5f4f5;
+}
+
+main {
+    padding: 20px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    align-items: center;
+}
+
+.tab button.active, .tab-upload button.active {
+    background-color: #4EB6FF; /* Cor de fundo do botão ativo */
+    color: #fff; /* Cor do texto do botão ativo */
+}
+
+.tab {
+    background-color: #C7E9FF;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+    width: 300px;
+    margin: 0 auto 20px auto;
+}
+
+.tab button {
+    background-color: #C7E9FF;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100px;
+}
+
+.tab-upload {
+    background-color: #C7E9FF;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+    width: 320px;
+    margin: 0 auto 20px auto;
+}
+
+.tab-upload button {
+    background-color: #C7E9FF;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 160px;
+}
+
+.selected-item-menu {
+    border-bottom: 5px solid #4EB6FF
+}
+
+.upload-button,
+.add-sala,
+.reload-button,
+.action-button,
+dialog button {
+    position: relative;
+    background-color: #1E314E;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin: 0 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.action-button {
+    position: relative;
+    margin: 5px 5px;
+    padding: 5px 10px;
+}
+
+dialog {
+    max-height: 90%;
+    width: 50%;
+    text-align: center;
+    border: none;
+    border-radius: 20px;
+}
+
+dialog form .bloco-informacoes {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 10px auto;
+    width: 80%;
+}
+
+dialog form .bloco-informacoes label,
+dialog form .bloco-informacoes input {
+    width: 100%;
+    margin: 5px 0;
+    text-align: left;
+    
+}
+
+dialog form .bloco-informacoes input, .bloco-informacoes select {
+    border: 0.1px solid rgb(179, 179, 179);
+    border-radius: 4px;
+}
+
+dialog form .bloco-informacoes select {
+    width: 40%;
+    margin: 5px 0;
+    text-align: center;
+    padding: 10px;
+    background: transparent;
+}
+
+dialog form .bloco-informacoes input {
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+dialog button {
+    margin: 15px 10px;
+    width: 165px;
+}
+
+.input_file {
+    margin: 10px 0;
+}
+
+.bloco-botoes-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+dialog video {
+    max-height: 700px;
+}
+
+.modal-body {
+    max-height: 70vh; /* Limita a altura para 70% da altura da viewport */
+    overflow-y: auto; /* Adiciona o scroll vertical quando necessário */
+}
+
+.upload-button .tooltip-text {
+    visibility: hidden;
+    width: 210px;
+    background-color: #1E314E;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 20%;
+    left: -250%;
+    margin-left: -80px;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none; /* Impede que o tooltip seja clicado */
+}
+
+.add-sala .tooltip-text {
+    visibility: hidden;
+    width: 210px;
+    background-color: #1E314E;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 20%;
+    left: 250%;
+    margin-left: -80px;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none; /* Impede que o tooltip seja clicado */
+}
+
+.reload-button .tooltip-text {
+    visibility: hidden;
+    width: 250px;
+    background-color: #1E314E;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: 250%;
+    margin-left: -80px;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none; /* Impede que o tooltip seja clicado */
+}
+
+.action-button .tooltip-text {
+    visibility: hidden;
+    width: 135px;
+    background-color: #07172e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 110%; /* Posiciona acima do botão */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none; /* Impede que o tooltip seja clicado */
+}
+
+.upload-button:hover .tooltip-text,
+.action-button:hover .tooltip-text,
+.reload-button:hover .tooltip-text,
+.add-sala:hover .tooltip-text {
+    visibility: visible;
+    opacity: 0.85;
+}
+
+.loader {
+    border: 16px solid #aeb6c0;
+    border-top: 16px solid #4EB6FF;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin: 20px auto;
+    animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+/* LISTAS */
+
+.div-table {
+    width: 100%;
+}
+
+#file-table {
+    width: 70%;
+    margin: auto;
+    list-style: none;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-collapse: collapse;
+}
+
+#file-table th:not(.th-actions) { /* Todas exceto a .th-actions */
+    text-align: center;
+    padding: 10px;
+    border: 0px solid #1E314E;
+    border-right: rgb(211, 211, 211) 0.1px solid;
+}
+
+#file-table th {
+    background-color: #C7E9FF;
+}
+
+#file-table td {
+    text-align: center;
+    padding: 10px;
+    border-top: 0.1px solid rgb(211, 211, 211);
+    border-right: rgb(211, 211, 211) 0.1px solid;
+}
+
+#file-table td.td-actions {
+    border-right: none;
+}
+
+.actions-list {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.th-actions {
+    border-radius: 0 8px 0 0;
+}
+
+.th-id {
+    border-radius: 8px 0 0 0 ;
+}
+
+.menu-toggle {
+    display: none;
+}
+
+/* Estilos para o toggle da navbar em resoluções menores */
+@media (max-width: 1000px) {
+    .logoArea {
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .NavBar {
+        position: relative;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tabArea {
+        display: none; /* Oculta os links inicialmente */
+        flex-direction: column;
+        width: 100%;
+        background-color: #011f36;
+        z-index: 1;
+    }
+
+    .NavBarItem {
+        margin: 0;
+        text-align: center;
+        padding: 20px 0;
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    .menu-toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 0;
+        height: 0;
+    }
+
+    .menu-toggle i {
+        position: absolute;
+        right: 50px;
+        top: 50px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #E5F4FF;
+    }
+
+    .NavBar.active .tabArea {
+        display: flex; /* Exibe o menu quando o botão for clicado */
+        height: 1000px;
+    }
+}
+
+
+.input_file {
+    width: 400px; /* Ajusta a largura */
+}    
+
+.input_file::file-selector-button {
+    background-color: #C7E9FF;
+    color: black;
+    border: 1px solid #aeb6c0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.bloco-select-file {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 10px auto;
+    width: 80%;
+}
+
+/* GENERICO */
+.btn-generico {     
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.input-generico {
+    border: 0.1px solid rgb(179, 179, 179);
+    border-radius: 4px;
+    padding: 10px;
+    box-sizing: border-box;
+}
