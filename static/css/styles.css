@@ -10,6 +10,20 @@ body {
     padding: 0;
 }
 
+html::-webkit-scrollbar, .modal-body::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+html::-webkit-scrollbar-track, .modal-body::-webkit-scrollbar-track {
+    background-color: none;
+}
+
+html::-webkit-scrollbar-thumb, .modal-body::-webkit-scrollbar-thumb {
+    background-color: #8dcfff;
+    border-radius: 5px;
+}
+
 header {
     height: 120px;
 }
@@ -61,6 +75,7 @@ header {
     align-items: center;
     justify-content: center;
     margin: 0 50px;
+    border-bottom: 5px;
 }
 
 .NavBarItem:hover{
@@ -75,11 +90,6 @@ main {
     padding: 20px;
 }
 
-.tab button.active {
-    background-color: #4EB6FF; /* Cor de fundo do botão ativo */
-    color: #fff; /* Cor do texto do botão ativo */
-}
-
 .content {
     display: flex;
     flex-direction: column;
@@ -90,20 +100,49 @@ main {
     align-items: center;
 }
 
+.tab button.active, .tab-upload button.active {
+    background-color: #4EB6FF; /* Cor de fundo do botão ativo */
+    color: #fff; /* Cor do texto do botão ativo */
+}
+
 .tab {
+    background-color: #C7E9FF;
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+    width: 300px;
+    margin: 0 auto 20px auto;
 }
 
 .tab button {
     background-color: #C7E9FF;
     border: none;
     padding: 10px 20px;
-    margin: 0 5px;
     border-radius: 20px;
     cursor: pointer;
     font-size: 16px;
+    width: 100px;
+}
+
+.tab-upload {
+    background-color: #C7E9FF;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+    width: 320px;
+    margin: 0 auto 20px auto;
+}
+
+.tab-upload button {
+    background-color: #C7E9FF;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 160px;
 }
 
 .active {
@@ -191,6 +230,11 @@ dialog button {
 
 dialog video {
     max-height: 700px;
+}
+
+.modal-body {
+    max-height: 70vh; /* Limita a altura para 70% da altura da viewport */
+    overflow-y: auto; /* Adiciona o scroll vertical quando necessário */
 }
 
 .upload-button .tooltip-text {
@@ -372,7 +416,7 @@ dialog video {
         text-align: center;
         padding: 20px 0;
         width: 50%;
-        margin: 5px auto;
+        margin: 0 auto;
     }
 
     .menu-toggle {

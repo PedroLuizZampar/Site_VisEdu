@@ -6,7 +6,7 @@ from database.models.turma import Turma
 
 class Upload(Model):
     nome_arquivo = CharField()
-    sala = ForeignKeyField(Sala, backref='uploads', on_delete='RESTRICT')  # Adiciona a chave estrangeira e evita deleção em cascata quando uma sala for deletada
+    sala = ForeignKeyField(Sala, backref='uploads', on_delete='RESTRICT', null=True)  # Adiciona a chave estrangeira e evita deleção em cascata quando uma sala for deletada
     periodo = ForeignKeyField(Periodo, backref='uploads', on_delete='RESTRICT')
     turma = ForeignKeyField(Turma, backref='uploads', on_delete='RESTRICT', null=True)
     data_registro = DateField()

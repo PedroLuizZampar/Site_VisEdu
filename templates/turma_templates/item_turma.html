@@ -1,7 +1,13 @@
 <tr id="turma-{{turma.id }}">
     <td scope="row">{{ turma.id }}</td>
     <td>{{ turma.nome_turma }}</td>
-    <td>{{ turma.sala.nome_sala }}</td>
+    <td>
+        {% if turma.sala %}
+            {{ turma.sala.nome_sala }}
+        {% else %}
+            Sala não cadastrada!
+        {% endif %}
+    </td>
     <td>{{ turma.periodo.nome_periodo }}</td>
     <td>{{ turma.qtde_alunos }}</td>
     <td>

@@ -1,5 +1,7 @@
 from flask import Blueprint, url_for, render_template, redirect, flash, session, request
 from database.models.sala import Sala
+from database.models.upload import Upload
+from database.models.turma import Turma
 from funcoes_extras import alterando_sessions_para_false
 
 sala_route = Blueprint("sala", __name__)
@@ -10,16 +12,10 @@ def lista_salas():
 
     salas = Sala.select()
 
-    salas_ativas = []
-
-    for sala in salas:
-        if (sala.is_ativa == True):
-            salas_ativas.append(sala)
-
     alterando_sessions_para_false()
     session['visualizando_salas'] = True
 
-    return render_template("sala_templates/lista_salas.html", salas=salas_ativas)
+    return render_template("sala_templates/lista_salas.html", salas=salas)
 
 @sala_route.route('/new')
 def form_sala():
@@ -29,6 +25,12 @@ def form_sala():
 @sala_route.route('/', methods=["POST"])
 def inserir_sala():
     data = request.form
+
+    sala_existente_nome = Sala.select().where(Sala.nome_sala == data['nome_sala']).first()
+
+    if sala_existente_nome:
+        flash("Já existe uma sala cadastrada com esse nome!", "error")
+        return redirect(url_for('home.home'))
 
     Sala.create(
         nome_sala=data['nome_sala']
@@ -51,6 +53,14 @@ def atualizar_sala(sala_id):
     if request.form.get('_method') == "PUT":
         data = request.form
 
+        sala_existente_nome = Sala.select().where(
+            (Sala.nome_sala == data['nome_sala']) & (Sala.id != sala_id)
+            ).first()
+        
+        if sala_existente_nome:
+            flash("Já existe uma sala cadastrada com esse nome!", "error")
+            return redirect(url_for('home.home'))
+
         sala_editada = Sala.get_by_id(sala_id)
 
         sala_editada.nome_sala = data['nome_sala']
@@ -63,9 +73,19 @@ def atualizar_sala(sala_id):
 def deletar_sala(sala_id):
 
     sala = Sala.get_by_id(sala_id)
+    uploads = Upload.select()
+    turmas = Turma.select()
 
-    sala.is_ativa = False
+    for upload in uploads:
+        if upload.sala == sala:
+            upload.sala = None
+            upload.save()
 
-    sala.save()
+    for turma in turmas:
+        if turma.sala == sala:
+            turma.sala = None
+            turma.save()
 
-    return {"Sala inativada": "ok"}
+    sala.delete_instance()
+
+    return {"Sala excluída": "ok"}

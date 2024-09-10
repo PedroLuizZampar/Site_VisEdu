@@ -1,7 +1,13 @@
 <tr id="upload-{{upload.id }}">
     <td scope="row">{{ upload.id }}</td>
     <td>{{ upload.nome_arquivo }}</td>
-    <td>{{ upload.sala.nome_sala }}</td>
+    <td>
+        {% if upload.sala %}
+            {{ upload.sala.nome_sala }}
+        {% else %}
+            Sala não cadastrada!
+        {% endif %}
+    </td>
     <td>
         {% if upload.turma %}
             {{ upload.turma.nome_turma }}

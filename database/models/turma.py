@@ -5,7 +5,7 @@ from database.models.periodo import Periodo
 
 class Turma(Model):
     nome_turma = CharField()
-    sala = ForeignKeyField(Sala, backref='turma', on_delete='RESTRICT')  # Adiciona a chave estrangeira e evita deleção em cascata quando uma sala for deletada
+    sala = ForeignKeyField(Sala, backref='turma', on_delete='RESTRICT', null=True)  # Adiciona a chave estrangeira e evita deleção em cascata quando uma sala for deletada
     periodo = ForeignKeyField(Periodo, backref='turma', on_delete='RESTRICT')
     qtde_alunos = IntegerField()
 

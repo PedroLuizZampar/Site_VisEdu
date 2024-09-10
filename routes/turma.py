@@ -27,12 +27,6 @@ def form_turma():
     periodos = Periodo.select()
     salas = Sala.select()
 
-    salas_ativas = []
-
-    for sala in salas:
-        if (sala.is_ativa == True):
-            salas_ativas.append(sala)
-
     return render_template("turma_templates/form_turma.html", periodos=periodos, salas=salas)
 
 @turma_route.route('/', methods=["POST"])
@@ -65,6 +59,8 @@ def inserir_turma():
         periodo=periodo,
         qtde_alunos=data['qtde_alunos']
     )
+
+    atualizando_turma_upload()
 
     return redirect(url_for('home.home'))
 
@@ -128,6 +124,12 @@ def deletar_turma(turma_id):
     """ Deleta o registro da turma selecionada """
 
     turma = Turma.get_by_id(turma_id)
+    uploads = Upload.select()
+
+    for upload in uploads:
+        if upload.turma == turma:
+            upload.turma = None
+            upload.save()
 
     turma.delete_instance()
 

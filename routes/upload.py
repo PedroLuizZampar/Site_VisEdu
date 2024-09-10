@@ -139,13 +139,7 @@ def form_upload():
     salas = Sala.select()
     periodos = Periodo.select()
 
-    salas_ativas = []
-
-    for sala in salas:
-        if (sala.is_ativa == True):
-            salas_ativas.append(sala)
-
-    return render_template("upload_templates/form_upload.html", salas=salas_ativas, periodos=periodos)
+    return render_template("upload_templates/form_upload.html", salas=salas, periodos=periodos)
 
 @upload_route.route('/<int:upload_id>/edit')
 def form_edit_upload(upload_id):
@@ -156,13 +150,7 @@ def form_edit_upload(upload_id):
     salas = Sala.select()
     periodos = Periodo.select()
 
-    salas_ativas = []
-
-    for sala in salas:
-        if (sala.is_ativa == True):
-            salas_ativas.append(sala)
-
-    return render_template("upload_templates/form_upload.html", upload=upload_selecionado, salas=salas_ativas, periodos=periodos)
+    return render_template("upload_templates/form_upload.html", upload=upload_selecionado, salas=salas, periodos=periodos)
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
