@@ -145,8 +145,8 @@ main {
     width: 160px;
 }
 
-.active {
-    border-bottom: 1px solid #4EB6FF
+.selected-item-menu {
+    border-bottom: 5px solid #4EB6FF
 }
 
 .upload-button,
@@ -196,16 +196,16 @@ dialog form .bloco-informacoes input {
 }
 
 dialog form .bloco-informacoes input, .bloco-informacoes select {
-    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
     border: 0.1px solid rgb(179, 179, 179);
     border-radius: 4px;
 }
 
 dialog form .bloco-informacoes select {
-    width: 30%;
+    width: 40%;
     margin: 5px 0;
     text-align: center;
-    height: 30px;
+    padding: 10px;
+    background: transparent;
 }
 
 dialog form .bloco-informacoes input {
@@ -440,4 +440,43 @@ dialog video {
         display: flex; /* Exibe o menu quando o botão for clicado */
         height: 1000px;
     }
+}
+
+
+.input_file {
+    width: 400px; /* Ajusta a largura */
+}    
+
+.input_file::file-selector-button {
+    background-color: #C7E9FF;
+    color: black;
+    border: 1px solid #aeb6c0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.bloco-select-file {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 10px auto;
+    width: 80%;
+}
+
+/* GENERICO */
+.btn-generico {     
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.input-generico {
+    border: 0.1px solid rgb(179, 179, 179);
+    border-radius: 4px;
+    padding: 10px;
+    box-sizing: border-box;
 }
