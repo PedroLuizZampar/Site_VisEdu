@@ -1,0 +1,27 @@
+<div class="modal-body">
+    <h1>Nova Sala</h1>
+    <form enctype="multipart/form-data" method="POST"
+        {% if sala %}
+            action="{{ url_for('sala.atualizar_sala', sala_id=sala.id) }}"
+            c-swap="#sala-{{ sala.id }}"
+        {% else %}
+            action="{{ url_for('sala.inserir_sala') }}"
+            c-append="lista-salas"
+        {% endif %}
+        c-callback="fecharModal">
+
+        <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
+
+        <div class="bloco-informacoes">
+            <label for="nome_sala">Nome: </label>
+            <input type="text" name="nome_sala" {% if sala %} value="{{ sala.nome_sala }}" {% endif %} required>
+        </div>
+
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close()">Cancelar</button>
+            <button type="submit">
+                {% if sala %}Atualizar Sala{% else %}Adicionar Sala{% endif %}
+            </button>
+        </div>
+    </form>
+</div>

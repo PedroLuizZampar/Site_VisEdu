@@ -1,0 +1,83 @@
+<div class="modal-body">
+    <h1>Novo Upload</h1>
+
+    <form enctype="multipart/form-data" method="POST"
+        {% if upload %}
+            action="{{ url_for('upload.atualizar_upload', upload_id=upload.id) }}"
+            c-swap="#upload-{{ upload.id }}"
+        {% else %}
+            action="{{ url_for('upload.inserir_upload') }}"
+            c-append="#lista-uploads"
+        {% endif %}
+        c-callback="fecharModal"
+        >
+        <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
+
+        
+    
+        {% if upload %}
+        
+            <div c-container="{{ url_for('upload.reproduzir_video_form', upload_id=upload.id) }}"></div> <!-- Busca o upload salvo no servidor -->
+
+        {% endif %}
+
+        {% if upload %}
+        
+            <h4>Caso deseja alterar o arquivo, selecione um novo!</h4>
+
+        {% endif %}
+        <div class="bloco-select-file">
+            <input id="file" class="input_file" type="file" name="file" accept="video/*" {% if upload %} {% else %} required {% endif %}>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="nome_arquivo">Nome do arquivo: </label>
+            <input type="text" name="nome_arquivo" {% if upload %} value="{{ upload.nome_arquivo }}"{% endif %} required>
+        </div>
+
+
+
+        <div class="bloco-informacoes">
+            <label for="sala">Sala: </label>
+            <select name="sala" id="sala" required>
+                {% if not upload %}
+                    {% set upload = None %}
+                {% endif %} <!-- Se não tiver upload, cria uma variável upload vazia pra não dar erro na opção da sala -->
+
+                {% for sala in salas %}
+                    {% include 'cadastro/option_sala.html' %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="periodo">Periodo: </label>
+            <select name="periodo" id="periodo" required>
+                {% if not upload %}
+                    {% set upload = None %}
+                {% endif %} <!-- Se não tiver upload, cria uma variável upload vazia pra não dar erro na opção do período -->
+
+                {% for periodo in periodos %}
+                    {% include 'cadastro/option_periodo.html' %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="data_registro">Data do registro: </label>
+            <input type="date" name="data_registro" {% if upload %} value="{{ upload.data_registro }}"{% endif %} required>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="hora_registro">Hora do registro: </label>
+            <input type="time" name="hora_registro" {% if upload %} value="{{ upload.hora_registro }}"{% endif %} required>
+        </div>
+
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close();">Cancelar</button>
+            <button type="submit">
+                {% if upload %}Atualizar upload{% else %}Adicionar upload{% endif %}
+            </button>
+        </div>    
+    </form>
+</div>

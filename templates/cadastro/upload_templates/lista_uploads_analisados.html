@@ -1,0 +1,40 @@
+<div class="div-table">
+    <div class="tab-upload">
+        <button
+            c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
+            c-target=".content">
+            Não Analisados
+        </button>
+        <button class="active"
+            c-get="{{ url_for('upload.lista_uploads_analisados') }}"
+            c-target=".content">
+            Analisados
+        </button>
+    </div>
+    <div class="actions-list">
+        <button class="reload-button">
+            <span class="tooltip-text">Não está vendo o upload? Recarregue a lista aqui!</span>
+            🔄
+        </button>
+    </div>
+
+    <table id="file-table">
+        <thead>
+            <tr>
+                <th scope="col" class="th-id">#</th>
+                <th>Nome</th>
+                <th>Sala</th>
+                <th>Turma</th>
+                <th>Periodo</th>
+                <th>Data de registro</th>
+                <th>Hora de registro</th>
+                <th class="th-actions">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-uploads">
+            {% for upload in uploads %}
+                {% include 'cadastro/upload_templates/item_upload.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

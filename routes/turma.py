@@ -17,7 +17,7 @@ def lista_turmas():
     alterando_sessions_para_false()
     session['visualizando_turmas'] = True
 
-    return render_template("turma_templates/lista_turmas.html", turmas=turmas)
+    return render_template("cadastro/turma_templates/lista_turmas.html", turmas=turmas)
 
 @turma_route.route('/new')
 def form_turma():
@@ -27,7 +27,7 @@ def form_turma():
     periodos = Periodo.select()
     salas = Sala.select()
 
-    return render_template("turma_templates/form_turma.html", periodos=periodos, salas=salas)
+    return render_template("cadastro/turma_templates/form_turma.html", periodos=periodos, salas=salas)
 
 @turma_route.route('/', methods=["POST"])
 def inserir_turma():
@@ -46,11 +46,11 @@ def inserir_turma():
     # Se o nome ou a combinação de sala e período já existir, impedir a criação
     if turma_existente_nome:
         flash("Já existe uma turma cadastrada com esse nome!", "error")
-        return redirect(url_for('home.home'))
+        return redirect(url_for('cadastro.tela_cadastro'))
 
     if turma_existente_sala_periodo:
         flash("Já existe uma turma cadastrada na mesma sala e no mesmo período!", "error")
-        return redirect(url_for('home.home'))
+        return redirect(url_for('cadastro.tela_cadastro'))
 
     # Se tudo estiver ok, cria a nova turma
     Turma.create(
@@ -62,7 +62,7 @@ def inserir_turma():
 
     atualizando_turma_upload()
 
-    return redirect(url_for('home.home'))
+    return redirect(url_for('cadastro.tela_cadastro'))
 
 @turma_route.route('<int:turma_id>/edit')
 def form_edit_turma(turma_id):
@@ -72,7 +72,7 @@ def form_edit_turma(turma_id):
 
     turma_selecionada = Turma.get_by_id(turma_id)
 
-    return render_template("turma_templates/form_turma.html", turma=turma_selecionada, periodos=periodos, salas=salas)
+    return render_template("cadastro/turma_templates/form_turma.html", turma=turma_selecionada, periodos=periodos, salas=salas)
 
 @turma_route.route('/<int:turma_id>/update', methods=["POST"])
 def atualizar_turma(turma_id):
@@ -97,11 +97,11 @@ def atualizar_turma(turma_id):
         # Se houver duplicidade, exibir erro
         if turma_existente_nome:
             flash("Já existe uma turma cadastrada com esse nome!", "error")
-            return redirect(url_for('home.home'))
+            return redirect(url_for('cadastro.tela_cadastro'))
         
         if turma_existente_sala_periodo:
             flash("Já existe uma turma cadastrada na mesma sala e no mesmo período!", "error")
-            return redirect(url_for('home.home'))
+            return redirect(url_for('cadastro.tela_cadastro'))
 
         # Recuperar a instância de Sala e Período com base no novo formulário
         nova_sala = Sala.get(Sala.nome_sala == data['sala'])
@@ -116,7 +116,7 @@ def atualizar_turma(turma_id):
 
         atualizando_turma_upload()
 
-    return redirect(url_for('home.home'))
+    return redirect(url_for('cadastro.tela_cadastro'))
 
 @turma_route.route('<int:turma_id>/delete', methods=["DELETE"])
 def deletar_turma(turma_id):

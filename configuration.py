@@ -1,4 +1,5 @@
 from routes.home import home_route
+from routes.cadastro import cadastro_route
 from routes.upload import upload_route
 from routes.sala import sala_route
 from routes.turma import turma_route
@@ -17,9 +18,10 @@ def configure_all(app):
 
 def configure_routes(app):
     app.register_blueprint(home_route) # Prefix = "/"
-    app.register_blueprint(upload_route, url_prefix = "/upload")
-    app.register_blueprint(sala_route, url_prefix = "/sala")
-    app.register_blueprint(turma_route, url_prefix="/turma")
+    app.register_blueprint(cadastro_route, url_prefix="/cadastro")
+    app.register_blueprint(upload_route, url_prefix = "/cadastro/upload")
+    app.register_blueprint(sala_route, url_prefix = "/cadastro/sala")
+    app.register_blueprint(turma_route, url_prefix="/cadastro/turma")
 
 def configure_db():
     db.connect()

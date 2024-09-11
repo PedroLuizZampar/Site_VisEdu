@@ -15,12 +15,12 @@ def lista_salas():
     alterando_sessions_para_false()
     session['visualizando_salas'] = True
 
-    return render_template("sala_templates/lista_salas.html", salas=salas)
+    return render_template("cadastro/sala_templates/lista_salas.html", salas=salas)
 
 @sala_route.route('/new')
 def form_sala():
 
-    return render_template("sala_templates/form_sala.html")
+    return render_template("cadastro/sala_templates/form_sala.html")
 
 @sala_route.route('/', methods=["POST"])
 def inserir_sala():
@@ -30,7 +30,7 @@ def inserir_sala():
 
     if sala_existente_nome:
         flash("Já existe uma sala cadastrada com esse nome!", "error")
-        return redirect(url_for('home.home'))
+        return redirect(url_for('cadastro.tela_cadastro'))
 
     Sala.create(
         nome_sala=data['nome_sala']
@@ -39,14 +39,14 @@ def inserir_sala():
     # Armazena dados temporariamente na sessão
     session['visualizando_salas'] = True
 
-    return redirect(url_for('home.home'))
+    return redirect(url_for('cadastro.tela_cadastro'))
 
 @sala_route.route('<int:sala_id>/edit')
 def form_edit_sala(sala_id):
 
     sala_selecionada = Sala.get_by_id(sala_id)
 
-    return render_template("sala_templates/form_sala.html", sala=sala_selecionada)
+    return render_template("cadastro/sala_templates/form_sala.html", sala=sala_selecionada)
 
 @sala_route.route('/<int:sala_id>/update', methods=["POST"])
 def atualizar_sala(sala_id):
@@ -59,7 +59,7 @@ def atualizar_sala(sala_id):
         
         if sala_existente_nome:
             flash("Já existe uma sala cadastrada com esse nome!", "error")
-            return redirect(url_for('home.home'))
+            return redirect(url_for('cadastro.tela_cadastro'))
 
         sala_editada = Sala.get_by_id(sala_id)
 
@@ -67,7 +67,7 @@ def atualizar_sala(sala_id):
 
         sala_editada.save()
 
-    return redirect(url_for('home.home'))
+    return redirect(url_for('cadastro.tela_cadastro'))
 
 @sala_route.route('/<int:sala_id>/delete', methods=["DELETE"])
 def deletar_sala(sala_id):

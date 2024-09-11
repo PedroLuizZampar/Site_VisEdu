@@ -59,7 +59,7 @@ def lista_uploads_nao_analisados():
         if upload.is_analisado == 0:
             uploads_nao_analisados.append(upload)
 
-    return render_template("upload_templates/lista_uploads_nao_analisados.html", uploads=uploads_nao_analisados)
+    return render_template("cadastro/upload_templates/lista_uploads_nao_analisados.html", uploads=uploads_nao_analisados)
 
 @upload_route.route('/analisados')
 def lista_uploads_analisados():
@@ -77,7 +77,7 @@ def lista_uploads_analisados():
         if upload.is_analisado == 1:
             uploads_analisados.append(upload)
 
-    return render_template("upload_templates/lista_uploads_analisados.html", uploads=uploads_analisados)
+    return render_template("cadastro/upload_templates/lista_uploads_analisados.html", uploads=uploads_analisados)
 
 @upload_route.route('/', methods=["POST"])
 def inserir_upload():
@@ -126,7 +126,7 @@ def inserir_upload():
         caminho_arquivo=caminho_arquivo
         )
 
-        return redirect(url_for('home.home'))
+        return redirect(url_for('cadastro.tela_cadastro'))
     else:
         flash("Arquivo não permitido!")
         return redirect(request.referrer)
@@ -139,7 +139,7 @@ def form_upload():
     salas = Sala.select()
     periodos = Periodo.select()
 
-    return render_template("upload_templates/form_upload.html", salas=salas, periodos=periodos)
+    return render_template("cadastro/upload_templates/form_upload.html", salas=salas, periodos=periodos)
 
 @upload_route.route('/<int:upload_id>/edit')
 def form_edit_upload(upload_id):
@@ -150,7 +150,7 @@ def form_edit_upload(upload_id):
     salas = Sala.select()
     periodos = Periodo.select()
 
-    return render_template("upload_templates/form_upload.html", upload=upload_selecionado, salas=salas, periodos=periodos)
+    return render_template("cadastro/upload_templates/form_upload.html", upload=upload_selecionado, salas=salas, periodos=periodos)
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
@@ -210,7 +210,7 @@ def atualizar_upload(upload_id):
 
         upload_editado.save()  # Salva as alterações no banco
 
-        return redirect(url_for('home.home'))
+        return redirect(url_for('cadastro.tela_cadastro'))
 
 
 @upload_route.route('/<int:upload_id>/view_on_form')
@@ -222,7 +222,7 @@ def reproduzir_video_form(upload_id):
     nome_arquivo = upload.nome_arquivo
     timestamp = int(time.time())  # Adiciona um timestamp como parâmetro de consulta (Isso evita um bug na reprodução do vídeo e não sei o porquê. NÃO REMOVER)
 
-    return render_template('video.html', nome_arquivo=nome_arquivo, timestamp=timestamp)
+    return render_template('cadastro/video.html', nome_arquivo=nome_arquivo, timestamp=timestamp)
 
 @upload_route.route('/<int:upload_id>/view')
 def reproduzir_video_modal(upload_id):
@@ -233,7 +233,7 @@ def reproduzir_video_modal(upload_id):
     nome_arquivo = upload.nome_arquivo
     timestamp = int(time.time())  # Adiciona um timestamp como parâmetro de consulta (Isso evita um bug na reprodução do vídeo e não sei o porquê. NÃO REMOVER)
 
-    return render_template('video.html', nome_arquivo=nome_arquivo, timestamp=timestamp, modal=True)
+    return render_template('cadastro/video.html', nome_arquivo=nome_arquivo, timestamp=timestamp, modal=True)
 
 @upload_route.route('/<filename>')
 def uploaded_file(filename):
@@ -379,7 +379,7 @@ def cancelar_analise():
 
     cancelado = True
 
-    return redirect(url_for('home.home'))
+    return redirect(url_for('cadastro.tela_cadastro'))
 
 @upload_route.route('<int:upload_id>/deletar_analise', methods=["DELETE"])
 def deletar_analise(upload_id):
