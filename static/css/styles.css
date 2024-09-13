@@ -111,7 +111,7 @@ main {
     justify-content: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: 25px;
-    width: 300px;
+    width: 200px;
     margin: 0 auto 20px auto;
 }
 
@@ -422,11 +422,9 @@ dialog video {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 0;
-        height: 0;
     }
 
-    .menu-toggle i {
+    .menu-toggle {
         position: absolute;
         right: 50px;
         top: 50px;

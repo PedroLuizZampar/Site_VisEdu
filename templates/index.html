@@ -7,15 +7,31 @@
     <link rel="stylesheet" href="../static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        .image {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 800px
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
         }
 
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70%;
+        }
+
+        .image {
+            max-width: 100%;
+            max-height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    
         img {
-            height: 500px;
+            width: 40%;
+            object-fit: contain; /* Garante que a imagem seja redimensionada sem perder proporção */
+            opacity: 0.8;
         }
     </style>
     <link rel="icon" type="image/x-icon" href="../static/images/logoNavBarSemFundo.png">
@@ -24,14 +40,16 @@
     <header>
         <div class="NavBar">
             <div class="logoArea">
-                <img src="../static/images/logoNavBarSemFundo.png" alt="">
+                <a href="/">
+                    <img src="../static/images/logoNavBarSemFundo.png" alt="">
+                </a>
             </div>
             <div class="tabArea">
                 <div class="NavBarItem">
-                    <a class="NavBarSection" href="/cadastro">Cadastro</a>
+                    <a class="NavBarSection" class="NavBarSection" href="/cadastro">Cadastro</a>
                 </div>
                 <div class="NavBarItem">
-                    <a class="NavBarSection" href="">Uploads</a>
+                    <a class="NavBarSection" href="/upload">Uploads</a>
                 </div>
                 <div class="NavBarItem">
                     <a class="NavBarSection" href="">Relatórios</a>
@@ -49,19 +67,18 @@
         <div class="image">
             <img src="../static/images/LogoFundoRemovido.png" alt="Logo">
         </div>
-    <script src="{{ url_for('static', filename='cru.js') }}"></script>
 
-    <div class="teste"></div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const toggleButton = document.querySelector('.menu-toggle');
-            const navBar = document.querySelector('.NavBar');
-            
-            toggleButton.addEventListener('click', function() {
-                navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const toggleButton = document.querySelector('.menu-toggle');
+                const navBar = document.querySelector('.NavBar');
+                
+                toggleButton.addEventListener('click', function() {
+                    navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
+                });
             });
-        });
-    </script>
+        </script>
+        <script src="{{ url_for('static', filename='cru.js') }}"></script>
+    </main>
 </body>
 </html>

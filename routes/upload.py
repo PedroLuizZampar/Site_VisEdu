@@ -43,6 +43,16 @@ def gerar_nome_unico(directory, filename):
 
     return new_filename
 
+@upload_route.route('/')
+def tela_uploads():
+    visualizando_uploads = session.pop('visualizando_uploads', None)
+    visualizando_uploads_analisados = session.pop('visualizando_uploads_analisados', None)
+    visualizando_uploads_nao_analisados = session.pop('visualizando_uploads_nao_analisados', None)
+
+    session['visualizando_uploads'] = True
+
+    return render_template('/upload/index.html', visualizando_uploads=visualizando_uploads, visualizando_uploads_analisados=visualizando_uploads_analisados, visualizando_uploads_nao_analisados=visualizando_uploads_nao_analisados)
+
 @upload_route.route('/nao_analisados')
 def lista_uploads_nao_analisados():
 
@@ -59,7 +69,7 @@ def lista_uploads_nao_analisados():
         if upload.is_analisado == 0:
             uploads_nao_analisados.append(upload)
 
-    return render_template("cadastro/upload_templates/lista_uploads_nao_analisados.html", uploads=uploads_nao_analisados)
+    return render_template("upload/upload_templates/lista_uploads_nao_analisados.html", uploads=uploads_nao_analisados)
 
 @upload_route.route('/analisados')
 def lista_uploads_analisados():
@@ -77,7 +87,7 @@ def lista_uploads_analisados():
         if upload.is_analisado == 1:
             uploads_analisados.append(upload)
 
-    return render_template("cadastro/upload_templates/lista_uploads_analisados.html", uploads=uploads_analisados)
+    return render_template("upload/upload_templates/lista_uploads_analisados.html", uploads=uploads_analisados)
 
 @upload_route.route('/', methods=["POST"])
 def inserir_upload():
@@ -126,7 +136,7 @@ def inserir_upload():
         caminho_arquivo=caminho_arquivo
         )
 
-        return redirect(url_for('cadastro.tela_cadastro'))
+        return redirect(url_for('upload.tela_uploads'))
     else:
         flash("Arquivo não permitido!")
         return redirect(request.referrer)
@@ -139,7 +149,7 @@ def form_upload():
     salas = Sala.select()
     periodos = Periodo.select()
 
-    return render_template("cadastro/upload_templates/form_upload.html", salas=salas, periodos=periodos)
+    return render_template("upload/upload_templates/form_upload.html", salas=salas, periodos=periodos)
 
 @upload_route.route('/<int:upload_id>/edit')
 def form_edit_upload(upload_id):
@@ -150,7 +160,7 @@ def form_edit_upload(upload_id):
     salas = Sala.select()
     periodos = Periodo.select()
 
-    return render_template("cadastro/upload_templates/form_upload.html", upload=upload_selecionado, salas=salas, periodos=periodos)
+    return render_template("upload/upload_templates/form_upload.html", upload=upload_selecionado, salas=salas, periodos=periodos)
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
@@ -210,7 +220,7 @@ def atualizar_upload(upload_id):
 
         upload_editado.save()  # Salva as alterações no banco
 
-        return redirect(url_for('cadastro.tela_cadastro'))
+        return redirect(url_for('upload.tela_uploads'))
 
 
 @upload_route.route('/<int:upload_id>/view_on_form')
@@ -379,7 +389,7 @@ def cancelar_analise():
 
     cancelado = True
 
-    return redirect(url_for('cadastro.tela_cadastro'))
+    return redirect(url_for('upload.tela_uploads'))
 
 @upload_route.route('<int:upload_id>/deletar_analise', methods=["DELETE"])
 def deletar_analise(upload_id):

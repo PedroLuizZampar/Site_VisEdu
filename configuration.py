@@ -19,7 +19,7 @@ def configure_all(app):
 def configure_routes(app):
     app.register_blueprint(home_route) # Prefix = "/"
     app.register_blueprint(cadastro_route, url_prefix="/cadastro")
-    app.register_blueprint(upload_route, url_prefix = "/cadastro/upload")
+    app.register_blueprint(upload_route, url_prefix = "/upload")
     app.register_blueprint(sala_route, url_prefix = "/cadastro/sala")
     app.register_blueprint(turma_route, url_prefix="/cadastro/turma")
 

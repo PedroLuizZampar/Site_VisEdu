@@ -8,6 +8,9 @@ def alterando_sessions_para_false():
     session['visualizando_uploads_nao_analisados'] = False
     session['visualizando_uploads_analisados'] = False
     session['visualizando_turmas'] = False
+    session['visualizando_cadastros'] = False
+    session['visualizando_uploads'] = False
+    session['visalizando_index'] = False
 
 def atualizando_turma_upload():
     turmas = Turma.select()

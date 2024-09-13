@@ -6,19 +6,22 @@
     <title>Interface de Upload</title>
     <link rel="stylesheet" href="../static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../static/images/logoNavBarSemFundo.png">
 </head>
 <body>
     <header>
         <div class="NavBar">
             <div class="logoArea">
-                <img src="../static/images/logoNavBarSemFundo.png" alt="">
+                <a href="/">
+                    <img src="../static/images/logoNavBarSemFundo.png" alt="">
+                </a>
             </div>
             <div class="tabArea">
                 <div class="NavBarItem selected-item-menu">
-                    <a class="NavBarSection" href="/cadastro">Cadastro</a>
+                    <a class="NavBarSection" class="NavBarSection" href="/cadastro">Cadastro</a>
                 </div>
                 <div class="NavBarItem">
-                    <a class="NavBarSection" href="">Uploads</a>
+                    <a class="NavBarSection" href="/upload">Uploads</a>
                 </div>
                 <div class="NavBarItem">
                     <a class="NavBarSection" href="">Relatórios</a>
@@ -35,13 +38,7 @@
     <main>
 
         <div class="tab">
-            <button id="uploads-button" {% if not visualizando_salas and not visualizando_turmas %}class="active"{% endif %}
-                c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
-                c-target=".div-table">
-                Uploads
-            </button>
-
-            <button id="salas-button" {% if visualizando_salas %}class="active"{% endif %}
+            <button id="salas-button" {% if not visualizando_turmas %}class="active"{% endif %}
                 c-get="{{ url_for('sala.lista_salas') }}"
                 c-target=".div-table">
                 Salas
@@ -59,18 +56,12 @@
             {% if visualizando_salas %}
                 c-container="{{ url_for('sala.lista_salas') }}"
 
-            {% elif visualizando_uploads_nao_analisados %}
-                c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}"
-
-            {% elif visualizando_uploads_analisados %}
-                c-container="{{ url_for('upload.lista_uploads_analisados') }}"
-
             {% elif visualizando_turmas %}
                 c-container="{{ url_for('turma.lista_turmas') }}"
             
             {% endif %}
             
-            c-container="{{ url_for('upload.lista_uploads_nao_analisados') }}">
+            c-container="{{ url_for('sala.lista_salas') }}">
         </section>    
 
         <!-- Modal formulários -->
@@ -99,76 +90,16 @@
             <button onclick="getElementById('error').close()">Ok</button>
         </dialog>
 
-        <!-- Modal aviso de análise em andamento -->
-        <dialog id="mensagem_analise">
-            <p>O vídeo está sendo analisado, isso pode demorar alguns minutos!</p>
-            <div class="loader"></div>
-            <button onclick="document.getElementById('mensagem_analise').close(), localStorage.removeItem('modal_analise_aberto'), location.reload();"
-                c-post="{{ url_for('upload.cancelar_analise') }}">
-                Cancelar análise
-            </button>
-        </dialog>
-
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                const toggleButton = document.querySelector('.menu-toggle');
-                const navBar = document.querySelector('.NavBar');
-                
-                toggleButton.addEventListener('click', function() {
-                    navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
-                });
-            });
-        </script>
-
     </main>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            if (localStorage.getItem('modal_analise_aberto') === 'true') {
-                document.getElementById('mensagem_analise').showModal();
-
-                function verificarStatusAnalise() {
-
-                    const upload_id = localStorage.getItem('upload_id');
-
-                    if (upload_id) {
-                        fetch(`/upload/status_analise/${upload_id}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.status === 'concluido') {
-                                    document.getElementById('mensagem_analise').close();
-                                    localStorage.removeItem('modal_analise_aberto'); // Remove a informação do localstorage
-                                    localStorage.removeItem('upload_id'); // Remove a informação do localstorage
-                                    location.reload();
-                                }
-                            })
-                            .catch(error => console.error('Erro ao verificar o status da análise:', error));
-                    }
-                }
-
-                setInterval(verificarStatusAnalise, 5000); // Chama a função pra verificar o status a cada 5 segundos
-            }
-
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape') {
-                    event.preventDefault();
-                }
-            });
-        });
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
             // Obtenha os botões
-            
-            const uploadsButton = document.getElementById('uploads-button');
             const salasButton = document.getElementById('salas-button');
             const turmasButton = document.getElementById('turmas-button');
             // Função para ativar o botão clicado e desativar o outro
             function activateButton(activeButton) {
                 // Remova a classe active de ambos os botões
-
-                uploadsButton.classList.remove('active');
                 salasButton.classList.remove('active');
                 turmasButton.classList.remove('active');
 
@@ -177,9 +108,19 @@
             }
 
             // Adicione eventos de clique aos botões
-            uploadsButton.addEventListener('click', () => activateButton(uploadsButton));
             salasButton.addEventListener('click', () => activateButton(salasButton));
             turmasButton.addEventListener('click', () => activateButton(turmasButton));
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleButton = document.querySelector('.menu-toggle');
+            const navBar = document.querySelector('.NavBar');
+            
+            toggleButton.addEventListener('click', function() {
+                navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
+            });
         });
     </script>
     <script src="{{ url_for('static', filename='cru.js') }}"></script>

@@ -61,6 +61,8 @@ def inserir_turma():
     )
 
     atualizando_turma_upload()
+    alterando_sessions_para_false()
+    session['visualizando_turmas'] = True
 
     return redirect(url_for('cadastro.tela_cadastro'))
 
