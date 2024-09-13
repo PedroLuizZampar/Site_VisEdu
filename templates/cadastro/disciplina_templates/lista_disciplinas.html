@@ -1,0 +1,26 @@
+<div class="div-table" >
+    <div class="actions-list">
+        <button class="add-disciplina"
+            onclick="document.getElementById('modal').showModal()"
+            c-get="{{ url_for('disciplina.form_disciplina') }}"
+            c-target="#modal">
+            ➕
+            <span class="tooltip-text">Adicionar uma nova disciplina</span>
+        </button>
+    </div>
+
+    <table id="file-table" class="table-disciplina">
+        <thead>
+            <tr>
+                <th scope="col" class="th-id">#</th>
+                <th>Nome</th>
+                <th class="th-actions">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-disciplinas">
+            {% for disciplina in disciplinas %}
+                {% include 'cadastro/disciplina_templates/item_disciplina.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

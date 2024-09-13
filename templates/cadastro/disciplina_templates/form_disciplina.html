@@ -1,0 +1,27 @@
+<div class="modal-body">
+    <h1>Nova Disciplina</h1>
+    <form enctype="multipart/form-data" method="POST"
+        {% if disciplina %}
+            action="{{ url_for('disciplina.atualizar_disciplina', disciplina_id=disciplina.id) }}"
+            c-swap="#disciplina-{{ disciplina.id }}"
+        {% else %}
+            action="{{ url_for('disciplina.inserir_disciplina') }}"
+            c-append="lista-disciplinas"
+        {% endif %}
+        c-callback="fecharModal">
+
+        <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
+
+        <div class="bloco-informacoes">
+            <label for="nome_disciplina">Nome: </label>
+            <input type="text" name="nome_disciplina" {% if disciplina %} value="{{ disciplina.nome_disciplina }}" {% endif %} required>
+        </div>
+
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close()">Cancelar</button>
+            <button type="submit">
+                {% if disciplina %}Atualizar Disciplina{% else %}Adicionar Disciplina{% endif %}
+            </button>
+        </div>
+    </form>
+</div>

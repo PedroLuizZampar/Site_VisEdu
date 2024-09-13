@@ -111,7 +111,7 @@ main {
     justify-content: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: 25px;
-    width: 200px;
+    width: 330px;
     margin: 0 auto 20px auto;
 }
 
@@ -122,7 +122,7 @@ main {
     border-radius: 20px;
     cursor: pointer;
     font-size: 16px;
-    width: 100px;
+    width: 110px;
 }
 
 .tab-upload {
@@ -151,6 +151,7 @@ main {
 
 .upload-button,
 .add-sala,
+.add-disciplina,
 .reload-button,
 .action-button,
 dialog button {
@@ -214,7 +215,8 @@ dialog form .bloco-informacoes input {
 
 dialog button {
     margin: 15px 10px;
-    width: 165px;
+    min-width: 165px;
+    max-width: 300px;
 }
 
 .input_file {
@@ -254,7 +256,7 @@ dialog video {
     pointer-events: none; /* Impede que o tooltip seja clicado */
 }
 
-.add-sala .tooltip-text {
+.add-sala .tooltip-text, .add-disciplina .tooltip-text {
     visibility: hidden;
     width: 210px;
     background-color: #1E314E;
@@ -311,7 +313,8 @@ dialog video {
 .upload-button:hover .tooltip-text,
 .action-button:hover .tooltip-text,
 .reload-button:hover .tooltip-text,
-.add-sala:hover .tooltip-text {
+.add-sala:hover .tooltip-text,
+.add-disciplina:hover .tooltip-text {
     visibility: visible;
     opacity: 0.85;
 }
