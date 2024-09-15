@@ -45,7 +45,7 @@
                 {% endif %} <!-- Se não tiver upload, cria uma variável upload vazia pra não dar erro na opção da sala -->
 
                 {% for sala in salas %}
-                    {% include 'cadastro/option_sala.html' %}
+                    {% include 'options/option_sala.html' %}
                 {% endfor %}
             </select>
         </div>
@@ -58,7 +58,7 @@
                 {% endif %} <!-- Se não tiver upload, cria uma variável upload vazia pra não dar erro na opção do período -->
 
                 {% for periodo in periodos %}
-                    {% include 'cadastro/option_periodo.html' %}
+                    {% include 'options/option_periodo.html' %}
                 {% endfor %}
             </select>
         </div>

@@ -247,7 +247,7 @@ dialog video {
     border-radius: 6px;
     padding: 5px;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     bottom: 20%;
     left: -250%;
     margin-left: -80px;
@@ -265,7 +265,7 @@ dialog video {
     border-radius: 6px;
     padding: 5px;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     bottom: 20%;
     left: 250%;
     margin-left: -80px;
@@ -283,7 +283,7 @@ dialog video {
     border-radius: 6px;
     padding: 5px;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     bottom: 0;
     left: 250%;
     margin-left: -80px;
@@ -301,7 +301,7 @@ dialog video {
     border-radius: 6px;
     padding: 5px;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     bottom: 110%; /* Posiciona acima do botão */
     left: 50%;
     transform: translateX(-50%);
@@ -338,7 +338,7 @@ dialog video {
 
 .div-table {
     width: 100%;
-    max-height: 400px; /* Altura fixa */
+    max-height: 600px; /* Altura fixa */
     overflow-y: auto; /* Adiciona a barra de rolagem quando necessário */
 }
 
@@ -354,14 +354,16 @@ dialog video {
 }
 
 .table th:not(.th-actions) { /* Todas exceto a .th-actions */
-    text-align: center;
-    padding: 10px;
     border: 0px solid #1E314E;
     border-right: rgb(211, 211, 211) 0.1px solid;
 }
 
 .table th {
     background-color: #C7E9FF;
+    position: sticky;
+    top: 0; /* Fixa o cabeçalho no topo da div quando a tabela é rolada */
+    z-index: 1; /* Garante que o cabeçalho fique acima do restante do conteúdo */
+    padding: 10px;
 }
 
 .table td {
@@ -369,9 +371,10 @@ dialog video {
     padding: 10px;
     border-top: 0.1px solid rgb(211, 211, 211);
     border-right: rgb(211, 211, 211) 0.1px solid;
+    background-color: #fff;
 }
 
-.table th.th-actions, .table td.td-actions {
+.table td.td-actions {
     position: sticky;
     right: 0; /* Fixa a coluna "Ações" à direita */
     z-index: 1; /* Garante que a coluna ficará sobre as outras */
@@ -380,17 +383,17 @@ dialog video {
 
 .table td.td-actions {
     border-right: none;
-    background-color: #fff;
 }
 
 .actions-list {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin: 8px 0 20px 0;
 }
 
 .th-actions {
     border-radius: 0 8px 0 0;
+    right: 0; /* Fixa a coluna "Ações" à direita */
 }
 
 .th-id {

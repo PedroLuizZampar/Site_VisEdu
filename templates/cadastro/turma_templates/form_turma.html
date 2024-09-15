@@ -27,7 +27,7 @@
                 {% endif %} <!-- Se não tiver turma, cria uma variável turma vazia pra não dar erro na opção da sala -->
 
                 {% for sala in salas %}
-                    {% include 'cadastro/option_sala.html' %}
+                    {% include 'options/option_sala.html' %}
                 {% endfor %}
             </select>
         </div>
@@ -41,7 +41,7 @@
                 {% endif %} <!-- Se não tiver turma, cria uma variável turma vazia pra não dar erro na opção da sala -->
 
                 {% for periodo in periodos %}
-                    {% include 'cadastro/option_periodo.html' %}
+                    {% include 'options/option_periodo.html' %}
                 {% endfor %}
             </select>
         </div>

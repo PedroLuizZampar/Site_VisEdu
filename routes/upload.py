@@ -232,7 +232,7 @@ def reproduzir_video_form(upload_id):
     nome_arquivo = upload.nome_arquivo
     timestamp = int(time.time())  # Adiciona um timestamp como parâmetro de consulta (Isso evita um bug na reprodução do vídeo e não sei o porquê. NÃO REMOVER)
 
-    return render_template('cadastro/video.html', nome_arquivo=nome_arquivo, timestamp=timestamp)
+    return render_template('video/video.html', nome_arquivo=nome_arquivo, timestamp=timestamp)
 
 @upload_route.route('/<int:upload_id>/view')
 def reproduzir_video_modal(upload_id):
@@ -243,7 +243,7 @@ def reproduzir_video_modal(upload_id):
     nome_arquivo = upload.nome_arquivo
     timestamp = int(time.time())  # Adiciona um timestamp como parâmetro de consulta (Isso evita um bug na reprodução do vídeo e não sei o porquê. NÃO REMOVER)
 
-    return render_template('cadastro/video.html', nome_arquivo=nome_arquivo, timestamp=timestamp, modal=True)
+    return render_template('video/video.html', nome_arquivo=nome_arquivo, timestamp=timestamp, modal=True)
 
 @upload_route.route('/<filename>')
 def uploaded_file(filename):
