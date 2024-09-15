@@ -6,7 +6,7 @@
             c-swap="#disciplina-{{ disciplina.id }}"
         {% else %}
             action="{{ url_for('disciplina.inserir_disciplina') }}"
-            c-append="lista-disciplinas"
+            c-append="#lista-disciplinas"
         {% endif %}
         c-callback="fecharModal">
 

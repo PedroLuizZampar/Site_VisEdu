@@ -6,7 +6,7 @@
             c-swap="#sala-{{ sala.id }}"
         {% else %}
             action="{{ url_for('sala.inserir_sala') }}"
-            c-append="lista-salas"
+            c-append="#lista-salas"
         {% endif %}
         c-callback="fecharModal">
 

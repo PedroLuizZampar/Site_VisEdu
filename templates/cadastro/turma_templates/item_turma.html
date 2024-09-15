@@ -10,7 +10,7 @@
     </td>
     <td>{{ turma.periodo.nome_periodo }}</td>
     <td>{{ turma.qtde_alunos }}</td>
-    <td>
+    <td class="td-actions">
         
         <button class="action-button" 
             c-get="{{ url_for('turma.form_edit_turma', turma_id=turma.id) }}"

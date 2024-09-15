@@ -10,16 +10,16 @@ body {
     padding: 0;
 }
 
-html::-webkit-scrollbar, .modal-body::-webkit-scrollbar {
+html::-webkit-scrollbar, .modal-body::-webkit-scrollbar, .div-table::-webkit-scrollbar {
     width: 10px;
     height: 10px;
 }
 
-html::-webkit-scrollbar-track, .modal-body::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track, .modal-body::-webkit-scrollbar-track, .div-table::-webkit-scrollbar-track {
     background-color: none;
 }
 
-html::-webkit-scrollbar-thumb, .modal-body::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb, .modal-body::-webkit-scrollbar-thumb, .div-table::-webkit-scrollbar-thumb {
     background-color: #8dcfff;
     border-radius: 5px;
 }
@@ -338,9 +338,11 @@ dialog video {
 
 .div-table {
     width: 100%;
+    max-height: 400px; /* Altura fixa */
+    overflow-y: auto; /* Adiciona a barra de rolagem quando necessário */
 }
 
-#file-table {
+.table {
     width: 70%;
     margin: auto;
     list-style: none;
@@ -351,26 +353,34 @@ dialog video {
     border-collapse: collapse;
 }
 
-#file-table th:not(.th-actions) { /* Todas exceto a .th-actions */
+.table th:not(.th-actions) { /* Todas exceto a .th-actions */
     text-align: center;
     padding: 10px;
     border: 0px solid #1E314E;
     border-right: rgb(211, 211, 211) 0.1px solid;
 }
 
-#file-table th {
+.table th {
     background-color: #C7E9FF;
 }
 
-#file-table td {
+.table td {
     text-align: center;
     padding: 10px;
     border-top: 0.1px solid rgb(211, 211, 211);
     border-right: rgb(211, 211, 211) 0.1px solid;
 }
 
-#file-table td.td-actions {
+.table th.th-actions, .table td.td-actions {
+    position: sticky;
+    right: 0; /* Fixa a coluna "Ações" à direita */
+    z-index: 1; /* Garante que a coluna ficará sobre as outras */
+    border-left: 1px solid #C7E9FF;
+}
+
+.table td.td-actions {
     border-right: none;
+    background-color: #fff;
 }
 
 .actions-list {
@@ -410,7 +420,7 @@ dialog video {
         flex-direction: column;
         width: 100%;
         background-color: #011f36;
-        z-index: 1;
+        z-index: 100;
     }
 
     .NavBarItem {

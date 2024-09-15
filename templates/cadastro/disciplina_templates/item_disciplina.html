@@ -1,7 +1,7 @@
 <tr id="disciplina-{{disciplina.id }}">
     <td scope="row">{{ disciplina.id }}</td>
     <td>{{ disciplina.nome_disciplina }}</td>
-    <td>
+    <td class="td-actions">
 
         <button class="action-button" 
             c-get="{{ url_for('disciplina.form_edit_disciplina', disciplina_id=disciplina.id) }}"
