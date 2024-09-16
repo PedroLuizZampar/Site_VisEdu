@@ -1,6 +1,6 @@
 import os, time
 import cv2
-from peewee import DoesNotExist
+from peewee import DoesNotExist, fn
 from ultralytics import YOLO
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, jsonify, session, request
 from werkzeug.utils import secure_filename
@@ -322,7 +322,7 @@ def analisar_upload(upload_id):
             for box in results.boxes:
                 obj_class = box.cls.item()
                 conf = box.conf.item()
-                if conf >= 0.5:
+                if conf >= 0.2:
                     high_conf_boxes.append(box)
                     qtde_objetos += 1
 
@@ -416,3 +416,86 @@ def status_analise(upload_id):
         return jsonify({'status': status})
     else:
         return jsonify({'error': 'Análise não encontrada'}), 404
+
+@upload_route.route('/<int:upload_id>/teste', methods=["GET"])
+def testando(upload_id):
+
+    upload = Upload.get_by_id(upload_id)
+
+    return render_template('/relatorios/opcoes_relatorios.html', upload=upload)
+    
+@upload_route.route('/<int:upload_id>/relatorio/media_comportamentos', methods=["GET"])
+def media_comportamentos(upload_id):
+    query = (Analise
+             .select(
+                 fn.AVG(Analise.qtde_objeto_prestando_atencao).alias('avg_prestando_atencao'),
+                 fn.AVG(Analise.qtde_objeto_copiando).alias('avg_copiando'),
+                 fn.AVG(Analise.qtde_objeto_conversando).alias('avg_conversando'),
+                 fn.AVG(Analise.qtde_objeto_distraido).alias('avg_distraido'),
+                 fn.AVG(Analise.qtde_objeto_mexendo_celular).alias('avg_mexendo_celular'),
+                 fn.AVG(Analise.qtde_objeto_dormindo).alias('avg_dormindo')
+             )
+             .where(Analise.upload_id == upload_id)
+             .dicts()
+             .get())
+
+    labels = [
+        "Prestando Atenção", "Copiando", "Conversando",
+        "Distraído", "Mexendo no Celular", "Dormindo"
+    ]
+    data = [
+        round(query['avg_prestando_atencao'], 2),
+        round(query['avg_copiando'], 2),
+        round(query['avg_conversando'], 2),
+        round(query['avg_distraido'], 2),
+        round(query['avg_mexendo_celular'], 2),
+        round(query['avg_dormindo'], 2)
+    ]
+
+    return jsonify({
+        'labels': labels,
+        'data': data
+    })
+
+@upload_route.route('/<int:upload_id>/relatorio/moda_comportamentos', methods=["GET"])
+def moda_comportamentos(upload_id):
+    query = (Analise
+             .select(
+                 Analise.qtde_objeto_prestando_atencao,
+                 Analise.qtde_objeto_copiando,
+                 Analise.qtde_objeto_conversando,
+                 Analise.qtde_objeto_distraido,
+                 Analise.qtde_objeto_mexendo_celular,
+                 Analise.qtde_objeto_dormindo,
+                 fn.COUNT(Analise.id).alias('count')
+             )
+             .where(Analise.upload_id == upload_id)
+             .group_by(
+                 Analise.qtde_objeto_prestando_atencao,
+                 Analise.qtde_objeto_copiando,
+                 Analise.qtde_objeto_conversando,
+                 Analise.qtde_objeto_distraido,
+                 Analise.qtde_objeto_mexendo_celular,
+                 Analise.qtde_objeto_dormindo
+             )
+             .order_by(fn.COUNT(Analise.id).desc())
+             .dicts()
+             .first())  # Pegamos o primeiro resultado com maior contagem
+
+    labels = [
+        "Prestando Atenção", "Copiando", "Conversando",
+        "Distraído", "Mexendo no Celular", "Dormindo"
+    ]
+    data = [
+        query['qtde_objeto_prestando_atencao'],
+        query['qtde_objeto_copiando'],
+        query['qtde_objeto_conversando'],
+        query['qtde_objeto_distraido'],
+        query['qtde_objeto_mexendo_celular'],
+        query['qtde_objeto_dormindo']
+    ]
+
+    return jsonify({
+        'labels': labels,
+        'data': data
+    })

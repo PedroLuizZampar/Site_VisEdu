@@ -52,7 +52,10 @@
 
         {% if upload.is_analisado == 1 %}
 
-            <button class="action-button">
+            <button class="action-button"
+                c-get="{{ url_for('upload.testando', upload_id=upload.id) }}"
+                onclick="document.getElementById('opcoes-relatorio').showModal()"
+                c-target="#opcoes-relatorio">
                 📋
                 <span class="tooltip-text">Ver análise</span>
             </button>

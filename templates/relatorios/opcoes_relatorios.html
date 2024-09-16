@@ -1,0 +1,9 @@
+<div class="modal-body">
+    <button onclick="document.getElementById('opcoes-relatorio').close(), document.getElementById('relatorio').showModal(), grafico_media_comportamentos(`{{ upload.id }}`)">
+        Média
+    </button>
+
+    <button onclick="document.getElementById('opcoes-relatorio').close(), document.getElementById('relatorio').showModal(), grafico_moda_comportamentos(`{{ upload.id }}`)">
+        Moda
+    </button>
+</div>
