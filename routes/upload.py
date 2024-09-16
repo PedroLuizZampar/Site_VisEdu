@@ -444,12 +444,12 @@ def media_comportamentos(upload_id):
         "Distraído", "Mexendo no Celular", "Dormindo"
     ]
     data = [
-        round(query['avg_prestando_atencao'], 2),
-        round(query['avg_copiando'], 2),
-        round(query['avg_conversando'], 2),
-        round(query['avg_distraido'], 2),
-        round(query['avg_mexendo_celular'], 2),
-        round(query['avg_dormindo'], 2)
+        round(query['avg_prestando_atencao']),
+        round(query['avg_copiando']),
+        round(query['avg_conversando']),
+        round(query['avg_distraido']),
+        round(query['avg_mexendo_celular']),
+        round(query['avg_dormindo'])
     ]
 
     return jsonify({
@@ -480,22 +480,32 @@ def moda_comportamentos(upload_id):
              )
              .order_by(fn.COUNT(Analise.id).desc())
              .dicts()
-             .first())  # Pegamos o primeiro resultado com maior contagem
+             .execute())  # Obtendo todos os resultados
 
+    # Listas para armazenar os dados
     labels = [
         "Prestando Atenção", "Copiando", "Conversando",
         "Distraído", "Mexendo no Celular", "Dormindo"
     ]
     data = [
-        query['qtde_objeto_prestando_atencao'],
-        query['qtde_objeto_copiando'],
-        query['qtde_objeto_conversando'],
-        query['qtde_objeto_distraido'],
-        query['qtde_objeto_mexendo_celular'],
-        query['qtde_objeto_dormindo']
+        0, 0, 0, 0, 0, 0
     ]
+
+    for result in query:
+        data[0] += result['qtde_objeto_prestando_atencao']
+        data[1] += result['qtde_objeto_copiando']
+        data[2] += result['qtde_objeto_conversando']
+        data[3] += result['qtde_objeto_distraido']
+        data[4] += result['qtde_objeto_mexendo_celular']
+        data[5] += result['qtde_objeto_dormindo']
+
+    # Encontrar a moda
+    mode_value = max(data)
+    mode_label = labels[data.index(mode_value)]
 
     return jsonify({
         'labels': labels,
-        'data': data
+        'data': data,
+        'mode_label': mode_label,
+        'mode_value': mode_value
     })
