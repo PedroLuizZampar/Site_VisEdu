@@ -1,0 +1,19 @@
+<div class="div-table" >
+    <table id="table-sala" class="table">
+        <thead>
+            <tr>
+                <th scope="col" class="th-id">#</th>
+                <th>Nome</th>
+                <th>Horário início</th>
+                <th>Horário término</th>
+                <th>Quantidade de aulas</th>
+                <th class="th-actions">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-periodos">
+            {% for periodo in periodos %}
+                {% include 'cadastro/periodo_templates/item_periodo.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

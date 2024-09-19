@@ -65,7 +65,7 @@
 
         <div class="bloco-informacoes">
             <label for="data_registro">Data do registro: </label>
-            <input type="date" name="data_registro" {% if upload %} value="{{ upload.data_registro }}"{% endif %} required>
+            <input type="date" name="data_registro" {% if upload %} value="{{ upload.data_registro }}"{% endif %} max="9999-12-31" required>
         </div>
 
         <div class="bloco-informacoes">

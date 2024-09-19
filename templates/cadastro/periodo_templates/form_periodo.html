@@ -1,0 +1,33 @@
+<div class="modal-body">
+    <h1>Editar Período</h1>
+
+    <form enctype="multipart/form-data" method="POST"
+        action="{{ url_for('periodo.atualizar_periodo', periodo_id=periodo.id) }}"
+        c-swap="#periodo-{{ periodo.id }}"
+        c-callback="fecharModal"
+        >
+        <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
+
+        <div class="bloco-informacoes">
+            <label for="qtde_aulas">Quantidade de aulas: </label>
+            <input type="number" name="qtde_aulas" value="{{ periodo.qtde_aulas }}" required>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="hora_inicio">Horário de início: </label>
+            <input type="time" name="hora_inicio" value="{{ periodo.hora_inicio }}" required>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="hora_termino">Horário de término: </label>
+            <input type="time" name="hora_termino" value="{{ periodo.hora_termino }}" required>
+        </div>
+
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close();">Cancelar</button>
+            <button type="submit">
+                Atualizar Período
+            </button>
+        </div>    
+    </form>
+</div>

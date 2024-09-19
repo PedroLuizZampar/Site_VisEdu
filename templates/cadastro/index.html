@@ -38,7 +38,7 @@
     <main>
 
         <div class="tab">
-            <button id="salas-button" {% if not visualizando_turmas and not visualizando_disciplinas %}class="active"{% endif %}
+            <button id="salas-button" {% if not visualizando_turmas and not visualizando_disciplinas and not visualizando_periodos %}class="active"{% endif %}
                 c-get="{{ url_for('sala.lista_salas') }}"
                 c-target=".div-table">
                 Salas
@@ -55,6 +55,12 @@
                 c-target=".div-table">
                 Turmas
             </button>
+
+            <button id="periodos-button" {% if visualizando_periodos %}class="active"{% endif %}
+                c-get="{{ url_for('periodo.lista_periodos') }}"
+                c-target=".div-table">
+                Periodos
+            </button>
         </div>
 
         <!-- Valida a última sessão aberta e busca o conteúdo. Caso não ache, renderiza por padrão a lista de uploads não analisados -->
@@ -67,6 +73,9 @@
 
             {% elif visualizando_disciplinas %}
                 c-container="{{ url_for('disciplina.lista_disciplinas') }}"
+
+            {% elif visualizando_periodos %}
+                c-container="{{ url_for('periodo.lista_periodos') }}"
             
             {% endif %}
             
@@ -102,12 +111,14 @@
             const salasButton = document.getElementById('salas-button');
             const turmasButton = document.getElementById('turmas-button');
             const disciplinaButton = document.getElementById('disciplina-button');
+            const periodosButton = document.getElementById('periodos-button');
             // Função para ativar o botão clicado e desativar o outro
             function activateButton(activeButton) {
                 // Remova a classe active de ambos os botões
                 salasButton.classList.remove('active');
                 turmasButton.classList.remove('active');
                 disciplinaButton.classList.remove('active');
+                periodosButton.classList.remove('active');
 
                 // Adicione a classe active ao botão clicado
                 activeButton.classList.add('active');
@@ -117,6 +128,7 @@
             salasButton.addEventListener('click', () => activateButton(salasButton));
             turmasButton.addEventListener('click', () => activateButton(turmasButton));
             disciplinaButton.addEventListener('click', () => activateButton(disciplinaButton));
+            periodosButton.addEventListener('click', () => activateButton(periodosButton));
         });
     </script>
 

@@ -378,7 +378,7 @@ canvas {
     background-color: #C7E9FF;
     position: sticky;
     top: 0; /* Fixa o cabeçalho no topo da div quando a tabela é rolada */
-    z-index: 1; /* Garante que o cabeçalho fique acima do restante do conteúdo */
+    z-index: 2; /* Garante que o cabeçalho fique acima do restante do conteúdo */
     padding: 10px;
 }
 

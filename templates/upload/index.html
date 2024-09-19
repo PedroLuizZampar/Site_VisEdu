@@ -270,8 +270,8 @@
                 addDownloadButton();
         }
 
-        function grafico_moda_comportamentos(uploadId) {
-            fetch(`/upload/${uploadId}/relatorio/moda_comportamentos`)
+        function grafico_contagem_alunos_comportamentos(uploadId) {
+            fetch(`/upload/${uploadId}/relatorio/contagem_alunos_comportamentos`)
                 .then(response => response.json())
                 .then(data => {
                     const ctx = document.getElementById('canvas_grafico').getContext('2d');
@@ -280,7 +280,7 @@
                         data: {
                             labels: data.labels,
                             datasets: [{
-                                label: 'Moda de Alunos por Comportamentos',
+                                label: 'Contagem de Alunos por Comportamentos',
                                 data: data.data,
                                 backgroundColor: [
                                     'rgba(75, 192, 192, 0.6)',

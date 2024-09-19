@@ -457,8 +457,8 @@ def media_comportamentos(upload_id):
         'data': data
     })
 
-@upload_route.route('/<int:upload_id>/relatorio/moda_comportamentos', methods=["GET"])
-def moda_comportamentos(upload_id):
+@upload_route.route('/<int:upload_id>/relatorio/contagem_alunos_comportamentos', methods=["GET"])
+def contagem_alunos_comportamentos(upload_id):
     query = (Analise
              .select(
                  Analise.qtde_objeto_prestando_atencao,
