@@ -79,21 +79,31 @@ def atualizar_periodo(periodo_id):
             # Obtém a última aula como referência (se existir)
             ultima_aula = aulas_periodo.order_by(Aula.id.desc()).first()
 
-            for _ in range(diferenca):
+            for i in range(diferenca):
                 if ultima_aula:
+                    # Converte a hora_inicio e hora_termino da última aula para datetime
+                    ultima_hora_inicio = datetime.combine(datetime.today(), ultima_aula.hora_inicio)
+                    ultima_hora_termino = datetime.combine(datetime.today(), ultima_aula.hora_termino)
+
+                    # Adiciona o timedelta de 50 minutos
+                    nova_hora_inicio = (ultima_hora_inicio + timedelta(minutes=i)).time()
+                    nova_hora_termino = (ultima_hora_termino + timedelta(minutes=i+1)).time()
+
                     # Cria nova aula com base na última aula
                     nova_aula = Aula.create(
                         periodo=periodo_editado,
-                        hora_inicio=ultima_aula.hora_inicio + timedelta(minutes=50),
-                        hora_termino=ultima_aula.hora_termino + timedelta(minutes=50)
+                        hora_inicio=nova_hora_inicio,
+                        hora_termino=nova_hora_termino
                     )
                     ultima_aula = nova_aula  # Atualiza a referência para a próxima aula
                 else:
+                    horario_incio_aula_formatado = datetime.combine(datetime.today(), periodo_editado.hora_inicio) + timedelta(minutes=i)
+                    horario_termino_aula_formatado = datetime.combine(datetime.today(), periodo_editado.hora_inicio) + timedelta(minutes=i+1)
                     # Se não houver aula anterior, usa o horário do período
                     Aula.create(
                         periodo=periodo_editado,
-                        hora_inicio=periodo_editado.hora_inicio,
-                        hora_termino=periodo_editado.hora_termino
+                        hora_inicio=horario_incio_aula_formatado,
+                        hora_termino=horario_termino_aula_formatado
                     )
 
         # Se a nova quantidade for menor, remove aulas do final para o início

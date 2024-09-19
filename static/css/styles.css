@@ -317,7 +317,7 @@ canvas {
     border-radius: 6px;
     padding: 5px;
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     bottom: 110%; /* Posiciona acima do botão */
     left: 50%;
     transform: translateX(-50%);
@@ -360,7 +360,7 @@ canvas {
 
 .table {
     width: 70%;
-    margin: auto;
+    margin: 5px auto;
     list-style: none;
     background-color: #fff;
     border-radius: 8px;
@@ -395,9 +395,6 @@ canvas {
     right: 0; /* Fixa a coluna "Ações" à direita */
     z-index: 1; /* Garante que a coluna ficará sobre as outras */
     border-left: 1px solid #C7E9FF;
-}
-
-.table td.td-actions {
     border-right: none;
 }
 
