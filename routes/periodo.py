@@ -86,8 +86,8 @@ def atualizar_periodo(periodo_id):
                     ultima_hora_termino = datetime.combine(datetime.today(), ultima_aula.hora_termino)
 
                     # Adiciona o timedelta de 50 minutos
-                    nova_hora_inicio = (ultima_hora_inicio + timedelta(minutes=i)).time()
-                    nova_hora_termino = (ultima_hora_termino + timedelta(minutes=i+1)).time()
+                    nova_hora_inicio = (ultima_hora_termino + timedelta(minutes=1)).time()
+                    nova_hora_termino = (ultima_hora_termino + timedelta(minutes=2)).time()
 
                     # Cria nova aula com base na última aula
                     nova_aula = Aula.create(

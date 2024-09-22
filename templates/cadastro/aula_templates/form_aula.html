@@ -1,0 +1,45 @@
+<div class="modal-body">
+    <h1>{% if aula %}Editar Aula{% else %}Nova Aula{% endif %}</h1>
+    <form enctype="multipart/form-data" method="POST"
+        {% if aula %}
+            action="{{ url_for('aula.atualizar_aula', aula_id=aula.id) }}"
+            c-swap="#aula-{{ aula_id }}"
+        {% else %}
+            action="{{ url_for('aula.inserir_aula') }}"
+            c-append="#lista-aulas"
+        {% endif %}
+            c-callback="fecharModal">
+
+        <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
+
+        <div class="bloco-informacoes">
+            <label for="periodo">Período: </label>
+            <select name="periodo" id="periodo" required>
+                {% if not aula %}
+                    {% set aula = None %}
+                {% endif %} <!-- Se não tiver aula, cria uma variável aula vazia pra não dar erro na opção da sala -->
+
+                {% for periodo in periodos %}
+                    {% include 'options/option_periodo.html' %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="hora_inicio">Horário de início: </label>
+            <input type="time" name="hora_inicio" {% if aula %} value="{{ aula.hora_inicio }}" {% endif %} required>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="hora_termino">Horário de término: </label>
+            <input type="time" name="hora_termino" {% if aula %} value="{{ aula.hora_termino }}" {% endif %} required>
+        </div>
+
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close()">Cancelar</button>
+            <button type="submit">
+                {% if aula %}Atualizar aula{% else %}Adicionar aula{% endif %}
+            </button>
+        </div>
+    </form>
+</div>

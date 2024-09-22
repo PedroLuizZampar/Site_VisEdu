@@ -1,5 +1,5 @@
 <div class="modal-body">
-    <h1>Novo Upload</h1>
+    <h1>{% if upload %}Editar Upload{% else %}Nova Upload{% endif %}</h1>
 
     <form enctype="multipart/form-data" method="POST"
         {% if upload %}

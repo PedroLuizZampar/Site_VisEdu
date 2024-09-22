@@ -38,28 +38,34 @@
     <main>
 
         <div class="tab">
-            <button id="salas-button" {% if not visualizando_turmas and not visualizando_disciplinas and not visualizando_periodos %}class="active"{% endif %}
+            <button id="salas-button" {% if not visualizando_turmas and not visualizando_disciplinas and not visualizando_periodos and not visualizando_aulas %}class="active"{% endif %}
                 c-get="{{ url_for('sala.lista_salas') }}"
-                c-target=".div-table">
+                c-target=".content">
                 Salas
             </button>
 
             <button id="disciplina-button" {% if visualizando_disciplinas %}class="active"{% endif %}
                 c-get="{{ url_for('disciplina.lista_disciplinas') }}"
-                c-target=".div-table">
+                c-target=".content">
                 Disciplinas
             </button>
 
             <button id="turmas-button" {% if visualizando_turmas %}class="active"{% endif %}
                 c-get="{{ url_for('turma.lista_turmas') }}"
-                c-target=".div-table">
+                c-target=".content">
                 Turmas
             </button>
 
             <button id="periodos-button" {% if visualizando_periodos %}class="active"{% endif %}
                 c-get="{{ url_for('periodo.lista_periodos') }}"
-                c-target=".div-table">
+                c-target=".content">
                 Periodos
+            </button>
+
+            <button id="aulas-button" {% if visualizando_aulas %}class="active"{% endif %}
+                c-get="{{ url_for('aula.lista_aulas_matutinas') }}"
+                c-target=".content">
+                Aulas
             </button>
         </div>
 
@@ -76,6 +82,9 @@
 
             {% elif visualizando_periodos %}
                 c-container="{{ url_for('periodo.lista_periodos') }}"
+
+            {% elif visualizando_aulas %}
+                c-container="{{ url_for('aula.lista_aulas_matutinas') }}"
             
             {% endif %}
             
@@ -112,6 +121,8 @@
             const turmasButton = document.getElementById('turmas-button');
             const disciplinaButton = document.getElementById('disciplina-button');
             const periodosButton = document.getElementById('periodos-button');
+            const aulasButton = document.getElementById('aulas-button');
+
             // Função para ativar o botão clicado e desativar o outro
             function activateButton(activeButton) {
                 // Remova a classe active de ambos os botões
@@ -119,6 +130,7 @@
                 turmasButton.classList.remove('active');
                 disciplinaButton.classList.remove('active');
                 periodosButton.classList.remove('active');
+                aulasButton.classList.remove('active');
 
                 // Adicione a classe active ao botão clicado
                 activeButton.classList.add('active');
@@ -129,6 +141,7 @@
             turmasButton.addEventListener('click', () => activateButton(turmasButton));
             disciplinaButton.addEventListener('click', () => activateButton(disciplinaButton));
             periodosButton.addEventListener('click', () => activateButton(periodosButton));
+            aulasButton.addEventListener('click', () => activateButton(aulasButton));
         });
     </script>
 

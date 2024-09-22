@@ -11,7 +11,8 @@ def tela_cadastro():
     visualizando_turmas = session.pop('visualizando_turmas', None)
     visualizando_disciplinas = session.pop('visualizando_disciplinas', None)
     visualizando_periodos = session.pop('visualizando_periodos', None)
+    visualizando_aulas = session.pop('visualizando_aulas', None)
 
     session['visualizando_cadastros'] = True
     
-    return render_template('cadastro/index.html', visualizando_cadastros=visualizando_cadastros, visualizando_salas=visualizando_salas, visualizando_turmas=visualizando_turmas, visualizando_disciplinas=visualizando_disciplinas, visualizando_periodos=visualizando_periodos) # Se não ouver um session ativa, retorna a página sem parâmetros
+    return render_template('cadastro/index.html', visualizando_cadastros=visualizando_cadastros, visualizando_salas=visualizando_salas, visualizando_turmas=visualizando_turmas, visualizando_disciplinas=visualizando_disciplinas, visualizando_periodos=visualizando_periodos, visualizando_aulas=visualizando_aulas) # Se não ouver um session ativa, retorna a página sem parâmetros

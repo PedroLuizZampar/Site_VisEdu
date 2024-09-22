@@ -100,7 +100,7 @@ main {
     align-items: center;
 }
 
-.tab button.active, .tab-upload button.active {
+.tab button.active, .tab-upload button.active, .tab-periodos button.active {
     background-color: #4EB6FF; /* Cor de fundo do botão ativo */
     color: #fff; /* Cor do texto do botão ativo */
 }
@@ -111,7 +111,7 @@ main {
     justify-content: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: 25px;
-    width: 330px;
+    width: 500px;
     margin: 0 auto 20px auto;
 }
 
@@ -125,7 +125,7 @@ main {
     width: 110px;
 }
 
-.tab-upload {
+.tab-upload, .tab-periodos {
     background-color: #C7E9FF;
     display: flex;
     justify-content: center;
@@ -135,7 +135,7 @@ main {
     margin: 0 auto 20px auto;
 }
 
-.tab-upload button {
+.tab-upload button, .tab-periodos button {
     background-color: #C7E9FF;
     border: none;
     padding: 10px 20px;
@@ -151,6 +151,7 @@ main {
 
 .upload-button,
 .add-sala,
+.add-aula,
 .add-disciplina,
 .reload-button,
 .action-button,
@@ -272,7 +273,7 @@ canvas {
     pointer-events: none; /* Impede que o tooltip seja clicado */
 }
 
-.add-sala .tooltip-text, .add-disciplina .tooltip-text {
+.add-sala .tooltip-text, .add-disciplina .tooltip-text, .add-aula .tooltip-text {
     visibility: hidden;
     width: 210px;
     background-color: #1E314E;
@@ -330,6 +331,7 @@ canvas {
 .action-button:hover .tooltip-text,
 .reload-button:hover .tooltip-text,
 .add-sala:hover .tooltip-text,
+.add-aula:hover .tooltip-text,
 .add-disciplina:hover .tooltip-text {
     visibility: visible;
     opacity: 0.85;

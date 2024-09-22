@@ -1,0 +1,73 @@
+<div class="tab-periodos">
+    <button id="matutino-button" class="active"
+        c-get="{{ url_for('aula.lista_aulas_matutinas') }}"
+        c-target=".content">
+        Matutino
+    </button>
+    <button id="vespertino-button"
+        c-get="{{ url_for('aula.lista_aulas_vespertinas') }}"
+        c-target=".content">
+        Vespertino
+    </button>
+    <button id="noturno-button"
+        c-get="{{ url_for('aula.lista_aulas_noturnas') }}"
+        c-target=".content">
+        Noturno
+    </button>
+</div>
+
+<div class="div-table">
+    <div class="actions-list">
+        <button class="add-aula"
+            onclick="document.getElementById('modal').showModal()"
+            c-get="{{ url_for('aula.form_aula', periodo_id=1) }}"
+            c-target="#modal">
+            ➕
+            <span class="tooltip-text">Adicionar uma nova aula</span>
+        </button>
+    </div>
+
+    <table id="table-aula" class="table">
+        <thead>
+            <tr>
+                <th scope="col" class="th-id">#</th>
+                <th>Período</th>
+                <th>Hora início</th>
+                <th>Hora término</th>
+                <th class="th-actions">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-aulas">
+            {% for aula in aulas %}
+                {% set count = loop.index %}
+                {% include 'cadastro/aula_templates/item_aula.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Obtenha os botões
+        const matutinoButton = document.getElementById('matutino-button');
+        const vespertinoButton = document.getElementById('vespertino-button');
+        const noturnoButton = document.getElementById('noturno-button');
+        // Função para ativar o botão clicado e desativar o outro
+        function activateButton(activeButton) {
+            // Remova a classe active de ambos os botões
+            matutinoButton.classList.remove('active');
+            vespertinoButton.classList.remove('active');
+            noturnoButton.classList.remove('active');
+
+            // Adicione a classe active ao botão clicado
+            activeButton.classList.add('active');
+        }
+
+        // Adicione eventos de clique aos botões
+        matutinoButton.addEventListener('click', () => activateButton(matutinoButton));
+        vespertinoButton.addEventListener('click', () => activateButton(vespertinoButton));
+        noturnoButton.addEventListener('click', () => activateButton(noturnoButton));
+    });
+</script>
+
+<script src="{{ url_for('static', filename='cru.js') }}"></script>

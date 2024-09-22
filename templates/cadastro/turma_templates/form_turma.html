@@ -1,5 +1,5 @@
 <div class="modal-body">
-    <h1>Nova Turma</h1>
+    {% if turma %}Editar Turma{% else %}Nova Turma{% endif %}
     <form enctype="multipart/form-data" method="POST"
         {% if turma %}
             action="{{ url_for('turma.atualizar_turma', turma_id=turma.id) }}"
@@ -48,7 +48,7 @@
 
         <div class="bloco-informacoes">
             <label for="qtde_alunos">Quantidade de alunos: </label>
-            <input type="number" name="qtde_alunos" {% if turma %} value="{{ turma.qtde_alunos }}" {% endif %} required>
+            <input type="number" name="qtde_alunos" {% if turma %} value="{{ turma.qtde_alunos }}" {% endif %} min="0" required>
         </div>
 
         <div class="bloco-botoes-modal">

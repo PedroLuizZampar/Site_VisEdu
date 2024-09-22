@@ -1,0 +1,25 @@
+<tr id="aula-{{aula.id }}">
+    <td scope="row">{{ count }}° Aula</td>
+    <td>{{ aula.periodo.nome_periodo }}</td>
+    <td>{{ aula.hora_inicio }}</td>
+    <td>{{ aula.hora_termino }}</td>
+    <td class="td-actions">
+
+    <button class="action-button" 
+        c-get="{{ url_for('aula.form_edit_aula', aula_id=aula.id, periodo_id=aula.periodo.id) }}"
+        onclick="document.getElementById('modal').showModal()"
+        c-target="#modal">
+        ✏️
+        <span class="tooltip-text">Editar aula</span>
+    </button>
+
+    <button class="action-button" 
+        c-delete="{{ url_for('aula.deletar_aula', aula_id=aula.id) }}"
+        c-remove-closest="tr"
+        onclick="location.reload()">
+        🗑️
+        <span class="tooltip-text">Excluir aula</span>
+    </button>
+
+    </td>
+</tr>

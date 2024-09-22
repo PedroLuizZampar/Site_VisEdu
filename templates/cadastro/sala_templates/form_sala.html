@@ -1,5 +1,5 @@
 <div class="modal-body">
-    <h1>Nova Sala</h1>
+    <h1>{% if sala %}Editar Sala{% else %}Nova Sala{% endif %}</h1>
     <form enctype="multipart/form-data" method="POST"
         {% if sala %}
             action="{{ url_for('sala.atualizar_sala', sala_id=sala.id) }}"
