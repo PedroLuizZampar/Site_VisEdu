@@ -20,7 +20,9 @@
                 {% endif %} <!-- Se não tiver aula, cria uma variável aula vazia pra não dar erro na opção da sala -->
 
                 {% for periodo in periodos %}
-                    {% include 'options/option_periodo.html' %}
+                    {% if periodo_id == periodo.id %}
+                        {% include 'options/option_periodo.html' %}
+                        {% endif %}
                 {% endfor %}
             </select>
         </div>

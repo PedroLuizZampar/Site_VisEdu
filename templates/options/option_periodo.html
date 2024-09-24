@@ -1,7 +1,5 @@
-{% if periodo_id == periodo.id %}
-    <option value="{{ periodo.nome_periodo }}"
+<option value="{{ periodo.nome_periodo }}"
     {% if upload and upload.periodo.nome_periodo == periodo.nome_periodo or turma and turma.periodo.nome_periodo == periodo.nome_periodo %} selected {% endif %}
     {% if periodo_id == periodo.id %} selected {% endif %}>
-        {{ periodo.nome_periodo }}
-    </option>
-{% endif %}
+    {{ periodo.nome_periodo }}
+</option>
