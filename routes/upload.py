@@ -311,12 +311,12 @@ def analisar_upload(upload_id):
         
         # Variáveis para contar as detecções
         qtde_objetos = 0
-        qtde_objeto_prestando_atencao = 0
-        qtde_objeto_copiando = 0
-        qtde_objeto_conversando = 0
-        qtde_objeto_distraido = 0
-        qtde_objeto_mexendo_celular = 0
         qtde_objeto_dormindo = 0
+        qtde_objeto_prestando_atencao = 0
+        qtde_objeto_mexendo_celular = 0
+        qtde_objeto_copiando = 0
+        qtde_objeto_disperso = 0
+        qtde_objeto_trabalho_em_grupo = 0
 
         if results.boxes:  # Se há detecções
             for box in results.boxes:
@@ -328,29 +328,29 @@ def analisar_upload(upload_id):
 
                     # Incrementa as contagens com base na classe do objeto
                     if obj_class == 0:
-                        qtde_objeto_prestando_atencao += 1
-                    elif obj_class == 1:
-                        qtde_objeto_copiando += 1
-                    elif obj_class == 2:
-                        qtde_objeto_conversando += 1
-                    elif obj_class == 3:
-                        qtde_objeto_distraido += 1
-                    elif obj_class == 4:
-                        qtde_objeto_mexendo_celular += 1
-                    elif obj_class == 5:
                         qtde_objeto_dormindo += 1
+                    elif obj_class == 1:
+                        qtde_objeto_prestando_atencao += 1
+                    elif obj_class == 2:
+                        qtde_objeto_mexendo_celular += 1
+                    elif obj_class == 3:
+                        qtde_objeto_copiando += 1
+                    elif obj_class == 4:
+                        qtde_objeto_disperso += 1
+                    elif obj_class == 5:
+                        qtde_objeto_trabalho_em_grupo += 1
 
         # Salva a análise no banco de dados
         Analise.create(
             nome_analise=f"Análise do Frame {frame_count}",
             upload=upload,
             qtde_objetos=qtde_objetos,
+            qtde_objeto_dormindo=qtde_objeto_dormindo,
             qtde_objeto_prestando_atencao=qtde_objeto_prestando_atencao,
-            qtde_objeto_copiando=qtde_objeto_copiando,
-            qtde_objeto_conversando=qtde_objeto_conversando,
-            qtde_objeto_distraido=qtde_objeto_distraido,
             qtde_objeto_mexendo_celular=qtde_objeto_mexendo_celular,
-            qtde_objeto_dormindo=qtde_objeto_dormindo
+            qtde_objeto_copiando=qtde_objeto_copiando,
+            qtde_objeto_disperso=qtde_objeto_disperso,
+            qtde_objeto_trabalho_em_grupo=qtde_objeto_trabalho_em_grupo
         )
 
     if not cap.isOpened():
@@ -428,28 +428,28 @@ def testando(upload_id):
 def media_comportamentos(upload_id):
     query = (Analise
              .select(
+                 fn.AVG(Analise.qtde_objeto_dormindo).alias('avg_dormindo'),
                  fn.AVG(Analise.qtde_objeto_prestando_atencao).alias('avg_prestando_atencao'),
-                 fn.AVG(Analise.qtde_objeto_copiando).alias('avg_copiando'),
-                 fn.AVG(Analise.qtde_objeto_conversando).alias('avg_conversando'),
-                 fn.AVG(Analise.qtde_objeto_distraido).alias('avg_distraido'),
                  fn.AVG(Analise.qtde_objeto_mexendo_celular).alias('avg_mexendo_celular'),
-                 fn.AVG(Analise.qtde_objeto_dormindo).alias('avg_dormindo')
+                 fn.AVG(Analise.qtde_objeto_copiando).alias('avg_copiando'),
+                 fn.AVG(Analise.qtde_objeto_disperso).alias('avg_disperso'),
+                 fn.AVG(Analise.qtde_objeto_trabalho_em_grupo).alias('avg_trabalho_em_grupo')
              )
              .where(Analise.upload_id == upload_id)
              .dicts()
              .get())
 
     labels = [
-        "Prestando Atenção", "Copiando", "Conversando",
-        "Distraído", "Mexendo no Celular", "Dormindo"
+        "Dormindo", "Prestando Atenção", "Mexendo no Celular",
+        "Copiando", "Disperso", "Trabalho em Grupo"
     ]
     data = [
+        round(query['avg_dormindo']),
         round(query['avg_prestando_atencao']),
-        round(query['avg_copiando']),
-        round(query['avg_conversando']),
-        round(query['avg_distraido']),
         round(query['avg_mexendo_celular']),
-        round(query['avg_dormindo'])
+        round(query['avg_copiando']),
+        round(query['avg_disperso']),
+        round(query['avg_trabalho_em_grupo'])
     ]
 
     return jsonify({
@@ -461,22 +461,22 @@ def media_comportamentos(upload_id):
 def contagem_alunos_comportamentos(upload_id):
     query = (Analise
              .select(
-                 Analise.qtde_objeto_prestando_atencao,
-                 Analise.qtde_objeto_copiando,
-                 Analise.qtde_objeto_conversando,
-                 Analise.qtde_objeto_distraido,
-                 Analise.qtde_objeto_mexendo_celular,
                  Analise.qtde_objeto_dormindo,
+                 Analise.qtde_objeto_prestando_atencao,
+                 Analise.qtde_objeto_mexendo_celular,
+                 Analise.qtde_objeto_copiando,
+                 Analise.qtde_objeto_disperso,
+                 Analise.qtde_objeto_trabalho_em_grupo,
                  fn.COUNT(Analise.id).alias('count')
              )
              .where(Analise.upload_id == upload_id)
              .group_by(
+                 Analise.qtde_objeto_dormindo,
                  Analise.qtde_objeto_prestando_atencao,
-                 Analise.qtde_objeto_copiando,
-                 Analise.qtde_objeto_conversando,
-                 Analise.qtde_objeto_distraido,
                  Analise.qtde_objeto_mexendo_celular,
-                 Analise.qtde_objeto_dormindo
+                 Analise.qtde_objeto_copiando,
+                 Analise.qtde_objeto_disperso,
+                 Analise.qtde_objeto_trabalho_em_grupo
              )
              .order_by(fn.COUNT(Analise.id).desc())
              .dicts()
@@ -484,20 +484,20 @@ def contagem_alunos_comportamentos(upload_id):
 
     # Listas para armazenar os dados
     labels = [
-        "Prestando Atenção", "Copiando", "Conversando",
-        "Distraído", "Mexendo no Celular", "Dormindo"
+        "Dormindo", "Prestando Atenção", "Mexendo no Celular",
+        "Copiando", "Disperso", "Trabalho em Grupo"
     ]
     data = [
         0, 0, 0, 0, 0, 0
     ]
 
     for result in query:
-        data[0] += result['qtde_objeto_prestando_atencao']
-        data[1] += result['qtde_objeto_copiando']
-        data[2] += result['qtde_objeto_conversando']
-        data[3] += result['qtde_objeto_distraido']
-        data[4] += result['qtde_objeto_mexendo_celular']
-        data[5] += result['qtde_objeto_dormindo']
+        data[0] += result['qtde_objeto_dormindo']
+        data[1] += result['qtde_objeto_prestando_atencao']
+        data[2] += result['qtde_objeto_mexendo_celular']
+        data[3] += result['qtde_objeto_copiando']
+        data[4] += result['qtde_objeto_disperso']
+        data[5] += result['qtde_objeto_trabalho_em_grupo']
 
     # Encontrar a moda
     mode_value = max(data)
