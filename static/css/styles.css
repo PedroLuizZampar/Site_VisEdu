@@ -319,7 +319,7 @@ canvas {
     padding: 5px;
     position: absolute;
     z-index: 3;
-    bottom: 110%; /* Posiciona acima do botão */
+    bottom: 90%; /* Posiciona acima do botão */
     left: 50%;
     transform: translateX(-50%);
     opacity: 0;
@@ -386,7 +386,7 @@ canvas {
 
 .table td {
     text-align: center;
-    padding: 10px;
+    padding: 20px 10px;
     border-top: 0.1px solid rgb(211, 211, 211);
     border-right: rgb(211, 211, 211) 0.1px solid;
     background-color: #fff;
