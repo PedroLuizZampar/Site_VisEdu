@@ -2,6 +2,7 @@ import os, time
 import cv2
 from peewee import DoesNotExist, fn
 from ultralytics import YOLO
+from moviepy.editor import VideoFileClip
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, jsonify, session, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
@@ -117,6 +118,11 @@ def inserir_upload():
         
         f.save(caminho_arquivo)  # Salva o arquivo
 
+        # Obter a duração do vídeo
+        video = VideoFileClip(caminho_arquivo)
+        duracao = video.duration  # Duração em segundos
+        video.close()  # Fechar o arquivo para liberar recursos
+
         # Recuperar a instância de Sala e do Período com base no nome fornecido no formulário
         sala = Sala.get(Sala.nome_sala == data['sala'])
         periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
@@ -127,13 +133,14 @@ def inserir_upload():
             turma = None
 
         Upload.create(
-        nome_arquivo=nome_arquivo,
-        sala=sala,  # Passar a instância de Sala aqui
-        periodo=periodo,
-        turma=turma,
-        data_registro=data['data_registro'],
-        hora_registro=data['hora_registro'],
-        caminho_arquivo=caminho_arquivo
+            nome_arquivo=nome_arquivo,
+            sala=sala,  # Passar a instância de Sala aqui
+            periodo=periodo,
+            turma=turma,
+            data_registro=data['data_registro'],
+            hora_registro=data['hora_registro'],
+            caminho_arquivo=caminho_arquivo,
+            duracao=duracao
         )
 
         return redirect(url_for('upload.tela_uploads'))
@@ -201,6 +208,12 @@ def atualizar_upload(upload_id):
             f.save(new_caminho_arquivo)
             upload_editado.nome_arquivo = new_filename
             upload_editado.caminho_arquivo = new_caminho_arquivo
+
+            video = VideoFileClip(new_caminho_arquivo)
+            duracao = video.duration  # Duração em segundos
+            video.close()  # Fechar o arquivo para liberar recursos
+
+            upload_editado.duracao = duracao
 
         # Recuperar a instância da Sala e do Período com base no nome fornecido no formulário
         sala = Sala.get(Sala.nome_sala == data['sala'])

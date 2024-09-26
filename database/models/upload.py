@@ -1,4 +1,4 @@
-from peewee import Model, CharField, DateField, TimeField, BooleanField, ForeignKeyField
+from peewee import Model, CharField, DateField, TimeField, BooleanField, DecimalField, ForeignKeyField
 from database.database import db
 from database.models.sala import Sala
 from database.models.periodo import Periodo
@@ -12,6 +12,7 @@ class Upload(Model):
     data_registro = DateField()
     hora_registro = TimeField()
     caminho_arquivo = CharField()
+    duracao = DecimalField()
     is_analisado = BooleanField(default=False)
 
     class Meta:
