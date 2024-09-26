@@ -220,6 +220,20 @@ dialog button {
     max-width: 300px;
 }
 
+.modal-opcoes-relatorio {
+    height: 200px;
+    width: 500px;
+}
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 30px;
+    color: #1E314E;
+}
+
 .input_file {
     margin: 10px 0;
 }
@@ -345,12 +359,12 @@ canvas {
     height: 50px;
     margin: 20px auto;
     animation: spin 2s linear infinite;
-  }
+}
   
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-  }
+}
 
 /* LISTAS */
 
