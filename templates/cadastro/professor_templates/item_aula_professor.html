@@ -1,0 +1,43 @@
+<tr>
+    <td>{{ i }}° Aula</td>
+    <td>
+        <select name="turma-segunda">
+            {% for turma in turmas %}
+                {% set j = loop.index %}
+                {% include 'options/option_turma.html' %}
+            {% endfor %}
+        </select>
+    </td>
+    <td>
+        <select name="turma-terca">
+            {% for turma in turmas %}
+                {% set j = loop.index %}
+                {% include 'options/option_turma.html' %}
+            {% endfor %}
+        </select>
+    </td>
+    <td>
+        <select name="turma-quarta">
+            {% for turma in turmas %}
+                {% set j = loop.index %}
+                {% include 'options/option_turma.html' %}
+            {% endfor %}
+        </select>
+    </td>
+    <td>
+        <select name="turma-quinta">
+            {% for turma in turmas %}
+                {% set j = loop.index %}
+                {% include 'options/option_turma.html' %}
+            {% endfor %}
+        </select>
+    </td>
+    <td>
+        <select name="turma-sexta">
+            {% for turma in turmas %}
+                {% set j = loop.index %}
+                {% include 'options/option_turma.html' %}
+            {% endfor %}
+        </select>
+    </td>
+</tr>

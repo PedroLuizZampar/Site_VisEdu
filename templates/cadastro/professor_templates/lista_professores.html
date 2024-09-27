@@ -1,0 +1,30 @@
+<div class="div-table">
+    <div class="actions-list">
+        <button class="add-button"
+            onclick="document.getElementById('modal').showModal()"
+            c-get="{{ url_for('professor.form_professor') }}"
+            c-target="#modal">
+            ➕
+            <span class="tooltip-text">Adicionar um novo professor</span>
+        </button>
+    </div>
+
+    <table id="table-professor" class="table">
+        <thead>
+            <tr>
+                <th scope="col" class="th-id">#</th>
+                <th>Nome</th>
+                <th>Disciplina</th>
+                <th>Email</th>
+                <th class="th-actions">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-professores">
+            {% for professor in professores %}
+                {% include 'cadastro/professor_templates/item_professor.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="{{ url_for('static', filename='cru.js') }}"></script>

@@ -1,0 +1,25 @@
+<tr id="professor-{{professor.id }}">
+    <td scope="row">{{ professor.id }}</td>
+    <td>{{ professor.nome }}</td>
+    <td>{{ professor.disciplina }}</td>
+    <td>{{ professor.email }}</td>
+    <td class="td-actions">
+
+    <button class="action-button" 
+        c-get="{{ url_for('professor.form_edit_professor', professor_id=professor.id) }}"
+        onclick="document.getElementById('modal').showModal()"
+        c-target="#modal">
+        ✏️
+        <span class="tooltip-text">Editar professor</span>
+    </button>
+
+    <button class="action-button" 
+        c-delete="{{ url_for('professor.deletar_professor', professor_id=professor.id) }}"
+        c-remove-closest="tr"
+        onclick="location.reload()">
+        🗑️
+        <span class="tooltip-text">Excluir professor</span>
+    </button>
+
+    </td>
+</tr>

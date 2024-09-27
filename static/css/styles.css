@@ -111,14 +111,14 @@ main {
     justify-content: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: 25px;
-    width: 500px;
+    width: fit-content;
     margin: 0 auto 20px auto;
 }
 
 .tab button {
     background-color: #C7E9FF;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 0px;
     border-radius: 20px;
     cursor: pointer;
     font-size: 16px;
@@ -150,12 +150,9 @@ main {
 }
 
 .upload-button,
-.add-sala,
-.add-aula,
-.add-disciplina,
-.reload-button,
+.add-button,
 .action-button,
-dialog button {
+.bloco-botoes-modal button{
     position: relative;
     background-color: #1E314E;
     color: #fff;
@@ -165,6 +162,7 @@ dialog button {
     margin: 0 10px;
     cursor: pointer;
     font-size: 16px;
+    margin: 15px 10px;
 }
 
 .action-button {
@@ -174,7 +172,7 @@ dialog button {
 }
 
 dialog {
-    width: 50%;
+    width: 60%;
     text-align: center;
     border: none;
     border-radius: 20px;
@@ -201,7 +199,7 @@ dialog form .bloco-informacoes input, .bloco-informacoes select {
     border-radius: 4px;
 }
 
-dialog form .bloco-informacoes select {
+dialog form .bloco-informacoes select:not(dialog form td select) {
     width: 40%;
     margin: 5px 0;
     text-align: center;
@@ -209,15 +207,13 @@ dialog form .bloco-informacoes select {
     background: transparent;
 }
 
+dialog form td select {
+    width: 100px;
+}
+
 dialog form .bloco-informacoes input {
     padding: 10px;
     box-sizing: border-box;
-}
-
-dialog button {
-    margin: 15px 10px;
-    min-width: 165px;
-    max-width: 300px;
 }
 
 .modal-opcoes-relatorio {
@@ -249,7 +245,7 @@ dialog video {
 }
 
 .modal-body {
-    max-height: 70vh; /* Limita a altura para 70% da altura da viewport */
+    max-height: 90vh; /* Limita a altura para 70% da altura da viewport */
     overflow-y: auto; /* Adiciona o scroll vertical quando necessário */
 }
 
@@ -269,53 +265,17 @@ canvas {
     height: 80%;
 }
 
-.upload-button .tooltip-text {
+.add-button .tooltip-text {
     visibility: hidden;
-    width: 210px;
+    width: max-content;
     background-color: #1E314E;
     color: #fff;
     text-align: center;
-    border-radius: 6px;
-    padding: 5px;
+    border-radius: 10px;
+    padding: 8px;
     position: absolute;
     z-index: 2;
     bottom: 20%;
-    left: -250%;
-    margin-left: -80px;
-    opacity: 0;
-    transition: opacity 0.5s;
-    pointer-events: none; /* Impede que o tooltip seja clicado */
-}
-
-.add-sala .tooltip-text, .add-disciplina .tooltip-text, .add-aula .tooltip-text {
-    visibility: hidden;
-    width: 210px;
-    background-color: #1E314E;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 2;
-    bottom: 20%;
-    left: 250%;
-    margin-left: -80px;
-    opacity: 0;
-    transition: opacity 0.5s;
-    pointer-events: none; /* Impede que o tooltip seja clicado */
-}
-
-.reload-button .tooltip-text {
-    visibility: hidden;
-    width: 250px;
-    background-color: #1E314E;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 2;
-    bottom: 0;
     left: 250%;
     margin-left: -80px;
     opacity: 0;
@@ -325,12 +285,12 @@ canvas {
 
 .action-button .tooltip-text {
     visibility: hidden;
-    width: 135px;
+    width: max-content;
     background-color: #07172e;
     color: #fff;
     text-align: center;
     border-radius: 6px;
-    padding: 5px;
+    padding: 4px;
     position: absolute;
     z-index: 3;
     bottom: 90%; /* Posiciona acima do botão */
@@ -343,10 +303,7 @@ canvas {
 
 .upload-button:hover .tooltip-text,
 .action-button:hover .tooltip-text,
-.reload-button:hover .tooltip-text,
-.add-sala:hover .tooltip-text,
-.add-aula:hover .tooltip-text,
-.add-disciplina:hover .tooltip-text {
+.add-button:hover .tooltip-text{
     visibility: visible;
     opacity: 0.85;
 }
@@ -375,7 +332,7 @@ canvas {
 }
 
 .table {
-    width: 70%;
+    width: 90%;
     margin: 5px auto;
     list-style: none;
     background-color: #fff;
@@ -483,7 +440,6 @@ canvas {
         height: 1000px;
     }
 }
-
 
 .input_file {
     width: 400px; /* Ajusta a largura */

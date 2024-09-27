@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, session
-from funcoes_extras import alterando_sessions_para_false
 
 cadastro_route = Blueprint("cadastro", __name__)
 
@@ -12,7 +11,8 @@ def tela_cadastro():
     visualizando_disciplinas = session.pop('visualizando_disciplinas', None)
     visualizando_periodos = session.pop('visualizando_periodos', None)
     visualizando_aulas = session.pop('visualizando_aulas', None)
+    visualizando_professores = session.pop('visualizando_professores', None)
 
     session['visualizando_cadastros'] = True
     
-    return render_template('cadastro/index.html', visualizando_cadastros=visualizando_cadastros, visualizando_salas=visualizando_salas, visualizando_turmas=visualizando_turmas, visualizando_disciplinas=visualizando_disciplinas, visualizando_periodos=visualizando_periodos, visualizando_aulas=visualizando_aulas) # Se não ouver um session ativa, retorna a página sem parâmetros
+    return render_template('cadastro/index.html', visualizando_cadastros=visualizando_cadastros, visualizando_salas=visualizando_salas, visualizando_turmas=visualizando_turmas, visualizando_disciplinas=visualizando_disciplinas, visualizando_periodos=visualizando_periodos, visualizando_aulas=visualizando_aulas, visualizando_professores=visualizando_professores) # Se não ouver um session ativa, retorna a página sem parâmetros

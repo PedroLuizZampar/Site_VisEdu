@@ -1,5 +1,5 @@
 <div class="modal-body">
-    {% if turma %}Editar Turma{% else %}Nova Turma{% endif %}
+    <h1>{% if turma %}Editar Turma{% else %}Nova Turma{% endif %}</h1>
     <form enctype="multipart/form-data" method="POST"
         {% if turma %}
             action="{{ url_for('turma.atualizar_turma', turma_id=turma.id) }}"

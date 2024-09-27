@@ -1,0 +1,50 @@
+<div class="modal-body">
+    <h1>{% if professor %}Editar professor{% else %}Novo professor{% endif %}</h1>
+    <form enctype="multipart/form-data" method="POST"
+        {% if professor %}
+            action="{{ url_for('professor.atualizar_professor', professor_id=professor.id) }}"
+            c-swap="#professor-{{ professor_id }}"
+        {% else %}
+            action="{{ url_for('professor.inserir_professor') }}"
+            c-append="#lista-professores"
+        {% endif %}
+            c-callback="fecharModal">
+
+        <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
+
+        <div class="bloco-informacoes">
+            <label for="nome">Nome: </label>
+            <input type="text" name="nome" {% if professor %} value="{{ professor.nome }}" {% endif %} required>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="disciplina">Disciplina: </label>
+            <select name="disciplina" id="disciplina" required>
+                {% if not professor %}
+                    {% set professor = None %}
+                {% endif %} <!-- Se não tiver professor, cria uma variável professor vazia pra não dar erro na opção da sala -->
+
+                {% for disciplina in disciplinas %}
+                    {% include 'options/option_disciplina.html' %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="email">Email: </label>
+            <input type="email" name="email" {% if professor %} value="{{ professor.email }}" {% endif %} required>
+        </div>
+
+        <div class="container-aulas-professor"
+            c-container="{{ url_for('professor.lista_aulas_professor_matutino') }}">
+            <!-- Conteúdo vem aqui -->
+        </div>
+
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close()">Cancelar</button>
+            <button type="submit">
+                {% if professor %}Atualizar professor{% else %}Adicionar professor{% endif %}
+            </button>
+        </div>
+    </form>
+</div>

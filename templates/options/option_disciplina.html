@@ -1,0 +1,4 @@
+<option value="{{ disciplina.nome_disciplina }}"
+    {% if professor and professor.disciplina.nome_disciplina == disciplina.nome_disciplina %} selected {% endif%}>
+    {{ disciplina.nome_disciplina }}
+</option>
