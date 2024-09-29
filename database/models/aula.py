@@ -3,7 +3,7 @@ from database.database import db
 from database.models.periodo import Periodo
 
 class Aula(Model):
-    periodo = ForeignKeyField(Periodo, backref='turma', on_delete='RESTRICT')
+    periodo = ForeignKeyField(Periodo, backref='aula', on_delete='RESTRICT')
     hora_inicio = TimeField()
     hora_termino = TimeField()
 

@@ -68,53 +68,6 @@ def atualizar_periodo(periodo_id):
                 flash("O período informado se sobrepõe a outro período existente!", "error")
                 return redirect(url_for('cadastro.tela_cadastro'))
 
-        # Atualiza a quantidade de aulas do período
-        nova_qtde_aulas = int(data['qtde_aulas'])
-        periodo_editado.qtde_aulas = nova_qtde_aulas
-
-        # Se a nova quantidade for maior, adiciona aulas
-        if nova_qtde_aulas > quantidade_atual_aulas:
-            diferenca = nova_qtde_aulas - quantidade_atual_aulas
-
-            # Obtém a última aula como referência (se existir)
-            ultima_aula = aulas_periodo.order_by(Aula.id.desc()).first()
-
-            for i in range(diferenca):
-                if ultima_aula:
-                    # Converte a hora_inicio e hora_termino da última aula para datetime
-                    ultima_hora_inicio = datetime.combine(datetime.today(), ultima_aula.hora_inicio)
-                    ultima_hora_termino = datetime.combine(datetime.today(), ultima_aula.hora_termino)
-
-                    # Adiciona o timedelta de 50 minutos
-                    nova_hora_inicio = (ultima_hora_termino + timedelta(minutes=1)).time()
-                    nova_hora_termino = (ultima_hora_termino + timedelta(minutes=2)).time()
-
-                    # Cria nova aula com base na última aula
-                    nova_aula = Aula.create(
-                        periodo=periodo_editado,
-                        hora_inicio=nova_hora_inicio,
-                        hora_termino=nova_hora_termino
-                    )
-                    ultima_aula = nova_aula  # Atualiza a referência para a próxima aula
-                else:
-                    horario_incio_aula_formatado = datetime.combine(datetime.today(), periodo_editado.hora_inicio) + timedelta(minutes=i)
-                    horario_termino_aula_formatado = datetime.combine(datetime.today(), periodo_editado.hora_inicio) + timedelta(minutes=i+1)
-                    # Se não houver aula anterior, usa o horário do período
-                    Aula.create(
-                        periodo=periodo_editado,
-                        hora_inicio=horario_incio_aula_formatado,
-                        hora_termino=horario_termino_aula_formatado
-                    )
-
-        # Se a nova quantidade for menor, remove aulas do final para o início
-        elif nova_qtde_aulas < quantidade_atual_aulas:
-            diferenca = quantidade_atual_aulas - nova_qtde_aulas
-
-            # Remove aulas excedentes de baixo para cima
-            aulas_remover = aulas_periodo.order_by(Aula.id.desc()).limit(diferenca)
-            for aula in aulas_remover:
-                aula.delete_instance()
-
         # Salva as alterações no período
         periodo_editado.save()
 

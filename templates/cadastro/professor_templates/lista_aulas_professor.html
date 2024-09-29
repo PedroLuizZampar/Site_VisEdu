@@ -1,0 +1,18 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>S</th>
+            <th>T</th>
+            <th>Q</th>
+            <th>Q</th>
+            <th>S</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for aula in aulas %}
+            {% set i = loop.index %}
+            {% include 'cadastro/professor_templates/item_aula_professor.html' %}
+        {% endfor %}
+    </tbody>
+</table>

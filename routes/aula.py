@@ -14,6 +14,7 @@ def lista_aulas_matutinas():
 
     alterando_sessions_para_false()
     session['visualizando_aulas'] = True
+    session['visualizando_aulas_matutinas'] = True
     
     return render_template("cadastro/aula_templates/lista_aulas_matutinas.html", aulas=aulas)
 
@@ -23,6 +24,7 @@ def lista_aulas_vespertinas():
 
     alterando_sessions_para_false()
     session['visualizando_aulas'] = True
+    session['visualizando_aulas_vespertinas'] = True
     
     return render_template("cadastro/aula_templates/lista_aulas_vespertinas.html", aulas=aulas)
 
@@ -32,6 +34,7 @@ def lista_aulas_noturnas():
 
     alterando_sessions_para_false()
     session['visualizando_aulas'] = True
+    session['visualizando_aulas_noturnas'] = True
     
     return render_template("cadastro/aula_templates/lista_aulas_noturnas.html", aulas=aulas)
 

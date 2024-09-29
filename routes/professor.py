@@ -3,50 +3,67 @@ from flask import Blueprint, url_for, render_template, redirect, flash, session,
 from database.models.professor import Professor
 from database.models.disciplina import Disciplina
 from database.models.aula import Aula
+from database.models.periodo import Periodo
 from database.models.turma import Turma
 from funcoes_extras import alterando_sessions_para_false
 
 professor_route = Blueprint("professor", __name__)
 
-@professor_route.route('/lista_professores')
-def lista_professores():
-    professores = Professor.select()
+@professor_route.route('/lista_professores_matutinos')
+def lista_professores_matutinos():
+    periodo = Periodo.select().where(Periodo.nome_periodo == "Matutino")
+    professores = Professor.select().where(Professor.periodo == 1)
 
     alterando_sessions_para_false()
     session['visualizando_professores'] = True
+    session['visualizando_professores_matutinos'] = True
     
-    return render_template("cadastro/professor_templates/lista_professores.html", professores=professores)
+    return render_template("cadastro/professor_templates/lista_professores_matutinos.html", professores=professores, periodo=periodo)
 
-@professor_route.route('/lista_aulas_professor_matutino')
-def lista_aulas_professor_matutino():
-    aulas = Aula.select().where(Aula.periodo == 1)
-    turmas = Turma.select().where(Turma.periodo == 1)
+@professor_route.route('/lista_professores_vespertinos')
+def lista_professores_vespertinos():
+    periodo = Periodo.select().where(Periodo.nome_periodo == "Vespertino")
+    professores = Professor.select().where(Professor.periodo == 2)
+
+    alterando_sessions_para_false()
+    session['visualizando_professores'] = True
+    session['visualizando_professores_vespertinos'] = True
     
-    return render_template("cadastro/professor_templates/lista_aulas_professor_matutino.html", aulas=aulas, turmas=turmas)
+    return render_template("cadastro/professor_templates/lista_professores_vespertinos.html", professores=professores, periodo=periodo)
 
-@professor_route.route('/lista_aulas_professor_vespertino')
-def lista_aulas_professor_vespertino():
-    aulas = Aula.select().where(Aula.periodo == 2)
-    turmas = Turma.select().where(Turma.periodo == 2)
+@professor_route.route('/lista_professores_noturnos')
+def lista_professores_noturnos():
+    periodo = Periodo.select().where(Periodo.nome_periodo == "Noturno")
+    professores = Professor.select().where(Professor.periodo == 3)
+
+    alterando_sessions_para_false()
+    session['visualizando_professores'] = True
+    session['visualizando_professores_noturnos'] = True
     
-    return render_template("cadastro/professor_templates/lista_aulas_professor_vespertino.html", aulas=aulas, turmas=turmas)
+    return render_template("cadastro/professor_templates/lista_professores_noturnos.html", professores=professores, periodo=periodo)
 
-@professor_route.route('/lista_aulas_professor_noturno')
-def lista_aulas_professor_noturno():
-    aulas = Aula.select().where(Aula.periodo == 3)
-    turmas = Turma.select().where(Turma.periodo == 3)
-    
-    return render_template("cadastro/professor_templates/lista_aulas_professor_noturno.html", aulas=aulas, turmas=turmas)
-
-@professor_route.route('/new')
-def form_professor():
+@professor_route.route('periodo-<int:periodo_id>/new')
+def form_professor(periodo_id):
+    id_periodo=periodo_id
 
     disciplinas = Disciplina.select()
-    aulas_matutinas = Aula.select().where(Aula.id == 1)
-    aulas_vespertinas = Aula.select().where(Aula.id == 2)
-    aulas_noturnas = Aula.select().where(Aula.id == 3)
 
-    return render_template("cadastro/professor_templates/form_professor.html", disciplinas=disciplinas, aulas_matutinas=aulas_matutinas, aulas_vespertinas=aulas_vespertinas, aulas_noturnas=aulas_noturnas)
+    return render_template("cadastro/professor_templates/form_professor.html", disciplinas=disciplinas, id_periodo=id_periodo)
+
+@professor_route.route('periodo-<int:periodo_id>/lista_aulas_professor')
+def lista_aulas_professor(periodo_id):
+    if periodo_id == 1:
+        periodo = Periodo.select().where(Periodo.nome_periodo == "Matutino")
+    elif periodo_id == 2:
+        periodo = Periodo.select().where(Periodo.nome_periodo == "Vespertino")
+    if periodo_id == 3:
+        periodo = Periodo.select().where(Periodo.nome_periodo == "Noturno")
+
+    professores = Professor.select()
+    aulas = Aula.select().where(Aula.periodo == periodo)
+    turmas = Turma.select().where(Turma.periodo == periodo)
+    
+    return render_template("cadastro/professor_templates/lista_aulas_professor.html", professores=professores, aulas=aulas, turmas=turmas)
 
 @professor_route.route('/', methods=["POST"])
 def inserir_professor():

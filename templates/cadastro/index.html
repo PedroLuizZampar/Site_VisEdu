@@ -69,7 +69,7 @@
             </button>
 
             <button id="professores-button" {% if visualizando_professores %}class="active"{% endif %}
-                c-get="{{ url_for('professor.lista_professores') }}"
+                c-get="{{ url_for('professor.lista_professores_matutinos') }}"
                 c-target=".content">
                 Professores
             </button>
@@ -89,11 +89,23 @@
             {% elif visualizando_periodos %}
                 c-container="{{ url_for('periodo.lista_periodos') }}"
 
-            {% elif visualizando_aulas %}
+            {% elif visualizando_aulas and visualizando_aulas_matutinas %}
                 c-container="{{ url_for('aula.lista_aulas_matutinas') }}"
 
-            {% elif visualizando_professores %}
-                c-container="{{ url_for('professor.lista_professores') }}"
+            {% elif visualizando_aulas and visualizando_aulas_vespertinas %}
+                c-container="{{ url_for('aula.lista_aulas_vespertinas') }}"
+
+            {% elif visualizando_aulas and visualizando_aulas_noturnas %}
+                c-container="{{ url_for('aula.lista_aulas_noturnas') }}"
+
+            {% elif visualizando_professores and visualizando_professores_matutinos %}
+                c-container="{{ url_for('professor.lista_professores_matutinos') }}"
+            
+            {% elif visualizando_professores and visualizando_professores_vespertinos %}
+                c-container="{{ url_for('professor.lista_professores_vespertinos') }}"
+
+            {% elif visualizando_professores and visualizando_professores_noturnos %}
+                c-container="{{ url_for('professor.lista_professores_noturnos') }}"
             
             {% endif %}
             

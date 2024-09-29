@@ -1,13 +1,35 @@
+<div class="tab-periodos">
+    <button type="button" class="tab-periodos-button active"
+        c-get="{{ url_for('professor.lista_professores_matutinos') }}"
+        c-target=".content">
+        Matutino
+    </button>
+    <button type="button" class="tab-periodos-button"
+        c-get="{{ url_for('professor.lista_professores_vespertinos') }}"
+        c-target=".content">
+        Vespertino
+    </button>
+    <button type="button" class="tab-periodos-button"
+        c-get="{{ url_for('professor.lista_professores_noturnos') }}"
+        c-target=".content">
+        Noturno
+    </button>
+</div>
+
+{% set id_periodo = 1 %}
+
 <div class="div-table">
     <div class="actions-list">
         <button class="add-button"
             onclick="document.getElementById('modal').showModal()"
-            c-get="{{ url_for('professor.form_professor') }}"
+            c-get="{{ url_for('professor.form_professor', periodo_id=id_periodo) }}"
             c-target="#modal">
             ➕
             <span class="tooltip-text">Adicionar um novo professor</span>
         </button>
     </div>
+
+    <h2 style="color: #11223b; text-align: center;">Professores do período da manhã</h2>
 
     <table id="table-professor" class="table">
         <thead>
