@@ -5,7 +5,7 @@
             action="{{ url_for('professor.atualizar_professor', professor_id=professor.id) }}"
             c-swap="#professor-{{ professor_id }}"
         {% else %}
-            action="{{ url_for('professor.inserir_professor') }}"
+            action="{{ url_for('professor.inserir_professor', periodo_id=id_periodo) }}"
             c-append="#lista-professores"
         {% endif %}
             c-callback="fecharModal">
@@ -13,8 +13,8 @@
         <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
 
         <div class="bloco-informacoes">
-            <label for="nome">Nome: </label>
-            <input type="text" name="nome" {% if professor %} value="{{ professor.nome }}" {% endif %} required>
+            <label for="nome_professor">Nome: </label>
+            <input type="text" name="nome_professor" {% if professor %} value="{{ professor.nome_professor }}" {% endif %} required>
         </div>
 
         <div class="bloco-informacoes">

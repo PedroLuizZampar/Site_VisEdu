@@ -1,6 +1,6 @@
 <tr id="professor-{{professor.id }}">
     <td scope="row">{{ professor.id }}</td>
-    <td>{{ professor.nome }}</td>
+    <td>{{ professor.nome_professor }}</td>
     <td>{{ professor.disciplina }}</td>
     <td>{{ professor.email }}</td>
     <td class="td-actions">
@@ -15,8 +15,7 @@
 
     <button class="action-button" 
         c-delete="{{ url_for('professor.deletar_professor', professor_id=professor.id) }}"
-        c-remove-closest="tr"
-        onclick="location.reload()">
+        c-remove-closest="tr">
         🗑️
         <span class="tooltip-text">Excluir professor</span>
     </button>

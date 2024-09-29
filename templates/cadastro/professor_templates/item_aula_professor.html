@@ -1,7 +1,7 @@
 <tr>
     <td>{{ i }}° Aula</td>
     <td>
-        <select name="seg-{{ aula.id }}">
+        <select name="seg-{{ i }}">
             {% for turma in turmas %}
                 {% set j = loop.index %}
                 {% include 'options/option_turma.html' %}
@@ -9,7 +9,7 @@
         </select>
     </td>
     <td>
-        <select name="ter--{{ aula.id }}">
+        <select name="ter-{{ i }}">
             {% for turma in turmas %}
                 {% set j = loop.index %}
                 {% include 'options/option_turma.html' %}
@@ -17,7 +17,7 @@
         </select>
     </td>
     <td>
-        <select name="qua-{{ aula.id }}">
+        <select name="qua-{{ i }}">
             {% for turma in turmas %}
                 {% set j = loop.index %}
                 {% include 'options/option_turma.html' %}
@@ -25,7 +25,7 @@
         </select>
     </td>
     <td>
-        <select name="qui-{{ aula.id }}">
+        <select name="qui-{{ i }}">
             {% for turma in turmas %}
                 {% set j = loop.index %}
                 {% include 'options/option_turma.html' %}
@@ -33,7 +33,7 @@
         </select>
     </td>
     <td>
-        <select name="sex-{{ aula.id }}">
+        <select name="sex-{{ i }}">
             {% for turma in turmas %}
                 {% set j = loop.index %}
                 {% include 'options/option_turma.html' %}
