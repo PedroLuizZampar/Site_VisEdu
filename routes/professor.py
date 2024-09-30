@@ -74,7 +74,7 @@ def inserir_professor(periodo_id):
     elif periodo_id == 3:
         periodo = Periodo.get(Periodo.nome_periodo == "Noturno")
 
-    # **Validação 1: Verifica se o nome do professor já existe no mesmo período**
+    # Validação 1: Verifica se o nome do professor já existe no mesmo período
     professor_existente = Professor.select().where(
         (Professor.nome_professor == data["nome_professor"]) &
         (Professor.periodo == periodo)
@@ -97,52 +97,39 @@ def inserir_professor(periodo_id):
 
     i = 1
     for aula in aulas_periodo:
-        aulas_dados = []
+        # Obter os IDs das turmas selecionadas para cada dia
+        aula_seg_id = data.get(f"seg-{i}")
+        aula_ter_id = data.get(f"ter-{i}")
+        aula_qua_id = data.get(f"qua-{i}")
+        aula_qui_id = data.get(f"qui-{i}")
+        aula_sex_id = data.get(f"sex-{i}")
 
-        # Obtém as turmas para cada dia da semana
-        aula_seg = Turma.get_or_none(Turma.nome_turma == data.get(f"seg-{i}"))
-        aula_ter = Turma.get_or_none(Turma.nome_turma == data.get(f"ter-{i}"))
-        aula_qua = Turma.get_or_none(Turma.nome_turma == data.get(f"qua-{i}"))
-        aula_qui = Turma.get_or_none(Turma.nome_turma == data.get(f"qui-{i}"))
-        aula_sex = Turma.get_or_none(Turma.nome_turma == data.get(f"sex-{i}"))
+        dias_semana = ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira']
+        turma_ids = [aula_seg_id, aula_ter_id, aula_qua_id, aula_qui_id, aula_sex_id]
 
-        aulas_dados.extend([aula_seg, aula_ter, aula_qua, aula_qui, aula_sex])
+        for j, (dia_semana, turma_id) in enumerate(zip(dias_semana, turma_ids), start=1):
+            if turma_id:
+                turma = Turma.get_by_id(int(turma_id))
 
-        j = 1
-        for aula_dado in aulas_dados:
-            dia_semana = None
-            if j == 1:
-                dia_semana = "segunda-feira"
-            elif j == 2:
-                dia_semana = "terça-feira"
-            elif j == 3:
-                dia_semana = "quarta-feira"
-            elif j == 4:
-                dia_semana = "quinta-feira"
-            elif j == 5:
-                dia_semana = "sexta-feira"
-
-            if aula_dado:
-                # **Validação 2: Verifica se a turma já está vinculada à mesma aula e dia da semana para outro professor no mesmo período**
+                # Validação 2: Verifica se a turma já está vinculada à mesma aula e dia da semana para outro professor no mesmo período
                 aula_professor_existente = Aula_Professor.select().join(Professor).where(
-                    (Aula_Professor.turma == aula_dado) &
+                    (Aula_Professor.turma == turma) &
                     (Aula_Professor.aula == aula) &
                     (Aula_Professor.dia_semana == dia_semana) &
                     (Professor.periodo == periodo)
                 ).first()
 
                 if aula_professor_existente:
-                    flash(f"A turma {aula_dado.nome_turma} já está vinculada à {i}° aula de {dia_semana} para outro professor no mesmo período!", "error")
+                    flash(f"A turma {turma.nome_turma} já está vinculada à {i}ª aula de {dia_semana} para outro professor no mesmo período!", "error")
                     return redirect(url_for('cadastro.tela_cadastro', periodo_id=periodo_id))
 
                 # Cria a relação Aula_Professor
                 Aula_Professor.create(
-                    turma=aula_dado,
+                    turma=turma,
                     professor=professor_novo,
                     aula=aula,
                     dia_semana=dia_semana
                 )
-            j += 1
         i += 1
 
     # Armazena dados temporariamente na sessão
