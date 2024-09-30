@@ -48,8 +48,10 @@ def form_professor(periodo_id):
     id_periodo=periodo_id
 
     disciplinas = Disciplina.select()
+    turmas = Turma.select().where(Turma.periodo == periodo_id)
+    aulas = Aula.select().where(Aula.periodo == periodo_id)
 
-    return render_template("cadastro/professor_templates/form_professor.html", disciplinas=disciplinas, id_periodo=id_periodo)
+    return render_template("cadastro/professor_templates/form_professor.html", disciplinas=disciplinas, id_periodo=id_periodo, turmas=turmas, aulas=aulas)
 
 @professor_route.route('periodo-<int:periodo_id>/lista_aulas_professor')
 def lista_aulas_professor(periodo_id):
@@ -64,65 +66,191 @@ def lista_aulas_professor(periodo_id):
 def inserir_professor(periodo_id):
     data = request.form
 
+    # Determina o período com base no ID
     if periodo_id == 1:
-        periodo = Periodo.select().where(Periodo.nome_periodo == "Matutino")
+        periodo = Periodo.get(Periodo.nome_periodo == "Matutino")
     elif periodo_id == 2:
-        periodo = Periodo.select().where(Periodo.nome_periodo == "Vespertino")
-    if periodo_id == 3:
-        periodo = Periodo.select().where(Periodo.nome_periodo == "Noturno")
+        periodo = Periodo.get(Periodo.nome_periodo == "Vespertino")
+    elif periodo_id == 3:
+        periodo = Periodo.get(Periodo.nome_periodo == "Noturno")
 
-    # Cria a professor com os dados fornecidos
+    # **Validação 1: Verifica se o nome do professor já existe no mesmo período**
+    professor_existente = Professor.select().where(
+        (Professor.nome_professor == data["nome_professor"]) &
+        (Professor.periodo == periodo)
+    ).first()
+
+    if professor_existente:
+        flash('Já existe um professor com esse nome no mesmo período!', "error")
+        return redirect(url_for('cadastro.tela_cadastro'))
+
+    # Cria o novo professor
+    disciplina = Disciplina.get(Disciplina.nome_disciplina == data["disciplina"])
     professor_novo = Professor.create(
-        nome_professor = data["nome_professor"],
-        periodo = periodo,
-        disciplina = Disciplina.select().where(Disciplina.nome_disciplina ==data["disciplina"]),
-        email = data["email"]
+        nome_professor=data["nome_professor"],
+        periodo=periodo,
+        disciplina=disciplina,
+        email=data["email"]
     )
 
     aulas_periodo = Aula.select().where(Aula.periodo == periodo)
 
-    cont = 1
+    i = 1
     for aula in aulas_periodo:
         aulas_dados = []
 
-        aula_seg = Turma.select().where(Turma.nome_turma == data[f"seg-{cont}"])
-        aula_ter = Turma.select().where(Turma.nome_turma == data[f"ter-{cont}"])
-        aula_qua = Turma.select().where(Turma.nome_turma == data[f"qua-{cont}"])
-        aula_qui = Turma.select().where(Turma.nome_turma == data[f"qui-{cont}"])
-        aula_sex = Turma.select().where(Turma.nome_turma == data[f"sex-{cont}"])
-
-        cont += 1
+        # Obtém as turmas para cada dia da semana
+        aula_seg = Turma.get_or_none(Turma.nome_turma == data.get(f"seg-{i}"))
+        aula_ter = Turma.get_or_none(Turma.nome_turma == data.get(f"ter-{i}"))
+        aula_qua = Turma.get_or_none(Turma.nome_turma == data.get(f"qua-{i}"))
+        aula_qui = Turma.get_or_none(Turma.nome_turma == data.get(f"qui-{i}"))
+        aula_sex = Turma.get_or_none(Turma.nome_turma == data.get(f"sex-{i}"))
 
         aulas_dados.extend([aula_seg, aula_ter, aula_qua, aula_qui, aula_sex])
 
+        j = 1
         for aula_dado in aulas_dados:
+            dia_semana = None
+            if j == 1:
+                dia_semana = "segunda-feira"
+            elif j == 2:
+                dia_semana = "terça-feira"
+            elif j == 3:
+                dia_semana = "quarta-feira"
+            elif j == 4:
+                dia_semana = "quinta-feira"
+            elif j == 5:
+                dia_semana = "sexta-feira"
+
             if aula_dado:
+                # **Validação 2: Verifica se a turma já está vinculada à mesma aula e dia da semana para outro professor no mesmo período**
+                aula_professor_existente = Aula_Professor.select().join(Professor).where(
+                    (Aula_Professor.turma == aula_dado) &
+                    (Aula_Professor.aula == aula) &
+                    (Aula_Professor.dia_semana == dia_semana) &
+                    (Professor.periodo == periodo)
+                ).first()
+
+                if aula_professor_existente:
+                    flash(f"A turma {aula_dado.nome_turma} já está vinculada à {i}° aula de {dia_semana} para outro professor no mesmo período!", "error")
+                    return redirect(url_for('cadastro.tela_cadastro', periodo_id=periodo_id))
+
+                # Cria a relação Aula_Professor
                 Aula_Professor.create(
-                    turma = aula_dado,
-                    professor = professor_novo.id,
-                    aula = aula.id
+                    turma=aula_dado,
+                    professor=professor_novo,
+                    aula=aula,
+                    dia_semana=dia_semana
                 )
+            j += 1
+        i += 1
 
     # Armazena dados temporariamente na sessão
     session['visualizando_professores'] = True
 
     return redirect(url_for('cadastro.tela_cadastro'))
 
-@professor_route.route('<int:professor_id>/edit')
-def form_edit_professor(professor_id):
+@professor_route.route('periodo-<int:periodo_id>/professor-<int:professor_id>/edit')
+def form_edit_professor(periodo_id, professor_id):
+    id_periodo = periodo_id
 
     professor_selecionado = Professor.get_by_id(professor_id)
-
     disciplinas = Disciplina.select()
+    aulas = Aula.select().where(Aula.periodo == periodo_id)
+    turmas = Turma.select().where(Turma.periodo == periodo_id)
 
-    return render_template("cadastro/professor_templates/form_professor.html", professor=professor_selecionado, disciplinas=disciplinas)
+    # Obter as aulas associadas ao professor
+    aulas_professor = Aula_Professor.select().where(Aula_Professor.professor == professor_selecionado)
+
+    # Organizar o horário em um dicionário: {(aula_id, dia_semana): turma_id}
+    horario_professor = {}
+    for aula_prof in aulas_professor:
+        chave = (aula_prof.aula.id, aula_prof.dia_semana)
+        horario_professor[chave] = aula_prof.turma.id
+
+    return render_template(
+        "cadastro/professor_templates/form_professor.html",
+        professor=professor_selecionado,
+        disciplinas=disciplinas,
+        id_periodo=id_periodo,
+        aulas=aulas,
+        turmas=turmas,
+        horario_professor=horario_professor  # Passa o horário para o template
+    )
 
 @professor_route.route('/<int:professor_id>/update', methods=["POST"])
 def atualizar_professor(professor_id):
     if request.form.get('_method') == "PUT":
         data = request.form
 
-    return redirect(url_for('cadastro.tela_cadastro'))
+        # Recuperar o professor a ser editado
+        professor_editado = Professor.get_by_id(professor_id)
+
+        # Determina o período com base no professor
+        periodo = professor_editado.periodo
+
+        # Validação 1: Verifica se já existe outro professor com o mesmo nome no mesmo período (excluindo o atual)
+        professor_existente = Professor.select().where(
+            (Professor.nome_professor == data["nome_professor"]) &
+            (Professor.periodo == periodo) &
+            (Professor.id != professor_id)
+        ).first()
+
+        if professor_existente:
+            flash('Já existe um professor com esse nome no mesmo período!', "error")
+            return redirect(url_for('cadastro.tela_cadastro'))
+
+        # Atualizar os campos do professor
+        professor_editado.nome_professor = data['nome_professor']
+        professor_editado.disciplina = Disciplina.get(Disciplina.nome_disciplina == data["disciplina"])
+        professor_editado.email = data['email']
+        professor_editado.save()
+
+        # Deletar as relações antigas em Aula_Professor
+        Aula_Professor.delete().where(Aula_Professor.professor == professor_editado).execute()
+
+        aulas_periodo = Aula.select().where(Aula.periodo == periodo)
+
+        i = 1
+        for aula in aulas_periodo:
+            # Obter os IDs das turmas selecionadas para cada dia
+            aula_seg_id = data.get(f"seg-{i}")
+            aula_ter_id = data.get(f"ter-{i}")
+            aula_qua_id = data.get(f"qua-{i}")
+            aula_qui_id = data.get(f"qui-{i}")
+            aula_sex_id = data.get(f"sex-{i}")
+
+            dias_semana = ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira']
+            turma_ids = [aula_seg_id, aula_ter_id, aula_qua_id, aula_qui_id, aula_sex_id]
+
+            for j, (dia_semana, turma_id) in enumerate(zip(dias_semana, turma_ids), start=1):
+                if turma_id:
+                    turma = Turma.get_by_id(int(turma_id))
+
+                    # Validação 2: Verifica se a turma já está vinculada à mesma aula e dia da semana para outro professor no mesmo período (excluindo o atual)
+                    aula_professor_existente = Aula_Professor.select().join(Professor).where(
+                        (Aula_Professor.turma == turma) &
+                        (Aula_Professor.aula == aula) &
+                        (Aula_Professor.dia_semana == dia_semana) &
+                        (Professor.periodo == periodo) &
+                        (Professor.id != professor_id)
+                    ).first()
+
+                    if aula_professor_existente:
+                        flash(f"A turma {turma.nome_turma} já está vinculada à {i}ª aula de {dia_semana} para outro professor no mesmo período!", "error")
+                        return redirect(url_for('cadastro.tela_cadastro'))
+
+                    # Cria a relação Aula_Professor
+                    Aula_Professor.create(
+                        turma=turma,
+                        professor=professor_editado,
+                        aula=aula,
+                        dia_semana=dia_semana
+                    )
+            i += 1
+
+        return redirect(url_for('cadastro.tela_cadastro'))
+
 
 @professor_route.route('/<int:professor_id>/delete', methods=["DELETE"])
 def deletar_professor(professor_id):

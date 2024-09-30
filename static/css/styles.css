@@ -221,6 +221,19 @@ dialog form .bloco-informacoes input {
     width: 500px;
 }
 
+.modal-erro button {
+    position: relative;
+    background-color: #1E314E;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin: 0 10px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 15px 10px;
+}
+
 .close {
     position: absolute;
     top: 20px;

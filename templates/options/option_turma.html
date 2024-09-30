@@ -1,17 +1,7 @@
-{% if j == 1 %}
-
-<option value="" selected></option>
-
-<option value="{{ turma.nome_turma }}"
-    {% if professor and professor.turma.nome.turma == turma.nome_turma %} selected {% endif%}>
+<option value="{{ turma.id }}"
+    {% if horario_professor is defined and horario_professor.get((aula.id, day)) == turma.id %}
+        selected
+    {% endif %}
+>
     {{ turma.nome_turma }}
 </option>
-
-{% else %}
-
-<option value="{{ turma.nome_turma }}"
-    {% if professor and professor.turma.nome.turma == turma.nome_turma %} selected {% endif%}>
-    {{ turma.nome_turma }}
-</option>
-
-{% endif %}

@@ -6,7 +6,7 @@
     <td class="td-actions">
 
     <button class="action-button" 
-        c-get="{{ url_for('professor.form_edit_professor', professor_id=professor.id) }}"
+        c-get="{{ url_for('professor.form_edit_professor', periodo_id=id_periodo, professor_id=professor.id) }}"
         onclick="document.getElementById('modal').showModal()"
         c-target="#modal">
         ✏️

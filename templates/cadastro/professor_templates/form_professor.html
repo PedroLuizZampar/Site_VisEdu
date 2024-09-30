@@ -35,8 +35,8 @@
             <input type="email" name="email" {% if professor %} value="{{ professor.email }}" {% endif %} required>
         </div>
 
-        <div class="container-aulas-professor"
-            c-container="{{ url_for('professor.lista_aulas_professor', periodo_id=id_periodo) }}">
+        <div class="container-aulas-professor">
+            {% include 'cadastro/professor_templates/lista_aulas_professor.html' %}
             <!-- Conteúdo vem aqui -->
         </div>
 

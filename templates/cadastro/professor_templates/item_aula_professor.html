@@ -1,43 +1,13 @@
 <tr>
-    <td>{{ i }}° Aula</td>
-    <td>
-        <select name="seg-{{ i }}">
-            {% for turma in turmas %}
-                {% set j = loop.index %}
-                {% include 'options/option_turma.html' %}
-            {% endfor %}
-        </select>
-    </td>
-    <td>
-        <select name="ter-{{ i }}">
-            {% for turma in turmas %}
-                {% set j = loop.index %}
-                {% include 'options/option_turma.html' %}
-            {% endfor %}
-        </select>
-    </td>
-    <td>
-        <select name="qua-{{ i }}">
-            {% for turma in turmas %}
-                {% set j = loop.index %}
-                {% include 'options/option_turma.html' %}
-            {% endfor %}
-        </select>
-    </td>
-    <td>
-        <select name="qui-{{ i }}">
-            {% for turma in turmas %}
-                {% set j = loop.index %}
-                {% include 'options/option_turma.html' %}
-            {% endfor %}
-        </select>
-    </td>
-    <td>
-        <select name="sex-{{ i }}">
-            {% for turma in turmas %}
-                {% set j = loop.index %}
-                {% include 'options/option_turma.html' %}
-            {% endfor %}
-        </select>
-    </td>
+    <td>{{ i }}ª Aula</td>
+    {% for day in ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira'] %}
+        <td>
+            <select name="{{ day_abbr[day] }}-{{ i }}">
+                <option value=""></option>
+                {% for turma in turmas %}
+                    {% include 'options/option_turma.html' %}
+                {% endfor %}
+            </select>
+        </td>
+    {% endfor %}
 </tr>
