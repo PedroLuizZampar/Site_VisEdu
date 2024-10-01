@@ -70,15 +70,15 @@
         </dialog>
 
         <!-- Modal video -->
-        <dialog id="video">
+        <dialog id="video" class="modal">
         </dialog>
 
         <!-- Modal de opções de relatórios -->
-        <dialog id="opcoes-relatorio" class="modal-opcoes-relatorio">
+        <dialog id="opcoes-relatorio" class="modal">
         </dialog>
 
         <!-- Modal de renderização de relatórios -->
-        <dialog id="relatorio" class="modal-relatorio">
+        <dialog id="relatorio" class="modal modal-relatorio">
             <div class="modal-body">
                 <canvas id="canvas_grafico"></canvas>
                 <div id="botoes-modal-relatorio">
@@ -88,7 +88,7 @@
         </dialog>
 
         <!-- Modal erro -->
-        <dialog id="error" class="modal-erro">
+        <dialog id="error" class="modal">
 
             <!-- Mensagens de Flash -->
             {% with messages = get_flashed_messages(with_categories=True) %}
@@ -106,7 +106,7 @@
         </dialog>
 
         <!-- Modal aviso de análise em andamento -->
-        <dialog id="mensagem_analise">
+        <dialog id="mensagem_analise" class="modal">
             <p>O vídeo está sendo analisado, isso pode demorar alguns minutos!</p>
             <div class="loader"></div>
             <button onclick="document.getElementById('mensagem_analise').close(), localStorage.removeItem('modal_analise_aberto'), location.reload();"

@@ -221,7 +221,7 @@ dialog form .bloco-informacoes input {
     width: 500px;
 }
 
-.modal-erro button {
+.modal button {
     position: relative;
     background-color: #1E314E;
     color: #fff;
