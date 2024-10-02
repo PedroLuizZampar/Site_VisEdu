@@ -16,13 +16,13 @@
             c-get="{{ url_for('turma.form_edit_turma', turma_id=turma.id) }}"
             onclick="document.getElementById('modal').showModal()"
             c-target="#modal">
-            ✏️
+            <i class="fa-solid fa-pen-to-square" style="color: #ffffff;"></i>
             <span class="tooltip-text">Editar turma</span>
         </button>
         <button class="action-button" 
             c-delete="{{ url_for('turma.deletar_turma', turma_id=turma.id) }}"
             c-remove-closest="tr">
-            🗑️
+            <i class="fa-solid fa-trash-can" style="color: #ffffff;"></i>
             <span class="tooltip-text">Excluir turma</span>
         </button>
 

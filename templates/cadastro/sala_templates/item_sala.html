@@ -7,14 +7,14 @@
             c-get="{{ url_for('sala.form_edit_sala', sala_id=sala.id) }}"
             onclick="document.getElementById('modal').showModal()"
             c-target="#modal">
-            ✏️
+            <i class="fa-solid fa-pen-to-square" style="color: #ffffff;"></i>
             <span class="tooltip-text">Editar sala</span>
         </button>
 
         <button class="action-button" 
             c-delete="{{ url_for('sala.deletar_sala', sala_id=sala.id) }}"
             c-remove-closest="tr">
-            🗑️
+            <i class="fa-solid fa-trash-can" style="color: #ffffff;"></i>
             <span class="tooltip-text">Excluir sala</span>
         </button>
 

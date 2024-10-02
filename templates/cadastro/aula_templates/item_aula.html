@@ -9,7 +9,7 @@
         c-get="{{ url_for('aula.form_edit_aula', aula_id=aula.id, periodo_id=aula.periodo.id) }}"
         onclick="document.getElementById('modal').showModal()"
         c-target="#modal">
-        ✏️
+        <i class="fa-solid fa-pen-to-square" style="color: #ffffff;"></i>
         <span class="tooltip-text">Editar aula</span>
     </button>
 
@@ -17,7 +17,7 @@
         c-delete="{{ url_for('aula.deletar_aula', aula_id=aula.id) }}"
         c-remove-closest="tr"
         onclick="location.reload()">
-        🗑️
+        <i class="fa-solid fa-trash-can" style="color: #ffffff;"></i>
         <span class="tooltip-text">Excluir aula</span>
     </button>
 

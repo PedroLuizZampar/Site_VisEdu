@@ -9,14 +9,14 @@
         c-get="{{ url_for('professor.form_edit_professor', periodo_id=id_periodo, professor_id=professor.id) }}"
         onclick="document.getElementById('modal').showModal()"
         c-target="#modal">
-        ✏️
+        <i class="fa-solid fa-pen-to-square" style="color: #ffffff;"></i>
         <span class="tooltip-text">Editar professor</span>
     </button>
 
     <button class="action-button" 
         c-delete="{{ url_for('professor.deletar_professor', professor_id=professor.id) }}"
         c-remove-closest="tr">
-        🗑️
+        <i class="fa-solid fa-trash-can" style="color: #ffffff;"></i>
         <span class="tooltip-text">Excluir professor</span>
     </button>
 

@@ -7,14 +7,14 @@
             c-get="{{ url_for('disciplina.form_edit_disciplina', disciplina_id=disciplina.id) }}"
             onclick="document.getElementById('modal').showModal()"
             c-target="#modal">
-            ✏️
+            <i class="fa-solid fa-pen-to-square" style="color: #ffffff;"></i>
             <span class="tooltip-text">Editar disciplina</span>
         </button>
 
         <button class="action-button" 
             c-delete="{{ url_for('disciplina.deletar_disciplina', disciplina_id=disciplina.id) }}"
             c-remove-closest="tr">
-            🗑️
+            <i class="fa-solid fa-trash-can" style="color: #ffffff;"></i>
             <span class="tooltip-text">Excluir disciplina</span>
         </button>
 
