@@ -430,12 +430,12 @@ def status_analise(upload_id):
     else:
         return jsonify({'error': 'Análise não encontrada'}), 404
 
-@upload_route.route('/<int:upload_id>/teste', methods=["GET"])
-def testando(upload_id):
+@upload_route.route('/<int:upload_id>/opcoes_grafico', methods=["GET"])
+def opcoes_grafico(upload_id):
 
     upload = Upload.get_by_id(upload_id)
 
-    return render_template('/relatorios/opcoes_relatorios.html', upload=upload)
+    return render_template('/upload/graficos/opcoes_graficos.html', upload=upload)
     
 @upload_route.route('/<int:upload_id>/relatorio/media_comportamentos', methods=["GET"])
 def media_comportamentos(upload_id):

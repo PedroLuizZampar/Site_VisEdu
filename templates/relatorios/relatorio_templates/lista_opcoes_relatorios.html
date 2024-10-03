@@ -1,0 +1,23 @@
+<style>
+    .botao-opcao-relatorio {
+        position: relative;
+        background-color: #1E314E;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        margin: 0 10px;
+        cursor: pointer;
+        font-size: 18px;
+        margin: 15px 10px;
+    }
+</style>
+
+<div class="modal-body" style="display: flex; align-items: center; justify-content: center; height: 100%;">
+    <button class="botao-opcao-relatorio"
+        onclick="document.getElementById('modal').showModal()"
+        c-get="{{ url_for('relatorio.filtros_relatorio') }}"
+        c-target="#modal">
+        <i class="fa-solid fa-file-lines" style="color: #ffffff;"></i><br>Relatório completo
+    </button>
+</div>

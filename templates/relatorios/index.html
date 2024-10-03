@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatorios</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../static/images/logoNavBarSemFundo.png">
+</head>
+<body>
+    <header>
+        <div class="NavBar">
+            <div class="logoArea">
+                <a href="/">
+                    <img src="../static/images/logoNavBarSemFundo.png" alt="">
+                </a>
+            </div>
+            <div class="tabArea">
+                <div class="NavBarItem">
+                    <a class="NavBarSection" href="/cadastro">Cadastro</a>
+                </div>
+                <div class="NavBarItem">
+                    <a class="NavBarSection" href="/upload">Uploads</a>
+                </div>
+                <div class="NavBarItem selected-item-menu">
+                    <a class="NavBarSection" href="/relatorio">Relatórios</a>
+                </div>
+                <div class="NavBarItem">
+                    <a class="NavBarSection" href="">Opções</a>
+                </div>
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i> <!-- Ícone de toggle -->
+            </div>
+        </div>
+    </header>
+    <main>
+        <!-- Valida a última sessão aberta e busca o conteúdo. Caso não ache, renderiza por padrão a lista de uploads não analisados -->
+        <section class="content"            
+            c-container="{{ url_for('relatorio.lista_opcoes_relatorios') }}">
+        </section>    
+
+        {% if relatorio_aberto %}
+            <dialog id="modal"
+                {% if relatorio_aberto %}
+                    c-container="{{ url_for('relatorio.relatorio_geral') }}"
+                {% endif %}>
+
+                <button onclick="getElementById('modal').close()">Fechar</button>
+            </dialog>
+
+            <script>
+                document.getElementById("modal").showModal()
+            </script>
+        {% else %}
+
+            <!-- Modal formulários -->
+            <dialog id="modal">
+            </dialog>
+
+        {% endif %}
+
+        <!-- Modal erro -->
+        <dialog id="error" class="modal-erro">
+            <!-- Mensagens de Flash -->
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                <script>
+                    modal_erro = document.getElementById('error')
+                    modal_erro.showModal()
+                </script>
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <button onclick="getElementById('error').close()">Ok</button>
+        </dialog>
+
+    </main>
+    <script src="{{ url_for('static', filename='cru.js') }}"></script>
+</body>
+</html>

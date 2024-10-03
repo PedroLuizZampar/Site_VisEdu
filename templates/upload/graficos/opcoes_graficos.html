@@ -1,0 +1,10 @@
+<div class="modal-body" style="display: flex; align-items: center; justify-content: center; height: 100%;">
+    <i class="fa-solid fa-xmark close" onclick="document.getElementById('opcoes-relatorio').close()"></i>
+    <button onclick="document.getElementById('opcoes-relatorio').close(), document.getElementById('relatorio').showModal(), grafico_media_comportamentos(`{{ upload.id }}`)">
+        <i class="fa-solid fa-square-poll-vertical" style="color: #ffffff;"></i><br>Média
+    </button>
+
+    <button onclick="document.getElementById('opcoes-relatorio').close(), document.getElementById('relatorio').showModal(), grafico_contagem_alunos_comportamentos(`{{ upload.id }}`)">
+        <i class="fa-solid fa-square-poll-vertical" style="color: #ffffff;"></i><br>Moda
+    </button>
+</div>

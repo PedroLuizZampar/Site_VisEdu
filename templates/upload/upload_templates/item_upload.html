@@ -53,7 +53,7 @@
         {% if upload.is_analisado == 1 %}
 
             <button class="action-button"
-                c-get="{{ url_for('upload.testando', upload_id=upload.id) }}"
+                c-get="{{ url_for('upload.opcoes_grafico', upload_id=upload.id) }}"
                 onclick="document.getElementById('opcoes-relatorio').showModal()"
                 c-target="#opcoes-relatorio">
                 <i class="fa-solid fa-clipboard-list" style="color: #ffffff;"></i>
