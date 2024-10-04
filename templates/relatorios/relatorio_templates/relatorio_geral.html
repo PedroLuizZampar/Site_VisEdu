@@ -36,14 +36,17 @@
         </div>
     </header>
     <main>
+        <button class="return-button" onclick="window.history.back();">
+            <i class="fa-solid fa-arrow-left" style="color: #ffffff;"></i>
+        </button>
         <!-- Valida a última sessão aberta e busca o conteúdo. Caso não ache, renderiza por padrão a lista de uploads não analisados -->
         <section class="content">
             <div class="div-table">
             
-                <table class="table">
+                <table class="tabela-relatorio">
                     <thead>
-                        <tr>
-                            <th scope="col" class="th-id">#</th>
+                        <tr class="tr-cabecalho-relatorio">
+                            <th scope="col">#</th>
                             <th>Upload</th>
                             <th>Professor(es)</th>
                             <th>Sala</th>
@@ -55,7 +58,7 @@
                     </thead>
                     <tbody id="lista-uploads">
                         {% for upload in uploads %}
-                            <tr>
+                            <tr class="tr-corpo-relatorio">
                                 <td>{{ upload.id }}</td>
                                 <td>{{ upload.nome_arquivo }}</td>
                                 <td></td>
@@ -63,28 +66,21 @@
                                 <td></td>
                                 <td>{{ upload.turma.nome_turma }}</td>
                                 <td>{{ upload.sala.qtde_alunos }}</td>
-                                <td></td>
+                                <td>
+                                    {% set cont_objetos_disperso = 0 %}
+                                    {% for analise in analises %}
+                                        {% if upload.id == analise.upload_id %}
+                                            {{ analise.qtde_objeto_disperso }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             
             </div>
-        </section>    
-
-        {% if relatorio_aberto %}
-            <dialog id="modal"
-                {% if relatorio_aberto %}
-                    c-container="{{ url_for('relatorio.relatorio_geral') }}"
-                {% endif %}>
-
-                <button onclick="getElementById('modal').close()">Fechar</button>
-            </dialog>
-
-            <script>
-                document.getElementById("modal").showModal()
-            </script>
-        {% else %}
+        </section>
 
             <!-- Modal formulários -->
             <dialog id="modal">

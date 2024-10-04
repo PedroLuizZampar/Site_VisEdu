@@ -149,6 +149,20 @@ main {
     border-bottom: 5px solid #4EB6FF
 }
 
+.return-button {
+    position: relative;
+    background-color: #1E314E;
+    color: #fff;
+    border: none;
+    border-radius: 200px;
+    margin: 0 10px;
+    cursor: pointer;
+    font-size: 18px;
+    margin: 15px 10px;
+    width: 50px;
+    height: 50px;
+}
+
 .upload-button,
 .add-button,
 .action-button,
@@ -490,4 +504,30 @@ canvas {
     border-radius: 4px;
     padding: 10px;
     box-sizing: border-box;
+}
+
+/* RELATÓRIOS */
+
+.tabela-relatorio {
+    width: 90%;
+    margin: 5px auto;
+    list-style: none;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-collapse: collapse;
+}
+
+.tr-cabecalho-relatorio {
+    color: #FFF;
+    background-color: #011f36;
+}
+
+.tr-cabecalho-relatorio th, .tr-corpo-relatorio td {
+    font-weight: 300;
+    padding: 10px;
+    text-align: center;
+    border-right: 1px solid #b0c3da;
+    border-left: 1px solid#b0c3da;
+    border-bottom: 1px solid #b0c3da;
 }

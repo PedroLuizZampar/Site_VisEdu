@@ -36,7 +36,7 @@ def relatorio_geral():
     periodo_inicial = data["periodo_inicial"]
     periodo_final = data["periodo_final"]
 
-    uploads = Upload.select().where(Upload.data_registro >= periodo_inicial and Upload.data_registro <= periodo_final)
+    uploads = Upload.select().where(Upload.data_registro >= periodo_inicial and Upload.data_registro <= periodo_final and Upload.is_analisado == 1)
     analises = Analise.select().where(Analise.upload_id == next(iter(uploads), None))
 
-    return render_template("relatorios/relatorio_templates/relatorio_geral.html", uploads=uploads)
+    return render_template("relatorios/relatorio_templates/relatorio_geral.html", uploads=uploads, analises=analises)

@@ -8,6 +8,7 @@ from routes.disciplina import disciplina_route
 from routes.periodo import periodo_route
 from routes.aula import aula_route
 from routes.professor import professor_route
+from routes.relatorio import relatorio_route
 from database.database import db
 from database.models.upload import Upload
 from database.models.sala import Sala
@@ -34,6 +35,7 @@ def configure_routes(app):
     app.register_blueprint(periodo_route, url_prefix="/cadastro/periodo")
     app.register_blueprint(aula_route, url_prefix="/cadastro/aula")
     app.register_blueprint(professor_route, url_prefix = "/cadastro/professor")
+    app.register_blueprint(relatorio_route, url_prefix = "/relatorio")
 
 def configure_db():
     db.connect()
