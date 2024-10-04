@@ -62,7 +62,7 @@
         {% endif %}
 
         <!-- Modal erro -->
-        <dialog id="error" class="modal-erro">
+        <dialog id="error"  class="modal">
             <!-- Mensagens de Flash -->
             {% with messages = get_flashed_messages(with_categories=True) %}
                 {% if messages %}
@@ -80,5 +80,16 @@
 
     </main>
     <script src="{{ url_for('static', filename='cru.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleButton = document.querySelector('.menu-toggle');
+            const navBar = document.querySelector('.NavBar');
+            
+            toggleButton.addEventListener('click', function() {
+                navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
+            });
+        });
+    </script>
 </body>
 </html>

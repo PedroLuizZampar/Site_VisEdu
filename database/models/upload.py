@@ -13,6 +13,7 @@ class Upload(Model):
     hora_registro = TimeField()
     caminho_arquivo = CharField()
     duracao = DecimalField()
+    hora_termino = TimeField()
     is_analisado = BooleanField(default=False)
 
     class Meta:

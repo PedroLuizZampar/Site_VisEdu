@@ -3,6 +3,7 @@ import cv2
 from peewee import DoesNotExist, fn
 from ultralytics import YOLO
 from moviepy.editor import VideoFileClip
+from datetime import datetime, timedelta
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, jsonify, session, request
 from werkzeug.utils import secure_filename
 from database.models.upload import Upload
@@ -101,28 +102,6 @@ def inserir_upload():
         basepath = os.path.dirname(__file__)
         data = request.form
 
-        # Substituir espaços por underlines
-        nome_arquivo = data['nome_arquivo'].replace(' ', '_')
-
-        # Usa o nome fornecido pelo usuário no formulário
-        filename = secure_filename(data['nome_arquivo'])
-        old_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
-
-        base, extension = os.path.splitext(filename)
-
-        nome_arquivo = f"{base}{extension}"
-
-        nome_arquivo = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), nome_arquivo)
-
-        caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', nome_arquivo))
-        
-        f.save(caminho_arquivo)  # Salva o arquivo
-
-        # Obter a duração do vídeo
-        video = VideoFileClip(caminho_arquivo)
-        duracao = video.duration  # Duração em segundos
-        video.close()  # Fechar o arquivo para liberar recursos
-
         # Recuperar a instância de Sala e do Período com base no nome fornecido no formulário
         sala = Sala.get(Sala.nome_sala == data['sala'])
         periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
@@ -132,6 +111,41 @@ def inserir_upload():
         except DoesNotExist:
             turma = None
 
+        # Verificação de hora: Certificar que a hora_registro está dentro dos limites do período
+        hora_registro = datetime.strptime(data['hora_registro'], "%H:%M").time()
+
+        if not (periodo.hora_inicio <= hora_registro <= periodo.hora_termino):
+            flash(f"A hora de registro ({data['hora_registro']}) está fora do período selecionado!", "error")
+            return redirect(request.referrer)
+
+        # Substituir espaços por underlines
+        nome_arquivo = data['nome_arquivo'].replace(' ', '_')
+
+        # Usa o nome fornecido pelo usuário no formulário
+        filename = secure_filename(data['nome_arquivo'])
+        old_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', filename))
+
+        base, extension = os.path.splitext(filename)
+        nome_arquivo = f"{base}{extension}"
+
+        nome_arquivo = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), nome_arquivo)
+
+        caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', nome_arquivo))
+        
+        f.save(caminho_arquivo)  # Salva o arquivo após a verificação
+
+        # Obter a duração do vídeo
+        video = VideoFileClip(caminho_arquivo)
+        duracao = video.duration  # Duração em segundos
+        video.close()  # Fechar o arquivo para liberar recursos
+
+        # Calcular a hora de término com base na duração
+        hora_registro_dt = datetime.strptime(data['hora_registro'], "%H:%M")
+        duracao_timedelta = timedelta(seconds=duracao)
+        hora_termino_dt = hora_registro_dt + duracao_timedelta
+        hora_termino = hora_termino_dt.time()
+
+        # Criar o registro de upload
         Upload.create(
             nome_arquivo=nome_arquivo,
             sala=sala,  # Passar a instância de Sala aqui
@@ -140,7 +154,8 @@ def inserir_upload():
             data_registro=data['data_registro'],
             hora_registro=data['hora_registro'],
             caminho_arquivo=caminho_arquivo,
-            duracao=duracao
+            duracao=duracao,
+            hora_termino=hora_termino
         )
 
         return redirect(url_for('upload.tela_uploads'))
@@ -171,9 +186,9 @@ def form_edit_upload(upload_id):
 
 @upload_route.route('/<int:upload_id>/update', methods=["POST"])
 def atualizar_upload(upload_id):
-    
+
     """ Atualiza o upload """
-    
+
     if request.form.get('_method') == 'PUT':
         basepath = os.path.dirname(__file__)
         data = request.form
@@ -188,7 +203,27 @@ def atualizar_upload(upload_id):
         novo_nome_arquivo = secure_filename(data['nome_arquivo'])
         new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', novo_nome_arquivo))
 
-        if not f:  # Se não há arquivo novo sendo enviado
+        # Recuperar a instância da Sala e do Período com base no nome fornecido no formulário
+        sala = Sala.get(Sala.nome_sala == data['sala'])
+        periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
+
+        try:
+            turma = Turma.get(Turma.sala == sala, Turma.periodo == periodo)
+        except DoesNotExist:
+            turma = None
+
+        # Verificação de hora: Certificar que a hora_registro está dentro dos limites do período
+        try:
+            hora_registro = datetime.strptime(data['hora_registro'], "%H:%M:%S").time()
+        except ValueError:
+            hora_registro = datetime.strptime(data['hora_registro'], "%H:%M").time()
+            
+        if not (periodo.hora_inicio <= hora_registro <= periodo.hora_termino):
+            flash(f"A hora de registro ({data['hora_registro']}) está fora do período selecionado!", "error")
+            return redirect(request.referrer)
+
+        # Se não há arquivo novo sendo enviado
+        if not f:  
             # Se o nome do arquivo mudou, renomeie o arquivo antigo
             if old_name != novo_nome_arquivo:
                 new_filename = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), novo_nome_arquivo)
@@ -197,8 +232,8 @@ def atualizar_upload(upload_id):
                 upload_editado.nome_arquivo = new_filename
                 upload_editado.caminho_arquivo = new_caminho_arquivo
 
-        elif f:  # Se há um novo arquivo
-
+        # Se há um novo arquivo
+        elif f:  
             # Apaga o arquivo antigo
             if os.path.exists(old_caminho_arquivo):
                 os.remove(old_caminho_arquivo)
@@ -209,20 +244,22 @@ def atualizar_upload(upload_id):
             upload_editado.nome_arquivo = new_filename
             upload_editado.caminho_arquivo = new_caminho_arquivo
 
-            video = VideoFileClip(new_caminho_arquivo)
-            duracao = video.duration  # Duração em segundos
-            video.close()  # Fechar o arquivo para liberar recursos
+        video = VideoFileClip(new_caminho_arquivo)
+        duracao = video.duration  # Duração em segundos
+        video.close()  # Fechar o arquivo para liberar recursos
 
-            upload_editado.duracao = duracao
+        upload_editado.duracao = duracao
 
-        # Recuperar a instância da Sala e do Período com base no nome fornecido no formulário
-        sala = Sala.get(Sala.nome_sala == data['sala'])
-        periodo = Periodo.get(Periodo.nome_periodo == data['periodo'])
-
+        # Calcular a hora de término com base na duração
         try:
-            turma = Turma.get(Turma.sala == sala, Turma.periodo == periodo)
-        except DoesNotExist:
-            turma = None
+            hora_registro_dt = datetime.combine(datetime.today(), datetime.strptime(data['hora_registro'], "%H:%M:%S").time())
+        except:
+            hora_registro_dt = datetime.combine(datetime.today(), datetime.strptime(data['hora_registro'], "%H:%M").time())
+        duracao_timedelta = timedelta(seconds=duracao)
+        hora_termino_dt = hora_registro_dt + duracao_timedelta
+        hora_termino = hora_termino_dt.time()
+
+        upload_editado.hora_termino = hora_termino
 
         # Atualiza os demais campos
         upload_editado.sala = sala
@@ -234,7 +271,6 @@ def atualizar_upload(upload_id):
         upload_editado.save()  # Salva as alterações no banco
 
         return redirect(url_for('upload.tela_uploads'))
-
 
 @upload_route.route('/<int:upload_id>/view_on_form')
 def reproduzir_video_form(upload_id):

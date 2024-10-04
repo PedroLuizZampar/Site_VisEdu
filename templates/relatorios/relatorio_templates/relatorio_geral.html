@@ -52,8 +52,7 @@
                             <th>Sala</th>
                             <th>Periodo</th>
                             <th>Turma</th>
-                            <th>Qtde. Alunos</th>
-                            <th>Média Classificações</th>
+                            <th>Soma análises</th>
                         </tr>
                     </thead>
                     <tbody id="lista-uploads">
@@ -61,32 +60,28 @@
                             <tr class="tr-corpo-relatorio">
                                 <td>{{ upload.id }}</td>
                                 <td>{{ upload.nome_arquivo }}</td>
-                                <td></td>
-                                <td>{{ upload.sala.nome_sala }}</td>
-                                <td></td>
-                                <td>{{ upload.turma.nome_turma }}</td>
-                                <td>{{ upload.sala.qtde_alunos }}</td>
                                 <td>
-                                    {% set cont_objetos_disperso = 0 %}
-                                    {% for analise in analises %}
-                                        {% if upload.id == analise.upload_id %}
-                                            {{ analise.qtde_objeto_disperso }}
-                                        {% endif %}
+                                    {% for professor in professores_por_upload[upload.id] %}
+                                        {{ professor }}<br>
                                     {% endfor %}
+                                </td>
+                                <td>{{ upload.sala.nome_sala }}</td>
+                                <td>{{ upload.periodo.nome_periodo }}</td>
+                                <td>{{ upload.turma.nome_turma }}</td>
+                                <td>
+                                    {{ soma_qtde_objetos[upload.id] }}
                                 </td>
                             </tr>
                         {% endfor %}
-                    </tbody>
+                    </tbody>                                       
                 </table>
             
             </div>
         </section>
 
-            <!-- Modal formulários -->
-            <dialog id="modal">
-            </dialog>
-
-        {% endif %}
+        <!-- Modal formulários -->
+        <dialog id="modal">
+        </dialog>
 
         <!-- Modal erro -->
         <dialog id="error" class="modal-erro">
@@ -107,5 +102,16 @@
 
     </main>
     <script src="{{ url_for('static', filename='cru.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleButton = document.querySelector('.menu-toggle');
+            const navBar = document.querySelector('.NavBar');
+            
+            toggleButton.addEventListener('click', function() {
+                navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
+            });
+        });
+    </script>
 </body>
 </html>
