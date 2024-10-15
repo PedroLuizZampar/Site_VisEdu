@@ -76,18 +76,29 @@ def relatorio_geral():
             case "sunday":
                 dia_semana_upload = "domingo"
 
-        # Buscar professores para cada aula correspondente ao dia da semana
+        # Buscar professores para cada aula correspondente ao dia da semana e período do upload
         professores = (
             Professor
-            .select(Professor.nome_professor)
+            .select(Professor.nome_professor, Aula.hora_inicio, Aula.hora_termino, Aula_Professor.dia_semana, Aula_Professor.turma)
             .join(Aula_Professor)
+            .join(Aula)
             .where(
-                (Aula_Professor.aula.in_(aulas)) & 
-                (Aula_Professor.dia_semana == dia_semana_upload)  # Filtra pelo dia da semana
+                (Aula_Professor.aula.in_(aulas)) &
+                (Aula_Professor.dia_semana == dia_semana_upload)
             )
         )
-        
-        professores_por_upload[upload.id] = [professor.nome_professor for professor in professores]
+
+        for professor in professores:
+            if upload.id not in professores_por_upload:
+                professores_por_upload[upload.id] = set()  # Inicializa um conjunto para evitar duplicatas
+
+            # Comparando horários para adicionar o professor correspondente
+            if (professor.aula_professor.aula.hora_inicio < upload.hora_termino and professor.aula_professor.aula.hora_termino > upload.hora_registro) and professor.aula_professor.turma == upload.turma:
+                professores_por_upload[upload.id].add(professor.nome_professor)  # Adiciona o professor ao conjunto
+
+        # Convertendo os conjuntos de volta para listas para a renderização do template
+        professores_por_upload = {key: list(value) for key, value in professores_por_upload.items()}
+
 
     # Acumula a soma de qtde_objetos por upload
     for analise in analises:

@@ -3,6 +3,7 @@ from database.models.turma import Turma
 from database.models.sala import Sala
 from database.models.periodo import Periodo
 from database.models.upload import Upload
+from database.models.aula_professor import Aula_Professor
 from funcoes_extras import alterando_sessions_para_false, atualizando_turma_upload
 
 turma_route = Blueprint("turma", __name__)
@@ -127,11 +128,17 @@ def deletar_turma(turma_id):
 
     turma = Turma.get_by_id(turma_id)
     uploads = Upload.select()
+    aulas_professor = Aula_Professor.select()
 
     for upload in uploads:
         if upload.turma == turma:
             upload.turma = None
             upload.save()
+
+    for aula in aulas_professor:
+        if aula.turma == turma:
+            aula.turma = None
+            aula.save()
 
     turma.delete_instance()
 

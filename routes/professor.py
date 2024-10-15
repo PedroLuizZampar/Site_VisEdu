@@ -153,7 +153,11 @@ def form_edit_professor(periodo_id, professor_id):
     horario_professor = {}
     for aula_prof in aulas_professor:
         chave = (aula_prof.aula.id, aula_prof.dia_semana)
-        horario_professor[chave] = aula_prof.turma.id
+        if aula_prof.turma is not None:
+            horario_professor[chave] = aula_prof.turma.id
+        else:
+            horario_professor[chave] = None  # Ou qualquer valor que represente a ausência de uma turma
+
 
     return render_template(
         "cadastro/professor_templates/form_professor.html",
