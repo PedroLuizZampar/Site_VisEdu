@@ -39,7 +39,7 @@
         <button class="return-button" onclick="window.history.back();">
             <i class="fa-solid fa-arrow-left" style="color: #ffffff;"></i>
         </button>
-        <!-- Valida a última sessão aberta e busca o conteúdo. Caso não ache, renderiza por padrão a lista de uploads não analisados -->
+
         <section class="content">
             <div class="div-table">
             
@@ -65,15 +65,13 @@
                                         {{ professor }}<br>
                                     {% endfor %}
                                 </td>
-                                <td>{{ upload.sala.nome_sala }}</td>
-                                <td>{{ upload.periodo.nome_periodo }}</td>
-                                <td>{{ upload.turma.nome_turma }}</td>
-                                <td>
-                                    {{ soma_qtde_objetos[upload.id] }}
-                                </td>
+                                <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
+                                <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
+                                <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
+                                <td>{{ soma_qtde_objetos[upload.id] }}</td>
                             </tr>
                         {% endfor %}
-                    </tbody>                                       
+                    </tbody>                   
                 </table>
             
             </div>

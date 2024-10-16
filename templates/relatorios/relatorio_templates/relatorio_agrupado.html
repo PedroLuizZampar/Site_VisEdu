@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatorios</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../static/images/logoNavBarSemFundo.png">
+</head>
+<body>
+    <header>
+        <div class="NavBar">
+            <div class="logoArea">
+                <a href="/">
+                    <img src="../static/images/logoNavBarSemFundo.png" alt="">
+                </a>
+            </div>
+            <div class="tabArea">
+                <div class="NavBarItem">
+                    <a class="NavBarSection" href="/cadastro">Cadastro</a>
+                </div>
+                <div class="NavBarItem">
+                    <a class="NavBarSection" href="/upload">Uploads</a>
+                </div>
+                <div class="NavBarItem selected-item-menu">
+                    <a class="NavBarSection" href="/relatorio">Relatórios</a>
+                </div>
+                <div class="NavBarItem">
+                    <a class="NavBarSection" href="">Opções</a>
+                </div>
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i> <!-- Ícone de toggle -->
+            </div>
+        </div>
+    </header>
+    <main>
+        <button class="return-button" onclick="window.history.back();">
+            <i class="fa-solid fa-arrow-left" style="color: #ffffff;"></i>
+        </button>
+        
+        <section class="content">
+            <div style="width: 95%;">
+                {% if agrupado_por == 'aula' %}
+                    {% for periodo_nome, aulas_dict in grouped_uploads.items() %}
+                        <h2>Período: {{ periodo_nome }}</h2>
+                        {% for aula_nome, uploads in aulas_dict.items() %}
+                            <h3>{{ aula_nome }}</h3>
+                            <table class="tabela-relatorio">
+                                <thead>
+                                    <tr class="tr-cabecalho-relatorio">
+                                        <th>#</th>
+                                        <th>Upload</th>
+                                        <th>Professor(es)</th>
+                                        <th>Sala</th>
+                                        <th>Período</th>
+                                        <th>Turma</th>
+                                        <th>Soma Análises</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for upload in uploads %}
+                                        <tr class="tr-corpo-relatorio">
+                                            <td>{{ upload.id }}</td>
+                                            <td>{{ upload.nome_arquivo }}</td>
+                                            <td>
+                                                {% for professor in professores_por_upload[upload.id] %}
+                                                    {{ professor }}<br>
+                                                {% endfor %}
+                                            </td>
+                                            <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
+                                            <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
+                                            <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
+                                            <td>{{ soma_qtde_objetos[upload.id] }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    {% for grouping_key, uploads in grouped_uploads.items() %}
+                        <h2>{{ agrupado_por|capitalize }}: {{ grouping_key }}</h2>
+                        <table class="tabela-relatorio">
+                            <thead>
+                                <tr class="tr-cabecalho-relatorio">
+                                    <th>#</th>
+                                    <th>Upload</th>
+                                    <th>Professor(es)</th>
+                                    <th>Sala</th>
+                                    <th>Período</th>
+                                    <th>Turma</th>
+                                    <th>Soma Análises</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for upload in uploads %}
+                                    <tr class="tr-corpo-relatorio">
+                                        <td>{{ upload.id }}</td>
+                                        <td>{{ upload.nome_arquivo }}</td>
+                                        <td>
+                                            {% if agrupado_por != 'professor' %}
+                                                {% for professor in professores_por_upload[upload.id] %}
+                                                    {{ professor }}<br>
+                                                {% endfor %}
+                                            {% else %}
+                                                {{ grouping_key }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
+                                        <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
+                                        <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
+                                        <td>{{ soma_qtde_objetos[upload.id] }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Modal formulários -->
+        <dialog id="modal">
+        </dialog>
+
+        <!-- Modal erro -->
+        <dialog id="error" class="modal-erro">
+            <!-- Mensagens de Flash -->
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                <script>
+                    modal_erro = document.getElementById('error')
+                    modal_erro.showModal()
+                </script>
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <button onclick="getElementById('error').close()">Ok</button>
+        </dialog>
+
+    </main>
+    <script src="{{ url_for('static', filename='cru.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleButton = document.querySelector('.menu-toggle');
+            const navBar = document.querySelector('.NavBar');
+            
+            toggleButton.addEventListener('click', function() {
+                navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
+            });
+        });
+    </script>
+</body>
+</html>

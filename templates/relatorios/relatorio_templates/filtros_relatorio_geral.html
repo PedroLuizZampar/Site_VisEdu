@@ -1,0 +1,26 @@
+<div class="modal-body">
+    <h1>Relatório Completo</h1>
+
+    <form enctype="multipart/form-data" method="POST"
+        action="{{ url_for('relatorio.relatorio_geral') }}"
+        c-target="#modal"
+        c-callback="fecharModal">
+
+        <div class="bloco-informacoes">
+            <label for="periodo_inicial">Periodo inicial: </label>
+            <input type="date" name="periodo_inicial" max="9999-12-31" required>
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="periodo_final">Periodo final: </label>
+            <input type="date" name="periodo_final" max="9999-12-31" required>
+        </div>
+
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close();">Cancelar</button>
+            <button type="submit">
+                Gerar Relatório
+            </button>
+        </div>    
+    </form>
+</div>
