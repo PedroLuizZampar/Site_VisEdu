@@ -16,26 +16,29 @@
             <input type="date" name="periodo_final" max="9999-12-31" required>
         </div>
 
-        <select name="agrupado_por" id="agrupado_por">
-            <option value="professor">
-                Professor
-            </option>
-            <option value="disciplina">
-                Disciplina
-            </option>
-            <option value="sala">
-                Sala
-            </option>
-            <option value="turma">
-                Turma
-            </option>
-            <option value="aula">
-                Aula
-            </option>
-            <option value="periodo">
-                Período
-            </option>
-        </select>
+        <div class="bloco-informacoes">
+            <label for="agrupado_por">Agrupado por: </label>
+            <select name="agrupado_por" id="agrupado_por">
+                <option value="professor">
+                    Professor
+                </option>
+                <option value="disciplina">
+                    Disciplina
+                </option>
+                <option value="sala">
+                    Sala
+                </option>
+                <option value="turma">
+                    Turma
+                </option>
+                <option value="aula">
+                    Aula
+                </option>
+                <option value="periodo">
+                    Período
+                </option>
+            </select>
+        </div>
 
         <div class="bloco-botoes-modal">
             <button type="button" onclick="document.getElementById('modal').close();">Cancelar</button>

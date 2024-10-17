@@ -7,6 +7,41 @@
     <link rel="stylesheet" href="../static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="../static/images/logoNavBarSemFundo.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <style>
+        h2 {
+            width: 100%;
+            margin: 25px auto;
+            padding: 5px 0;
+            text-align: left;
+        }
+
+        .div-agrupamento-generalizado {
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+            padding: 10px 0;
+            margin: 30px 0;
+        }
+
+        .h2-agrupamento-generalizado {
+            width: 100%;
+            text-align: center;
+            margin: 25px auto;
+            padding: 5px 0;
+        }
+
+        .div-sub-agrupamento {
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        h3 {
+            width: 100%;
+            text-align: left;
+            margin: 0 0 12px 0;
+            color: rgb(54, 53, 53);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -40,58 +75,64 @@
             <i class="fa-solid fa-arrow-left" style="color: #ffffff;"></i>
         </button>
         
+        <button id="baixar">Baixar PDF</button>
         <section class="content">
             <div style="width: 95%;">
                 {% if agrupado_por == 'aula' %}
                     {% for periodo_nome, aulas_dict in grouped_uploads.items() %}
-                        <h2>Período: {{ periodo_nome }}</h2>
-                        {% for aula_nome, uploads in aulas_dict.items() %}
-                            <h3>{{ aula_nome }}</h3>
-                            <table class="tabela-relatorio">
-                                <thead>
-                                    <tr class="tr-cabecalho-relatorio">
-                                        <th>#</th>
-                                        <th>Upload</th>
-                                        <th>Professor(es)</th>
-                                        <th>Sala</th>
-                                        <th>Período</th>
-                                        <th>Turma</th>
-                                        <th>Soma Análises</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for upload in uploads %}
-                                        <tr class="tr-corpo-relatorio">
-                                            <td>{{ upload.id }}</td>
-                                            <td>{{ upload.nome_arquivo }}</td>
-                                            <td>
-                                                {% for professor in professores_por_upload[upload.id] %}
-                                                    {{ professor }}<br>
-                                                {% endfor %}
-                                            </td>
-                                            <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
-                                            <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
-                                            <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
-                                            <td>{{ soma_qtde_objetos[upload.id] }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        {% endfor %}
+                        <div class="div-agrupamento-generalizado">
+                            <h2 class="h2-agrupamento-generalizado">Período: {{ periodo_nome }}</h2>
+                            {% for aula_nome, uploads in aulas_dict.items() %}
+                                <div class="div-sub-agrupamento">
+                                    <h3>{{ aula_nome }}</h3>
+                                    <table class="tabela-relatorio">
+                                        <thead>
+                                            <tr class="tr-cabecalho-relatorio">
+                                                <th style="border-top-left-radius: 12px;">#</th>
+                                                <th>Upload</th>
+                                                <th>Professor(es)</th>
+                                                <th>Sala</th>
+                                                <th>Período</th>
+                                                <th>Turma</th>
+                                                <th style="border-top-right-radius: 12px;">Soma Análises</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for upload in uploads %}
+                                                <tr class="tr-corpo-relatorio">
+                                                    <td>{{ upload.id }}</td>
+                                                    <td>{{ upload.nome_arquivo }}</td>
+                                                    <td>
+                                                        {% for professor in professores_por_upload[upload.id] %}
+                                                            {{ professor }}<br>
+                                                        {% endfor %}
+                                                    </td>
+                                                    <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
+                                                    <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
+                                                    <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
+                                                    <td>{{ soma_qtde_objetos[upload.id] }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% endfor %}
+                        </div>
                     {% endfor %}
                 {% else %}
+                <h4 style="font-size: 28px; text-align: center;">Agrupamento por {{ agrupado_por|capitalize }}</h4>
                     {% for grouping_key, uploads in grouped_uploads.items() %}
-                        <h2>{{ agrupado_por|capitalize }}: {{ grouping_key }}</h2>
+                        <h2>{{ grouping_key }}</h2>
                         <table class="tabela-relatorio">
                             <thead>
                                 <tr class="tr-cabecalho-relatorio">
-                                    <th>#</th>
+                                    <th style="border-top-left-radius: 16px;">#</th>
                                     <th>Upload</th>
                                     <th>Professor(es)</th>
                                     <th>Sala</th>
                                     <th>Período</th>
                                     <th>Turma</th>
-                                    <th>Soma Análises</th>
+                                    <th style="border-top-right-radius: 16px;">Soma Análises</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -153,6 +194,21 @@
             toggleButton.addEventListener('click', function() {
                 navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
             });
+        });
+    </script>
+
+    <script>
+        document.getElementById("baixar").addEventListener("click", () => {
+            console.log("Clicou");
+            const elemento = document.querySelector(".content");
+            const opcoes = {
+                margin:       1,
+                filename:     'meu-documeto.pdf',
+                image:        { type: 'png', quality: 1 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opcoes).from(elemento).save();
         });
     </script>
 </body>
