@@ -39,27 +39,11 @@
         <!-- Valida a última sessão aberta e busca o conteúdo. Caso não ache, renderiza por padrão a lista de uploads não analisados -->
         <section class="content"            
             c-container="{{ url_for('relatorio.lista_opcoes_relatorios') }}">
-        </section>    
+        </section>
 
-        {% if relatorio_aberto %}
-            <dialog id="modal"
-                {% if relatorio_aberto %}
-                    c-container="{{ url_for('relatorio.relatorio_geral') }}"
-                {% endif %}>
-
-                <button onclick="getElementById('modal').close()">Fechar</button>
-            </dialog>
-
-            <script>
-                document.getElementById("modal").showModal()
-            </script>
-        {% else %}
-
-            <!-- Modal formulários -->
-            <dialog id="modal">
-            </dialog>
-
-        {% endif %}
+        <!-- Modal de filtros -->
+        <dialog id="modal">
+        </dialog>
 
         <!-- Modal erro -->
         <dialog id="error"  class="modal">
