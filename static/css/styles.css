@@ -352,7 +352,7 @@ header {
 }
 
 .selected-item-menu .NavBarSection{
-    color:#C7E9FF;    
+    color:#8dcfff;    
 }
 
 .NavBarItem {
@@ -368,7 +368,7 @@ header {
 }
 
 .NavBarSection:hover {
-    color: #e5f4f5;
+    color: #8dcfff;
 }
 
 .menu-toggle {
@@ -520,6 +520,15 @@ dialog form .bloco-informacoes input {
     background-color: #1E314E;
 }
 
+.tabela-relatorio tbody tr:nth-child(even) {
+    background-color: #e6e6e6;
+}
+
+.tabela-relatorio tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+
 .tr-cabecalho-relatorio th, .tr-corpo-relatorio td {
     font-weight: 300;
     padding: 10px;
@@ -549,4 +558,20 @@ dialog form .bloco-informacoes input {
     border-radius: 4px;
     padding: 6px;
     box-sizing: border-box;
+}
+
+.div-baixar-pdf {
+    text-align: center;
+    padding: 10px;
+    margin: -10px 0 15px 0;
+}
+
+.baixar-pdf {
+    padding: 10px;
+    font-size: 20px;
+    color: #E5F4FF;
+    background-color: #011f36;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
 }
