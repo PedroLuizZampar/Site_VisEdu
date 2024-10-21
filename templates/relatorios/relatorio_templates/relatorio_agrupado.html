@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatorios</title>
+    <title>Relatório Agrupado</title>
     <link rel="stylesheet" href="../static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="../static/images/logoNavBarSemFundo.png">
@@ -20,6 +20,7 @@
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
             padding: 10px 0;
             margin: 30px 0;
+            border-radius: 16px;
         }
 
         .h2-agrupamento-generalizado {
@@ -90,13 +91,13 @@
                                     <table class="tabela-relatorio">
                                         <thead>
                                             <tr class="tr-cabecalho-relatorio">
-                                                <th style="border-top-left-radius: 12px;">#</th>
+                                                <th style="border-top-left-radius: 16px;">#</th>
                                                 <th>Upload</th>
                                                 <th>Professor(es)</th>
                                                 <th>Sala</th>
                                                 <th>Período</th>
                                                 <th>Turma</th>
-                                                <th style="border-top-right-radius: 12px;">Soma Análises</th>
+                                                <th style="border-top-right-radius: 16px;">Ação mais detectada</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -105,14 +106,18 @@
                                                     <td>{{ upload.id }}</td>
                                                     <td>{{ upload.nome_arquivo }}</td>
                                                     <td>
-                                                        {% for professor in professores_por_upload[upload.id] %}
-                                                            {{ professor }}<br>
-                                                        {% endfor %}
+                                                        {% if professores_por_upload[upload.id] %}
+                                                            {% for professor in professores_por_upload[upload.id] %}
+                                                                {{ professor }}<br>
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            Sem professor
+                                                        {% endif %}
                                                     </td>
                                                     <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
                                                     <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
                                                     <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
-                                                    <td>{{ soma_qtde_objetos[upload.id] }}</td>
+                                                    <td>{{ classe_mais_comum[upload.id] }}</td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
@@ -134,7 +139,7 @@
                                     <th>Sala</th>
                                     <th>Período</th>
                                     <th>Turma</th>
-                                    <th style="border-top-right-radius: 16px;">Soma Análises</th>
+                                    <th style="border-top-right-radius: 16px;">Ação mais detectada</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -143,18 +148,18 @@
                                         <td>{{ upload.id }}</td>
                                         <td>{{ upload.nome_arquivo }}</td>
                                         <td>
-                                            {% if agrupado_por != 'professor' %}
+                                            {% if professores_por_upload[upload.id] %}
                                                 {% for professor in professores_por_upload[upload.id] %}
                                                     {{ professor }}<br>
                                                 {% endfor %}
                                             {% else %}
-                                                {{ grouping_key }}
+                                                Sem professor
                                             {% endif %}
                                         </td>
                                         <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
                                         <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
                                         <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
-                                        <td>{{ soma_qtde_objetos[upload.id] }}</td>
+                                        <td>{{ classe_mais_comum[upload.id] }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

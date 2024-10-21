@@ -44,15 +44,37 @@ def relatorio_geral():
         (Upload.is_analisado == True)
     )
 
-    # Obtém análises relacionadas aos uploads selecionados
+    # Obtém os uploads no período especificado que já foram analisados
     analises = Analise.select().where(Analise.upload_id.in_([upload.id for upload in uploads]))
 
-    # Dicionário para armazenar a soma de qtde_objetos por upload
-    soma_qtde_objetos = {upload.id: 0 for upload in uploads}
+    # Dicionário para armazenar as contagens de cada classe por upload
+    classes_por_upload = {upload.id: {
+        'Dormindo': 0,
+        'Prestando Atenção': 0,
+        'Mexendo no Celular': 0,
+        'Copiando': 0,
+        'Disperso': 0,
+        'Trabalho em Grupo': 0
+    } for upload in uploads}
 
-    # Calcula a soma de objetos analisados para cada upload
+    # Calcula as contagens de cada classe para cada upload
     for analise in analises:
-        soma_qtde_objetos[analise.upload_id] += analise.qtde_objetos
+        upload_id = analise.upload_id
+        counts = classes_por_upload[upload_id]
+        counts['Dormindo'] += analise.qtde_objeto_dormindo
+        counts['Prestando Atenção'] += analise.qtde_objeto_prestando_atencao
+        counts['Mexendo no Celular'] += analise.qtde_objeto_mexendo_celular
+        counts['Copiando'] += analise.qtde_objeto_copiando
+        counts['Disperso'] += analise.qtde_objeto_disperso
+        counts['Trabalho em Grupo'] += analise.qtde_objeto_trabalho_em_grupo
+
+    # Dicionário para armazenar a classe que mais se repete por upload
+    classe_mais_comum = {}
+
+    for upload_id, counts in classes_por_upload.items():
+        # Encontra a classe com a maior contagem
+        max_class = max(counts, key=counts.get)
+        classe_mais_comum[upload_id] = max_class
 
     # Obtém os professores associados a cada upload usando a função auxiliar
     professores_por_upload = {}
@@ -64,7 +86,7 @@ def relatorio_geral():
         uploads=uploads, 
         analises=analises, 
         professores_por_upload=professores_por_upload,
-        soma_qtde_objetos=soma_qtde_objetos
+        classe_mais_comum=classe_mais_comum
     )
 
 @relatorio_route.route("/filtros_relatorio_agrupado")
@@ -90,12 +112,34 @@ def relatorio_agrupado():
     # Obtém os uploads no período especificado que já foram analisados
     analises = Analise.select().where(Analise.upload_id.in_([upload.id for upload in uploads]))
 
-    # Dicionário para armazenar a soma de qtde_objetos por upload
-    soma_qtde_objetos = {upload.id: 0 for upload in uploads}
+    # Dicionário para armazenar as contagens de cada classe por upload
+    classes_por_upload = {upload.id: {
+        'Dormindo': 0,
+        'Prestando Atenção': 0,
+        'Mexendo no Celular': 0,
+        'Copiando': 0,
+        'Disperso': 0,
+        'Trabalho em Grupo': 0
+    } for upload in uploads}
 
-    # Calcula a soma de objetos analisados para cada upload
+    # Calcula as contagens de cada classe para cada upload
     for analise in analises:
-        soma_qtde_objetos[analise.upload_id] += analise.qtde_objetos
+        upload_id = analise.upload_id
+        counts = classes_por_upload[upload_id]
+        counts['Dormindo'] += analise.qtde_objeto_dormindo
+        counts['Prestando Atenção'] += analise.qtde_objeto_prestando_atencao
+        counts['Mexendo no Celular'] += analise.qtde_objeto_mexendo_celular
+        counts['Copiando'] += analise.qtde_objeto_copiando
+        counts['Disperso'] += analise.qtde_objeto_disperso
+        counts['Trabalho em Grupo'] += analise.qtde_objeto_trabalho_em_grupo
+
+    # Dicionário para armazenar a classe que mais se repete por upload
+    classe_mais_comum = {}
+
+    for upload_id, counts in classes_por_upload.items():
+        # Encontra a classe com a maior contagem
+        max_class = max(counts, key=counts.get)
+        classe_mais_comum[upload_id] = max_class
 
     # Dicionário para agrupar os uploads
     grouped_uploads = {}
@@ -154,12 +198,10 @@ def relatorio_agrupado():
             grouping_keys = []
 
             if agrupado_por == 'professor':
-                # Obtém os professores associados ao upload
                 professores = get_professores_for_upload(upload)
                 grouping_keys = professores if professores else ['Sem Professor']
 
             elif agrupado_por == 'disciplina':
-                # Obtém as disciplinas associadas ao upload
                 disciplinas = get_disciplinas_for_upload(upload)
                 grouping_keys = disciplinas if disciplinas else ['Sem Disciplina']
 
@@ -186,11 +228,10 @@ def relatorio_agrupado():
     for upload in uploads:
         professores_por_upload[upload.id] = get_professores_for_upload(upload)
 
-
     return render_template(
         "relatorios/relatorio_templates/relatorio_agrupado.html",
         grouped_uploads=grouped_uploads,
-        soma_qtde_objetos=soma_qtde_objetos,
+        classe_mais_comum=classe_mais_comum,
         agrupado_por=agrupado_por,
         professores_por_upload=professores_por_upload
     )

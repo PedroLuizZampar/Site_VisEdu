@@ -13,17 +13,17 @@
     }
 </style>
 
-<div class="modal-body" style="display: flex; align-items: center; justify-content: center; height: 100%;">
-    <button class="botao-opcao-relatorio"
+<div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 250px;">
+    <button class="botao-opcao-relatorio" style=" width: 100%;"
         onclick="document.getElementById('modal').showModal()"
         c-get="{{ url_for('relatorio.filtros_relatorio_geral') }}"
         c-target="#modal">
-        <i class="fa-solid fa-file-lines" style="color: #ffffff;"></i><br>Relatório completo
+        <i class="fa-solid fa-file-lines" style="color: #ffffff;"></i><br>Relatório geral
     </button>
 </div>
 
-<div class="modal-body" style="display: flex; align-items: center; justify-content: center; height: 100%;">
-    <button class="botao-opcao-relatorio"
+<div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 250px;">
+    <button class="botao-opcao-relatorio" style=" width: 100%;"
         onclick="document.getElementById('modal').showModal()"
         c-get="{{ url_for('relatorio.filtros_relatorio_agrupado') }}"
         c-target="#modal">

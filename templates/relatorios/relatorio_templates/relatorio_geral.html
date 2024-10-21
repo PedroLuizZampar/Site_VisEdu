@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatorios</title>
+    <title>Relatório Geral</title>
     <link rel="stylesheet" href="../static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="../static/images/logoNavBarSemFundo.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <header>
@@ -39,20 +40,25 @@
         <button class="return-button" onclick="window.history.back();">
             <i class="fa-solid fa-arrow-left" style="color: #ffffff;"></i>
         </button>
+        
+        <div class="div-baixar-pdf">
+            <button id="baixar" class="baixar-pdf">Baixar PDF</button>
+        </div>
 
         <section class="content">
+            <h2>Relatório Geral</h2>
             <div class="div-table">
             
                 <table class="tabela-relatorio">
                     <thead>
                         <tr class="tr-cabecalho-relatorio">
-                            <th scope="col">#</th>
+                            <th scope="col"  style="border-top-left-radius: 16px;">#</th>
                             <th>Upload</th>
                             <th>Professor(es)</th>
                             <th>Sala</th>
                             <th>Periodo</th>
                             <th>Turma</th>
-                            <th>Soma análises</th>
+                            <th style="border-top-right-radius: 16px;">Ação mais detectada</th>
                         </tr>
                     </thead>
                     <tbody id="lista-uploads">
@@ -61,14 +67,18 @@
                                 <td>{{ upload.id }}</td>
                                 <td>{{ upload.nome_arquivo }}</td>
                                 <td>
-                                    {% for professor in professores_por_upload[upload.id] %}
-                                        {{ professor }}<br>
-                                    {% endfor %}
+                                    {% if professores_por_upload[upload.id] %}
+                                        {% for professor in professores_por_upload[upload.id] %}
+                                            {{ professor }}<br>
+                                        {% endfor %}
+                                    {% else %}
+                                        Sem professor
+                                    {% endif %}
                                 </td>
                                 <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
                                 <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
                                 <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
-                                <td>{{ soma_qtde_objetos[upload.id] }}</td>
+                                <td>{{ classe_mais_comum[upload.id] }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>                   
@@ -109,6 +119,20 @@
             toggleButton.addEventListener('click', function() {
                 navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
             });
+        });
+    </script>
+
+    <script>
+        document.getElementById("baixar").addEventListener("click", () => {
+            const elemento = document.querySelector(".content");
+            const opcoes = {
+                margin:       1,
+                filename:     'meu-documeto.pdf',
+                image:        { type: 'png', quality: 1 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opcoes).from(elemento).save();
         });
     </script>
 </body>
