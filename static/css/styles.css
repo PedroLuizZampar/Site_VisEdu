@@ -313,9 +313,10 @@ header {
     height: 120px;
 }
 
-.NavBar{
+.NavBar {
+    position: relative;
     width: 100%;
-    height: 100%;
+    height: 120px;
     background-color: #011f36;
     display: flex;
     flex-direction: row;
@@ -346,30 +347,36 @@ header {
     
 }
 
-.selected-item-menu {
-    border-bottom: 5px solid #4EB6FF;
-    
-}
-
-.selected-item-menu .NavBarSection{
-    color:#8dcfff;    
-}
-
 .NavBarItem {
+    width: 120px;
+    font-size: 22px;
+    text-decoration: none;
+    text-transform: none;
+    color: #E5F4FF;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 50px;
-    border-bottom: 5px;
+    border-bottom: 5px solid transparent;
+    transition: border-bottom 0.2s, color 0.2s;
 }
 
-.NavBarItem:hover{
-    transition: 0.15s;
+.selected-item-menu {
+    border-bottom: 5px solid #4EB6FF;
+    color: #8dcfff;
+}
+
+.NavBarItem:hover {
+    border-bottom: 5px solid #4EB6FF;
+    color: #8dcfff;
+}
+
+.NavBarItem:has(.NavBarSection:hover) {
     border-bottom: 5px solid #4EB6FF;
 }
 
-.NavBarSection:hover {
-    color: #8dcfff;
+.NavBarItem.hovered {
+    border-bottom: 5px solid #4EB6FF;
 }
 
 .menu-toggle {
@@ -391,19 +398,22 @@ header {
     }
 
     .tabArea {
-        display: none; /* Oculta os links inicialmente */
-        flex-direction: column;
+        display: none;
+        position: absolute;
+        top: 100%; /* Posiciona a tabArea logo abaixo da NavBar */
+        left: 0;
         width: 100%;
         background-color: #011f36;
+        flex-direction: column;
         z-index: 100;
     }
 
     .NavBarItem {
         margin: 0;
         text-align: center;
-        padding: 20px 0;
-        width: 50%;
-        margin: 0 auto;
+        padding: 10px 0;
+        width: 240px;
+        margin: 10px auto;
     }
 
     .menu-toggle {
@@ -423,7 +433,7 @@ header {
 
     .NavBar.active .tabArea {
         display: flex; /* Exibe o menu quando o botão for clicado */
-        height: 1000px;
+        height: auto;
     }
 }
 
