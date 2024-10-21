@@ -39,7 +39,7 @@
         </div>
     </header>
     <main>
-        <div class="tab-upload">
+        <div class="tab-upload" style="margin-bottom: 20px;">
             <button id="nao_analisados_button" {% if not visualizando_uploads_analisados %} class="active" {% endif %}
                 c-get="{{ url_for('upload.lista_uploads_nao_analisados') }}"
                 c-target=".content">

@@ -67,12 +67,7 @@ def inserir_professor(periodo_id):
     data = request.form
 
     # Determina o período com base no ID
-    if periodo_id == 1:
-        periodo = Periodo.get(Periodo.nome_periodo == "Matutino")
-    elif periodo_id == 2:
-        periodo = Periodo.get(Periodo.nome_periodo == "Vespertino")
-    elif periodo_id == 3:
-        periodo = Periodo.get(Periodo.nome_periodo == "Noturno")
+    periodo = Periodo.get_by_id(periodo_id)
 
     # Validação 1: Verifica se o nome do professor já existe no mesmo período
     professor_existente = Professor.select().where(
@@ -95,6 +90,7 @@ def inserir_professor(periodo_id):
 
     aulas_periodo = Aula.select().where(Aula.periodo == periodo)
 
+    conflict_messages = []
     i = 1
     for aula in aulas_periodo:
         # Obter os IDs das turmas selecionadas para cada dia
@@ -107,11 +103,11 @@ def inserir_professor(periodo_id):
         dias_semana = ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira']
         turma_ids = [aula_seg_id, aula_ter_id, aula_qua_id, aula_qui_id, aula_sex_id]
 
-        for j, (dia_semana, turma_id) in enumerate(zip(dias_semana, turma_ids), start=1):
+        for dia_semana, turma_id in zip(dias_semana, turma_ids):
             if turma_id:
                 turma = Turma.get_by_id(int(turma_id))
 
-                # Validação 2: Verifica se a turma já está vinculada à mesma aula e dia da semana para outro professor no mesmo período
+                # Verifica se a turma já está vinculada à mesma aula e dia da semana para outro professor no mesmo período
                 aula_professor_existente = Aula_Professor.select().join(Professor).where(
                     (Aula_Professor.turma == turma) &
                     (Aula_Professor.aula == aula) &
@@ -120,17 +116,28 @@ def inserir_professor(periodo_id):
                 ).first()
 
                 if aula_professor_existente:
-                    flash(f"A turma {turma.nome_turma} já está vinculada à {i}ª aula de {dia_semana} para outro professor no mesmo período!", "error")
-                    return redirect(url_for('cadastro.tela_cadastro', periodo_id=periodo_id))
-
-                # Cria a relação Aula_Professor
-                Aula_Professor.create(
-                    turma=turma,
-                    professor=professor_novo,
-                    aula=aula,
-                    dia_semana=dia_semana
-                )
+                    # Obter o nome do professor que possui a aula conflitante
+                    professor_conflitante = aula_professor_existente.professor.nome_professor
+                    conflict_messages.append(
+                        f"A turma {turma.nome_turma} já está vinculada à {i}ª aula de {dia_semana} para o professor {professor_conflitante} no mesmo período!"
+                    )
+                    continue  # Pula esta aula e continua com a próxima
+                else:
+                    # Cria a relação Aula_Professor
+                    Aula_Professor.create(
+                        turma=turma,
+                        professor=professor_novo,
+                        aula=aula,
+                        dia_semana=dia_semana
+                    )
         i += 1
+
+    # Após processar todas as aulas, exibe as mensagens de conflito
+    if conflict_messages:
+        for msg in conflict_messages:
+            flash(msg, "error")
+    else:
+        flash("Professor cadastrado com sucesso!", "success")
 
     # Armazena dados temporariamente na sessão
     session['visualizando_professores'] = True
@@ -182,8 +189,8 @@ def atualizar_professor(professor_id):
 
         # Validação 1: Verifica se já existe outro professor com o mesmo nome no mesmo período (excluindo o atual)
         professor_existente = Professor.select().where(
-            (Professor.nome_professor == data["nome_professor"]) & 
-            (Professor.periodo == periodo) & 
+            (Professor.nome_professor == data["nome_professor"]) &
+            (Professor.periodo == periodo) &
             (Professor.id != professor_id)
         ).first()
 
@@ -199,6 +206,7 @@ def atualizar_professor(professor_id):
 
         aulas_periodo = Aula.select().where(Aula.periodo == periodo)
 
+        conflict_messages = []
         i = 1
         for aula in aulas_periodo:
             # Obter os IDs das turmas selecionadas para cada dia
@@ -211,11 +219,18 @@ def atualizar_professor(professor_id):
             dias_semana = ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira']
             turma_ids = [aula_seg_id, aula_ter_id, aula_qua_id, aula_qui_id, aula_sex_id]
 
-            for j, (dia_semana, turma_id) in enumerate(zip(dias_semana, turma_ids), start=1):
+            for dia_semana, turma_id in zip(dias_semana, turma_ids):
+                # Primeiro, deletar a relação existente para esta aula e dia
+                Aula_Professor.delete().where(
+                    (Aula_Professor.professor == professor_editado) &
+                    (Aula_Professor.aula == aula) &
+                    (Aula_Professor.dia_semana == dia_semana)
+                ).execute()
+
                 if turma_id:
                     turma = Turma.get_by_id(int(turma_id))
 
-                    # Validação 2: Verifica se a turma já está vinculada à mesma aula e dia da semana para outro professor no mesmo período (excluindo o atual)
+                    # Verifica se a turma já está vinculada à mesma aula e dia da semana para outro professor no mesmo período
                     aula_professor_existente = Aula_Professor.select().join(Professor).where(
                         (Aula_Professor.turma == turma) &
                         (Aula_Professor.aula == aula) &
@@ -225,25 +240,28 @@ def atualizar_professor(professor_id):
                     ).first()
 
                     if aula_professor_existente:
-                        flash(f"A turma {turma.nome_turma} já está vinculada à {i}ª aula de {dia_semana} para outro professor no mesmo período!", "error")
-                        return redirect(url_for('cadastro.tela_cadastro'))
-
-                    # Remover apenas as relações de Aula_Professor que conflitam
-                    Aula_Professor.delete().where(
-                        (Aula_Professor.professor == professor_editado) &
-                        (Aula_Professor.aula == aula) &
-                        (Aula_Professor.dia_semana == dia_semana) &
-                        (Aula_Professor.turma != turma)  # Excluir apenas as aulas conflitantes
-                    ).execute()
-
-                    # Cria a relação Aula_Professor
-                    Aula_Professor.create(
-                        turma=turma,
-                        professor=professor_editado,
-                        aula=aula,
-                        dia_semana=dia_semana
-                    )
+                        # Obter o nome do professor que possui a aula conflitante
+                        professor_conflitante = aula_professor_existente.professor.nome_professor
+                        conflict_messages.append(
+                            f"A turma {turma.nome_turma} já está vinculada à {i}ª aula de {dia_semana} para o professor {professor_conflitante} no mesmo período!"
+                        )
+                        continue  # Pula esta aula e continua com a próxima
+                    else:
+                        # Cria a relação Aula_Professor
+                        Aula_Professor.create(
+                            turma=turma,
+                            professor=professor_editado,
+                            aula=aula,
+                            dia_semana=dia_semana
+                        )
             i += 1
+
+        # Após processar todas as aulas, exibe as mensagens de conflito
+        if conflict_messages:
+            for msg in conflict_messages:
+                flash(msg, "error")
+        else:
+            flash("Professor atualizado com sucesso!", "success")
 
         return redirect(url_for('cadastro.tela_cadastro'))
 

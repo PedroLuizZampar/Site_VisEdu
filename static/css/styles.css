@@ -74,7 +74,7 @@ html::-webkit-scrollbar-thumb, .modal-body::-webkit-scrollbar-thumb, .div-table:
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: 25px;
     width: 320px;
-    margin: 0 auto 20px auto;
+    margin: 0 auto;
 }
 
 .tab-upload button, .tab-periodos button {
@@ -89,6 +89,13 @@ html::-webkit-scrollbar-thumb, .modal-body::-webkit-scrollbar-thumb, .div-table:
 
 .selected-item-menu {
     border-bottom: 5px solid #4EB6FF
+}
+
+/* Estilo para o botão quando está em hover */
+.tab button:hover, .tab-periodos button:hover, .tab-upload button:hover {
+    background-color: #4EB6FF;
+    color: #fff;
+    transition: 0.3s;
 }
 
 /* MODAIS */
@@ -358,7 +365,7 @@ header {
     justify-content: center;
     margin: 0 50px;
     border-bottom: 5px solid transparent;
-    transition: border-bottom 0.2s, color 0.2s;
+    transition: border-bottom 0.25s, color 0.25s;
 }
 
 .selected-item-menu {
