@@ -182,8 +182,8 @@ def atualizar_professor(professor_id):
 
         # Validação 1: Verifica se já existe outro professor com o mesmo nome no mesmo período (excluindo o atual)
         professor_existente = Professor.select().where(
-            (Professor.nome_professor == data["nome_professor"]) &
-            (Professor.periodo == periodo) &
+            (Professor.nome_professor == data["nome_professor"]) & 
+            (Professor.periodo == periodo) & 
             (Professor.id != professor_id)
         ).first()
 
@@ -196,9 +196,6 @@ def atualizar_professor(professor_id):
         professor_editado.disciplina = Disciplina.get(Disciplina.nome_disciplina == data["disciplina"])
         professor_editado.email = data['email']
         professor_editado.save()
-
-        # Deletar as relações antigas em Aula_Professor
-        Aula_Professor.delete().where(Aula_Professor.professor == professor_editado).execute()
 
         aulas_periodo = Aula.select().where(Aula.periodo == periodo)
 
@@ -231,6 +228,14 @@ def atualizar_professor(professor_id):
                         flash(f"A turma {turma.nome_turma} já está vinculada à {i}ª aula de {dia_semana} para outro professor no mesmo período!", "error")
                         return redirect(url_for('cadastro.tela_cadastro'))
 
+                    # Remover apenas as relações de Aula_Professor que conflitam
+                    Aula_Professor.delete().where(
+                        (Aula_Professor.professor == professor_editado) &
+                        (Aula_Professor.aula == aula) &
+                        (Aula_Professor.dia_semana == dia_semana) &
+                        (Aula_Professor.turma != turma)  # Excluir apenas as aulas conflitantes
+                    ).execute()
+
                     # Cria a relação Aula_Professor
                     Aula_Professor.create(
                         turma=turma,
@@ -241,7 +246,6 @@ def atualizar_professor(professor_id):
             i += 1
 
         return redirect(url_for('cadastro.tela_cadastro'))
-
 
 @professor_route.route('/<int:professor_id>/delete', methods=["DELETE"])
 def deletar_professor(professor_id):

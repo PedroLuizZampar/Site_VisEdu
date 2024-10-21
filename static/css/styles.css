@@ -364,6 +364,7 @@ header {
 }
 
 .NavBarItem:hover{
+    transition: 0.15s;
     border-bottom: 5px solid #4EB6FF;
 }
 
