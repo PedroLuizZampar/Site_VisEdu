@@ -18,18 +18,10 @@
                 </a>
             </div>
             <div class="tabArea">
-                <a class="NavBarItem" href="/cadastro">
-                    Cadastro
-                </a>
-                <a class="NavBarItem" href="/upload">
-                    Uploads
-                </a>
-                <a class="NavBarItem selected-item-menu" href="/relatorio">
-                    Relatórios
-                </a>
-                <a class="NavBarItem" href="">
-                    Opções
-                </a>
+                <a class="NavBarItem" href="/cadastro">Cadastro</a>
+                <a class="NavBarItem" href="/upload">Uploads</a>
+                <a class="NavBarItem selected-item-menu" href="/relatorio">Relatórios</a>
+                <a class="NavBarItem" href="">Opções</a>
             </div>
             <div class="menu-toggle">
                 <i class="fas fa-bars"></i> <!-- Ícone de toggle -->
@@ -48,17 +40,18 @@
         <section class="content">
             <h2>Relatório Geral</h2>
             <div class="div-table">
-            
                 <table class="tabela-relatorio">
                     <thead>
                         <tr class="tr-cabecalho-relatorio">
-                            <th scope="col"  style="border-top-left-radius: 16px;">#</th>
+                            <th scope="col" style="border-top-left-radius: 16px;">#</th>
                             <th>Upload</th>
-                            <th>Professor(es)</th>
-                            <th>Sala</th>
-                            <th>Periodo</th>
                             <th>Turma</th>
-                            <th style="border-top-right-radius: 16px;">Ação mais detectada</th>
+                            <th>Dormindo</th>
+                            <th>Prestando Atenção</th>
+                            <th>Mexendo no Celular</th>
+                            <th>Copiando</th>
+                            <th>Disperso</th>
+                            <th>Trabalho em Grupo</th>
                         </tr>
                     </thead>
                     <tbody id="lista-uploads">
@@ -66,24 +59,17 @@
                             <tr class="tr-corpo-relatorio">
                                 <td>{{ upload.id }}</td>
                                 <td>{{ upload.nome_arquivo }}</td>
-                                <td>
-                                    {% if professores_por_upload[upload.id] %}
-                                        {% for professor in professores_por_upload[upload.id] %}
-                                            {{ professor }}<br>
-                                        {% endfor %}
-                                    {% else %}
-                                        Sem professor
-                                    {% endif %}
-                                </td>
-                                <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
-                                <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
                                 <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
-                                <td>{{ classe_mais_comum[upload.id] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Dormindo'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Prestando Atenção'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Mexendo no Celular'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Copiando'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Disperso'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Trabalho em Grupo'] }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>                   
                 </table>
-            
             </div>
         </section>
 
@@ -127,7 +113,7 @@
             const elemento = document.querySelector(".content");
             const opcoes = {
                 margin:       1,
-                filename:     'meu-documeto.pdf',
+                filename:     'meu-documento.pdf',
                 image:        { type: 'png', quality: 1 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }

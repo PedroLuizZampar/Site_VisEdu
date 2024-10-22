@@ -44,7 +44,7 @@ def relatorio_geral():
         (Upload.is_analisado == True)
     )
 
-    # Obtém os uploads no período especificado que já foram analisados
+    # Obtém as análises relacionadas aos uploads
     analises = Analise.select().where(Analise.upload_id.in_([upload.id for upload in uploads]))
 
     # Dicionário para armazenar as contagens de cada classe por upload
@@ -68,25 +68,10 @@ def relatorio_geral():
         counts['Disperso'] += analise.qtde_objeto_disperso
         counts['Trabalho em Grupo'] += analise.qtde_objeto_trabalho_em_grupo
 
-    # Dicionário para armazenar a classe que mais se repete por upload
-    classe_mais_comum = {}
-
-    for upload_id, counts in classes_por_upload.items():
-        # Encontra a classe com a maior contagem
-        max_class = max(counts, key=counts.get)
-        classe_mais_comum[upload_id] = max_class
-
-    # Obtém os professores associados a cada upload usando a função auxiliar
-    professores_por_upload = {}
-    for upload in uploads:
-        professores_por_upload[upload.id] = get_professores_for_upload(upload)
-
     return render_template(
         "relatorios/relatorio_templates/relatorio_geral.html", 
         uploads=uploads, 
-        analises=analises, 
-        professores_por_upload=professores_por_upload,
-        classe_mais_comum=classe_mais_comum
+        classes_por_upload=classes_por_upload
     )
 
 @relatorio_route.route("/filtros_relatorio_agrupado")
@@ -109,7 +94,7 @@ def relatorio_agrupado():
         (Upload.is_analisado == True)
     )
 
-    # Obtém os uploads no período especificado que já foram analisados
+    # Obtém as análises relacionadas aos uploads
     analises = Analise.select().where(Analise.upload_id.in_([upload.id for upload in uploads]))
 
     # Dicionário para armazenar as contagens de cada classe por upload
@@ -162,7 +147,7 @@ def relatorio_agrupado():
                 aula_indices[aula.id] = index
             periodo_aulas[periodo.id] = aula_indices
 
-        # Agrupa uploads por período e por aula
+        # Agrupa uploads por período e por aula, garantindo a ordenação correta
         for upload in uploads:
             periodo = upload.periodo
             periodo_nome = periodo.nome_periodo if periodo else 'Sem Período'
@@ -175,16 +160,16 @@ def relatorio_agrupado():
                         # Obtém o índice da aula (1ª Aula, 2ª Aula, etc.)
                         aula_index = periodo_aulas[periodo.id][aula.id]
                         aula_nome = f"{aula_index}ª Aula"
-                    else:
-                        aula_nome = 'Sem Aula'
 
-                    # Inicializa os dicionários aninhados se necessário
-                    if periodo_nome not in grouped_uploads:
-                        grouped_uploads[periodo_nome] = {}
-                    if aula_nome not in grouped_uploads[periodo_nome]:
-                        grouped_uploads[periodo_nome][aula_nome] = []
-                    # Adiciona o upload ao grupo correspondente
-                    grouped_uploads[periodo_nome][aula_nome].append(upload)
+                        # Inicializa os dicionários aninhados se necessário
+                        if periodo_nome not in grouped_uploads:
+                            grouped_uploads[periodo_nome] = {}
+
+                        if aula_nome not in grouped_uploads[periodo_nome]:
+                            grouped_uploads[periodo_nome][aula_nome] = []
+
+                        # Adiciona o upload ao grupo correspondente da aula ordenada
+                        grouped_uploads[periodo_nome][aula_nome].append(upload)
             else:
                 # Caso o upload não corresponda a nenhuma aula
                 if periodo_nome not in grouped_uploads:
@@ -192,6 +177,11 @@ def relatorio_agrupado():
                 if 'Sem Aula' not in grouped_uploads[periodo_nome]:
                     grouped_uploads[periodo_nome]['Sem Aula'] = []
                 grouped_uploads[periodo_nome]['Sem Aula'].append(upload)
+
+        # Ordena as aulas por seu índice (1ª, 2ª, etc.)
+        for periodo_nome in grouped_uploads:
+            grouped_uploads[periodo_nome] = dict(sorted(grouped_uploads[periodo_nome].items(), key=lambda x: int(x[0].split('ª')[0])))
+    
     else:
         # Agrupamentos simples por outras categorias
         for upload in uploads:
