@@ -28,7 +28,7 @@ def lista_opcoes_relatorios():
 @relatorio_route.route("/filtros_relatorio_geral")
 def filtros_relatorio_geral():
     
-    return render_template("/relatorios/relatorio_templates/filtros_relatorio_geral.html")
+    return render_template("/relatorios/relatorio_templates/filtros/filtros_relatorio_geral.html")
 
 @relatorio_route.route("/relatorio_geral", methods=["POST"])
 def relatorio_geral():
@@ -69,7 +69,7 @@ def relatorio_geral():
         counts['Trabalho em Grupo'] += analise.qtde_objeto_trabalho_em_grupo
 
     return render_template(
-        "relatorios/relatorio_templates/relatorio_geral.html", 
+        "relatorios/relatorio_templates/paginas_relatorios/relatorio_geral.html", 
         uploads=uploads, 
         classes_por_upload=classes_por_upload
     )
@@ -77,27 +77,64 @@ def relatorio_geral():
 @relatorio_route.route("/filtros_relatorio_agrupado")
 def filtros_relatorio_agrupado():
     
-    return render_template("/relatorios/relatorio_templates/filtros_relatorio_agrupado.html")
+    return render_template("/relatorios/relatorio_templates/filtros/filtros_relatorio_agrupado.html")
 
 @relatorio_route.route("/relatorio_agrupado", methods=["POST"])
 def relatorio_agrupado():
-    data = request.form
+    dados = request.form
 
-    periodo_inicial = data["periodo_inicial"]
-    periodo_final = data["periodo_final"]
-    agrupado_por = data["agrupado_por"]
+    periodo_inicial = dados["periodo_inicial"]
+    periodo_final = dados["periodo_final"]
+    agrupado_por = dados["agrupado_por"]
 
     # Obtém uploads no período especificado que já foram analisados
-    uploads = Upload.select().where(
+    uploads = obter_uploads_no_periodo(periodo_inicial, periodo_final)
+
+    # Obtém as análises relacionadas aos uploads
+    analises = obter_analises_dos_uploads(uploads)
+
+    # Calcula as contagens de cada classe para cada upload
+    classes_por_upload = calcular_contagens_por_upload(uploads, analises)
+
+    # Determina a classe mais comum por upload e calcula a soma da classe mais repetida
+    classe_mais_comum, somas_por_upload = obter_classe_mais_comum_e_somas(classes_por_upload)
+
+    # Agrupa os uploads com base no parâmetro 'agrupado_por'
+    uploads_agrupados = agrupar_uploads(uploads, classe_mais_comum, agrupado_por)
+
+    # Pré-processa os professores por upload para uso no template
+    professores_por_upload = {upload.id: get_professores_for_upload(upload) for upload in uploads}
+
+    return render_template(
+        "relatorios/relatorio_templates/paginas_relatorios/relatorio_agrupado.html",
+        grouped_uploads=uploads_agrupados,
+        classe_mais_comum=classe_mais_comum,
+        agrupado_por=agrupado_por,
+        professores_por_upload=professores_por_upload,
+        somas_por_upload=somas_por_upload
+    )
+
+def obter_uploads_no_periodo(periodo_inicial, periodo_final):
+    """
+    Obtém os uploads no período especificado que já foram analisados.
+    """
+    return Upload.select().where(
         (Upload.data_registro >= periodo_inicial) & 
         (Upload.data_registro <= periodo_final) & 
         (Upload.is_analisado == True)
     )
 
-    # Obtém as análises relacionadas aos uploads
-    analises = Analise.select().where(Analise.upload_id.in_([upload.id for upload in uploads]))
+def obter_analises_dos_uploads(uploads):
+    """
+    Obtém as análises relacionadas aos uploads fornecidos.
+    """
+    upload_ids = [upload.id for upload in uploads]
+    return Analise.select().where(Analise.upload_id.in_(upload_ids))
 
-    # Dicionário para armazenar as contagens de cada classe por upload
+def calcular_contagens_por_upload(uploads, analises):
+    """
+    Calcula as contagens de cada classe para cada upload.
+    """
     classes_por_upload = {upload.id: {
         'Dormindo': 0,
         'Prestando Atenção': 0,
@@ -107,136 +144,128 @@ def relatorio_agrupado():
         'Trabalho em Grupo': 0
     } for upload in uploads}
 
-    # Calcula as contagens de cada classe para cada upload
     for analise in analises:
         upload_id = analise.upload_id
-        counts = classes_por_upload[upload_id]
-        counts['Dormindo'] += analise.qtde_objeto_dormindo
-        counts['Prestando Atenção'] += analise.qtde_objeto_prestando_atencao
-        counts['Mexendo no Celular'] += analise.qtde_objeto_mexendo_celular
-        counts['Copiando'] += analise.qtde_objeto_copiando
-        counts['Disperso'] += analise.qtde_objeto_disperso
-        counts['Trabalho em Grupo'] += analise.qtde_objeto_trabalho_em_grupo
+        contagens = classes_por_upload[upload_id]
+        contagens['Dormindo'] += analise.qtde_objeto_dormindo
+        contagens['Prestando Atenção'] += analise.qtde_objeto_prestando_atencao
+        contagens['Mexendo no Celular'] += analise.qtde_objeto_mexendo_celular
+        contagens['Copiando'] += analise.qtde_objeto_copiando
+        contagens['Disperso'] += analise.qtde_objeto_disperso
+        contagens['Trabalho em Grupo'] += analise.qtde_objeto_trabalho_em_grupo
 
-    # Dicionário para armazenar a classe que mais se repete por upload
+    return classes_por_upload
+
+def obter_classe_mais_comum_e_somas(classes_por_upload):
+    """
+    Determina a classe mais comum por upload e calcula a soma da classe mais repetida.
+    """
     classe_mais_comum = {}
+    somas_por_upload = {}
 
-    for upload_id, counts in classes_por_upload.items():
+    for upload_id, contagens in classes_por_upload.items():
         # Encontra a classe com a maior contagem
-        max_class = max(counts, key=counts.get)
-        classe_mais_comum[upload_id] = max_class
+        max_classe = max(contagens, key=contagens.get)
+        classe_mais_comum[upload_id] = max_classe
+        soma_classe_mais_repetida = contagens[max_classe]
+        somas_por_upload[upload_id] = soma_classe_mais_repetida
 
-    # Dicionário para agrupar os uploads
-    grouped_uploads = {}
+    return classe_mais_comum, somas_por_upload
 
+def agrupar_uploads(uploads, classe_mais_comum, agrupado_por):
+    """
+    Agrupa os uploads com base no parâmetro 'agrupado_por'.
+    """
     if agrupado_por == 'classificacoes':
-        # Agrupamento por classificações (Dormindo, Prestando Atenção, etc.)
-        classificacoes = ['Dormindo', 'Prestando Atenção', 'Mexendo no Celular', 'Copiando', 'Disperso', 'Trabalho em Grupo']
-        
-        # Inicializa o dicionário de agrupamento por classificação
-        for classificacao in classificacoes:
-            grouped_uploads[classificacao] = []
-
-        # Agrupa os uploads com base na classe mais comum
-        for upload_id, max_class in classe_mais_comum.items():
-            grouped_uploads[max_class].append(Upload.get_by_id(upload_id))
-
+        return agrupar_por_classificacao(uploads, classe_mais_comum)
     elif agrupado_por == 'aula':
-        # Agrupamento duplo: por período e por aula ordenada
-
-        # Obtém todos os períodos presentes nos uploads
-        periodos = set(upload.periodo for upload in uploads if upload.periodo is not None)
-
-        # Dicionário que mapeia cada período para suas aulas ordenadas
-        periodo_aulas = {}  # {periodo_id: {aula_id: index}}
-
-        for periodo in periodos:
-            # Obtém todas as aulas do período atual, ordenadas por hora de início
-            aulas = Aula.select().where(Aula.periodo == periodo).order_by(Aula.hora_inicio)
-            aula_indices = {}
-            # Enumera as aulas para atribuir índices (1ª Aula, 2ª Aula, etc.)
-            for index, aula in enumerate(aulas, start=1):
-                aula_indices[aula.id] = index
-            periodo_aulas[periodo.id] = aula_indices
-
-        # Agrupa uploads por período e por aula, garantindo a ordenação correta
-        for upload in uploads:
-            periodo = upload.periodo
-            periodo_nome = periodo.nome_periodo if periodo else 'Sem Período'
-
-            # Obtém as aulas que correspondem ao upload
-            aulas = get_aulas_for_upload(upload)
-            if aulas:
-                for aula in aulas:
-                    if periodo and periodo.id in periodo_aulas and aula.id in periodo_aulas[periodo.id]:
-                        # Obtém o índice da aula (1ª Aula, 2ª Aula, etc.)
-                        aula_index = periodo_aulas[periodo.id][aula.id]
-                        aula_nome = f"{aula_index}ª Aula"
-
-                        # Inicializa os dicionários aninhados se necessário
-                        if periodo_nome not in grouped_uploads:
-                            grouped_uploads[periodo_nome] = {}
-
-                        if aula_nome not in grouped_uploads[periodo_nome]:
-                            grouped_uploads[periodo_nome][aula_nome] = []
-
-                        # Adiciona o upload ao grupo correspondente da aula ordenada
-                        grouped_uploads[periodo_nome][aula_nome].append(upload)
-            else:
-                # Caso o upload não corresponda a nenhuma aula
-                if periodo_nome not in grouped_uploads:
-                    grouped_uploads[periodo_nome] = {}
-                if 'Sem Aula' not in grouped_uploads[periodo_nome]:
-                    grouped_uploads[periodo_nome]['Sem Aula'] = []
-                grouped_uploads[periodo_nome]['Sem Aula'].append(upload)
-
-        # Ordena as aulas por seu índice (1ª, 2ª, etc.)
-        for periodo_nome in grouped_uploads:
-            grouped_uploads[periodo_nome] = dict(sorted(grouped_uploads[periodo_nome].items(), key=lambda x: int(x[0].split('ª')[0])))
-
+        return agrupar_por_aula(uploads)
     else:
-        # Agrupamentos simples por outras categorias
-        for upload in uploads:
-            grouping_keys = []
+        return agrupar_por_outros(uploads, agrupado_por)
 
-            if agrupado_por == 'professor':
-                professores = get_professores_for_upload(upload)
-                grouping_keys = professores if professores else ['Sem Professor']
+def agrupar_por_classificacao(uploads, classe_mais_comum):
+    """
+    Agrupa os uploads por classificações (Dormindo, Prestando Atenção, etc.).
+    """
+    classificacoes = ['Dormindo', 'Prestando Atenção', 'Mexendo no Celular',
+                      'Copiando', 'Disperso', 'Trabalho em Grupo']
+    uploads_agrupados = {classificacao: [] for classificacao in classificacoes}
+    uploads_dict = {upload.id: upload for upload in uploads}
 
-            elif agrupado_por == 'disciplina':
-                disciplinas = get_disciplinas_for_upload(upload)
-                grouping_keys = disciplinas if disciplinas else ['Sem Disciplina']
+    for upload_id, max_classe in classe_mais_comum.items():
+        uploads_agrupados[max_classe].append(uploads_dict[upload_id])
 
-            elif agrupado_por == 'sala':
-                grouping_keys = [upload.sala.nome_sala] if upload.sala else ['Sem Sala']
+    return uploads_agrupados
 
-            elif agrupado_por == 'turma':
-                grouping_keys = [upload.turma.nome_turma] if upload.turma else ['Sem Turma']
+def agrupar_por_aula(uploads):
+    """
+    Agrupa os uploads por período e por aula, garantindo a ordenação correta.
+    """
+    uploads_agrupados = {}
+    periodos = set(upload.periodo for upload in uploads if upload.periodo is not None)
+    periodo_aulas = {}  # {periodo_id: {aula_id: indice}}
 
-            elif agrupado_por == 'periodo':
-                grouping_keys = [upload.periodo.nome_periodo] if upload.periodo else ['Sem Período']
+    # Mapeia cada período para suas aulas ordenadas
+    for periodo in periodos:
+        aulas = Aula.select().where(Aula.periodo == periodo).order_by(Aula.hora_inicio)
+        indice_aulas = {aula.id: indice for indice, aula in enumerate(aulas, start=1)}
+        periodo_aulas[periodo.id] = indice_aulas
 
-            else:
-                grouping_keys = ['Desconhecido']
-
-            # Agrupa o upload em cada chave de agrupamento
-            for key in grouping_keys:
-                if key not in grouped_uploads:
-                    grouped_uploads[key] = []
-                grouped_uploads[key].append(upload)
-
-    # Pré-processa os professores por upload para uso no template
-    professores_por_upload = {}
     for upload in uploads:
-        professores_por_upload[upload.id] = get_professores_for_upload(upload)
+        periodo = upload.periodo
+        nome_periodo = periodo.nome_periodo if periodo else 'Sem Período'
 
-    return render_template(
-        "relatorios/relatorio_templates/relatorio_agrupado.html",
-        grouped_uploads=grouped_uploads,
-        classe_mais_comum=classe_mais_comum,
-        agrupado_por=agrupado_por,
-        professores_por_upload=professores_por_upload
-    )
+        # Obtém as aulas que correspondem ao upload
+        aulas = get_aulas_for_upload(upload)  # Mantém a função existente
+        if aulas:
+            for aula in aulas:
+                if periodo and periodo.id in periodo_aulas and aula.id in periodo_aulas[periodo.id]:
+                    indice_aula = periodo_aulas[periodo.id][aula.id]
+                    nome_aula = f"{indice_aula}ª Aula"
+
+                    # Inicializa os dicionários aninhados se necessário
+                    uploads_agrupados.setdefault(nome_periodo, {}).setdefault(nome_aula, []).append(upload)
+        else:
+            # Caso o upload não corresponda a nenhuma aula
+            uploads_agrupados.setdefault(nome_periodo, {}).setdefault('Sem Aula', []).append(upload)
+
+    # Ordena as aulas por seu índice (1ª, 2ª, etc.)
+    for nome_periodo in uploads_agrupados:
+        uploads_agrupados[nome_periodo] = dict(sorted(
+            uploads_agrupados[nome_periodo].items(),
+            key=lambda x: int(x[0].split('ª')[0]) if x[0].split('ª')[0].isdigit() else float('inf')
+        ))
+
+    return uploads_agrupados
+
+def agrupar_por_outros(uploads, agrupado_por):
+    """
+    Agrupa os uploads por outras categorias (professor, disciplina, sala, etc.).
+    """
+    uploads_agrupados = {}
+    for upload in uploads:
+        chaves_agrupamento = []
+
+        if agrupado_por == 'professor':
+            professores = get_professores_for_upload(upload)  # Mantém a função existente
+            chaves_agrupamento = professores if professores else ['Sem Professor']
+        elif agrupado_por == 'disciplina':
+            disciplinas = get_disciplinas_for_upload(upload)  # Mantém a função existente
+            chaves_agrupamento = disciplinas if disciplinas else ['Sem Disciplina']
+        elif agrupado_por == 'sala':
+            chaves_agrupamento = [upload.sala.nome_sala] if upload.sala else ['Sem Sala']
+        elif agrupado_por == 'turma':
+            chaves_agrupamento = [upload.turma.nome_turma] if upload.turma else ['Sem Turma']
+        elif agrupado_por == 'periodo':
+            chaves_agrupamento = [upload.periodo.nome_periodo] if upload.periodo else ['Sem Período']
+        else:
+            chaves_agrupamento = ['Desconhecido']
+
+        # Agrupa o upload em cada chave de agrupamento
+        for chave in chaves_agrupamento:
+            uploads_agrupados.setdefault(chave, []).append(upload)
+
+    return uploads_agrupados
 
 def get_professores_for_upload(upload):
     professores_set = set()

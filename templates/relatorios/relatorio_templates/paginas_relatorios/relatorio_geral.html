@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório Geral</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../static/images/logoNavBarSemFundo.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="NavBar">
+            <div class="logoArea">
+                <a href="/">
+                    <img src="../static/images/logoNavBarSemFundo.png" alt="">
+                </a>
+            </div>
+            <div class="tabArea">
+                <a class="NavBarItem" href="/cadastro">Cadastro</a>
+                <a class="NavBarItem" href="/upload">Uploads</a>
+                <a class="NavBarItem selected-item-menu" href="/relatorio">Relatórios</a>
+                <a class="NavBarItem" href="">Opções</a>
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i> <!-- Ícone de toggle -->
+            </div>
+        </div>
+    </header>
+    <main>
+        <button class="return-button" onclick="window.history.back();">
+            <i class="fa-solid fa-arrow-left" style="color: #ffffff;"></i>
+        </button>
+        
+        <div class="div-baixar-pdf">
+            <button id="baixar" class="baixar-pdf">Baixar PDF</button>
+        </div>
+
+        <section class="content">
+            <h2>Relatório Geral</h2>
+            <div class="div-table">
+                <table class="tabela-relatorio">
+                    <thead>
+                        <tr class="tr-cabecalho-relatorio">
+                            <th scope="col" style="border-top-left-radius: 16px; width: 5%;">#</th>
+                            <th style="width: 12%">Upload</th>
+                            <th style="width: 12%">Turma</th>
+                            <th style="width: 12%">Dormindo</th>
+                            <th style="width: 12%">Prestando Atenção</th>
+                            <th style="width: 12%">Mexendo no Celular</th>
+                            <th style="width: 12%">Copiando</th>
+                            <th style="width: 12%">Disperso</th>
+                            <th style="border-top-right-radius: 16px; width: 12%">Trabalho em Grupo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-uploads">
+                        {% for upload in uploads %}
+                            <tr class="tr-corpo-relatorio">
+                                <td>{{ upload.id }}</td>
+                                <td>{{ upload.nome_arquivo }}</td>
+                                <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Dormindo'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Prestando Atenção'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Mexendo no Celular'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Copiando'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Disperso'] }}</td>
+                                <td>{{ classes_por_upload[upload.id]['Trabalho em Grupo'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>                   
+                </table>
+            </div>
+        </section>
+
+        <!-- Modal formulários -->
+        <dialog id="modal">
+        </dialog>
+
+        <!-- Modal erro -->
+        <dialog id="error" class="modal-erro">
+            <!-- Mensagens de Flash -->
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                <script>
+                    modal_erro = document.getElementById('error')
+                    modal_erro.showModal()
+                </script>
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <button onclick="getElementById('error').close()">Ok</button>
+        </dialog>
+
+    </main>
+    <script src="{{ url_for('static', filename='cru.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleButton = document.querySelector('.menu-toggle');
+            const navBar = document.querySelector('.NavBar');
+            
+            toggleButton.addEventListener('click', function() {
+                navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
+            });
+        });
+    </script>
+
+    <script>
+        document.getElementById("baixar").addEventListener("click", () => {
+            const elemento = document.querySelector(".content");
+            const opcoes = {
+                margin:       1,
+                filename:     'meu-documento.pdf',
+                image:        { type: 'png', quality: 1 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opcoes).from(elemento).save();
+        });
+    </script>
+</body>
+</html>
