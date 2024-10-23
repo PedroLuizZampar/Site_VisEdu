@@ -89,8 +89,8 @@ def relatorio_agrupado():
 
     # Obtém uploads no período especificado que já foram analisados
     uploads = Upload.select().where(
-        (Upload.data_registro >= periodo_inicial) &
-        (Upload.data_registro <= periodo_final) &
+        (Upload.data_registro >= periodo_inicial) & 
+        (Upload.data_registro <= periodo_final) & 
         (Upload.is_analisado == True)
     )
 
@@ -129,7 +129,19 @@ def relatorio_agrupado():
     # Dicionário para agrupar os uploads
     grouped_uploads = {}
 
-    if agrupado_por == 'aula':
+    if agrupado_por == 'classificacoes':
+        # Agrupamento por classificações (Dormindo, Prestando Atenção, etc.)
+        classificacoes = ['Dormindo', 'Prestando Atenção', 'Mexendo no Celular', 'Copiando', 'Disperso', 'Trabalho em Grupo']
+        
+        # Inicializa o dicionário de agrupamento por classificação
+        for classificacao in classificacoes:
+            grouped_uploads[classificacao] = []
+
+        # Agrupa os uploads com base na classe mais comum
+        for upload_id, max_class in classe_mais_comum.items():
+            grouped_uploads[max_class].append(Upload.get_by_id(upload_id))
+
+    elif agrupado_por == 'aula':
         # Agrupamento duplo: por período e por aula ordenada
 
         # Obtém todos os períodos presentes nos uploads
@@ -181,7 +193,7 @@ def relatorio_agrupado():
         # Ordena as aulas por seu índice (1ª, 2ª, etc.)
         for periodo_nome in grouped_uploads:
             grouped_uploads[periodo_nome] = dict(sorted(grouped_uploads[periodo_nome].items(), key=lambda x: int(x[0].split('ª')[0])))
-    
+
     else:
         # Agrupamentos simples por outras categorias
         for upload in uploads:
