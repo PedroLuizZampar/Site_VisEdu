@@ -136,8 +136,6 @@ def inserir_professor(periodo_id):
     if conflict_messages:
         for msg in conflict_messages:
             flash(msg, "error")
-    else:
-        flash("Professor cadastrado com sucesso!", "success")
 
     # Armazena dados temporariamente na sessão
     session['visualizando_professores'] = True
@@ -260,8 +258,6 @@ def atualizar_professor(professor_id):
         if conflict_messages:
             for msg in conflict_messages:
                 flash(msg, "error")
-        else:
-            flash("Professor atualizado com sucesso!", "success")
 
         return redirect(url_for('cadastro.tela_cadastro'))
 
