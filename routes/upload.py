@@ -351,6 +351,11 @@ def analisar_upload(upload_id):
     # Carrega o modelo pré-treinado
     model = YOLO(model_path)
     cap = cv2.VideoCapture(video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS) # Verifica quantos FPS tem no vídeo
+
+    if not fps or fps == 0:
+        flash("Erro ao obter FPS do vídeo!")
+        return redirect(request.referrer)
 
     # Função para processar cada frame do vídeo
     def identificar(frame, frame_count):
@@ -389,18 +394,29 @@ def analisar_upload(upload_id):
                     elif obj_class == 5:
                         qtde_objeto_trabalho_em_grupo += 1
 
-        # Salva a análise no banco de dados
-        Analise.create(
-            nome_analise=f"Análise do Frame {frame_count}",
-            upload=upload,
-            qtde_objetos=qtde_objetos,
-            qtde_objeto_dormindo=qtde_objeto_dormindo,
-            qtde_objeto_prestando_atencao=qtde_objeto_prestando_atencao,
-            qtde_objeto_mexendo_celular=qtde_objeto_mexendo_celular,
-            qtde_objeto_copiando=qtde_objeto_copiando,
-            qtde_objeto_disperso=qtde_objeto_disperso,
-            qtde_objeto_trabalho_em_grupo=qtde_objeto_trabalho_em_grupo
-        )
+            # Calcular o tempo decorrido desde o início do vídeo
+            time_offset_seconds = frame_count / fps
+            time_offset = timedelta(seconds=time_offset_seconds)
+
+            # Combinar data e hora de registro do upload
+            datetime_registro = datetime.combine(upload.data_registro, upload.hora_registro)
+
+            # Calcular a hora da análise a partir do tempo de gravação decorrido entre uma pausa no vídeo e outra
+            datetime_analise = datetime_registro + time_offset
+            hora_analise = datetime_analise.time()
+
+            Analise.create(
+                nome_analise=f"Análise do Frame {frame_count}",
+                upload=upload,
+                hora_analise=hora_analise,
+                qtde_objetos=qtde_objetos,
+                qtde_objeto_dormindo=qtde_objeto_dormindo,
+                qtde_objeto_prestando_atencao=qtde_objeto_prestando_atencao,
+                qtde_objeto_mexendo_celular=qtde_objeto_mexendo_celular,
+                qtde_objeto_copiando=qtde_objeto_copiando,
+                qtde_objeto_disperso=qtde_objeto_disperso,
+                qtde_objeto_trabalho_em_grupo=qtde_objeto_trabalho_em_grupo
+            )
 
     if not cap.isOpened():
         flash("Erro ao abrir o vídeo!")
@@ -510,26 +526,16 @@ def media_comportamentos(upload_id):
 def contagem_alunos_comportamentos(upload_id):
     query = (Analise
              .select(
-                 Analise.qtde_objeto_dormindo,
-                 Analise.qtde_objeto_prestando_atencao,
-                 Analise.qtde_objeto_mexendo_celular,
-                 Analise.qtde_objeto_copiando,
-                 Analise.qtde_objeto_disperso,
-                 Analise.qtde_objeto_trabalho_em_grupo,
-                 fn.COUNT(Analise.id).alias('count')
+                 fn.SUM(Analise.qtde_objeto_dormindo).alias('total_dormindo'),
+                 fn.SUM(Analise.qtde_objeto_prestando_atencao).alias('total_prestando_atencao'),
+                 fn.SUM(Analise.qtde_objeto_mexendo_celular).alias('total_mexendo_celular'),
+                 fn.SUM(Analise.qtde_objeto_copiando).alias('total_copiando'),
+                 fn.SUM(Analise.qtde_objeto_disperso).alias('total_disperso'),
+                 fn.SUM(Analise.qtde_objeto_trabalho_em_grupo).alias('total_trabalho_em_grupo')
              )
              .where(Analise.upload_id == upload_id)
-             .group_by(
-                 Analise.qtde_objeto_dormindo,
-                 Analise.qtde_objeto_prestando_atencao,
-                 Analise.qtde_objeto_mexendo_celular,
-                 Analise.qtde_objeto_copiando,
-                 Analise.qtde_objeto_disperso,
-                 Analise.qtde_objeto_trabalho_em_grupo
-             )
-             .order_by(fn.COUNT(Analise.id).desc())
              .dicts()
-             .execute())  # Obtendo todos os resultados
+             .get())  # Obtendo a soma total de cada comportamento
 
     # Listas para armazenar os dados
     labels = [
@@ -537,16 +543,13 @@ def contagem_alunos_comportamentos(upload_id):
         "Copiando", "Disperso", "Trabalho em Grupo"
     ]
     data = [
-        0, 0, 0, 0, 0, 0
+        query['total_dormindo'] or 0,
+        query['total_prestando_atencao'] or 0,
+        query['total_mexendo_celular'] or 0,
+        query['total_copiando'] or 0,
+        query['total_disperso'] or 0,
+        query['total_trabalho_em_grupo'] or 0
     ]
-
-    for result in query:
-        data[0] += result['qtde_objeto_dormindo']
-        data[1] += result['qtde_objeto_prestando_atencao']
-        data[2] += result['qtde_objeto_mexendo_celular']
-        data[3] += result['qtde_objeto_copiando']
-        data[4] += result['qtde_objeto_disperso']
-        data[5] += result['qtde_objeto_trabalho_em_grupo']
 
     # Encontrar a moda
     mode_value = max(data)
