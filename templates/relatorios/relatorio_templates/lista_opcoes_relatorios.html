@@ -9,21 +9,27 @@
         margin: 0 10px;
         cursor: pointer;
         font-size: 18px;
-        margin: 15px 10px;
+        margin: 75px 50px;
+        width: 300px;
+    }
+
+    .agrupamento-tipos-relatorio {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: center;
     }
 </style>
 
-<div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 250px;">
-    <button class="botao-opcao-relatorio" style=" width: 100%;"
+<div class="agrupamento-tipos-relatorio">
+    <button class="botao-opcao-relatorio"
         onclick="document.getElementById('modal').showModal()"
         c-get="{{ url_for('relatorio.filtros_relatorio_geral') }}"
         c-target="#modal">
         <i class="fa-solid fa-file-lines" style="color: #ffffff;"></i><br>Relatório geral
     </button>
-</div>
-
-<div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 250px;">
-    <button class="botao-opcao-relatorio" style=" width: 100%;"
+    
+    <button class="botao-opcao-relatorio"
         onclick="document.getElementById('modal').showModal()"
         c-get="{{ url_for('relatorio.filtros_relatorio_agrupado') }}"
         c-target="#modal">

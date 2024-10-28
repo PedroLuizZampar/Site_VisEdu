@@ -74,7 +74,7 @@
         </dialog>
 
         <!-- Modal de opções de relatórios -->
-        <dialog id="opcoes-relatorio" class="modal">
+        <dialog id="opcoes-relatorio" class="modal" style="width: 500px;">
         </dialog>
 
         <!-- Modal de renderização de relatórios -->
@@ -106,9 +106,18 @@
         </dialog>
 
         <!-- Modal aviso de análise em andamento -->
-        <dialog id="mensagem_analise" class="modal">
-            <p>O vídeo está sendo analisado, isso pode demorar alguns minutos!</p>
-            <div class="loader"></div>
+        <dialog id="mensagem_analise" class="modal" style="width: 1000px;">
+            <p style="font-size: 20px;">O vídeo está sendo analisado, isso pode demorar alguns minutos!</p>
+            
+            <strong><p id="progress-text">Progresso: 0%</p></strong>
+            
+            <div style="display: flex; justify-content: center;">
+                <!-- Container da Barra de Progresso -->
+                <div class="progress-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+            </div>
+            
             <button onclick="document.getElementById('mensagem_analise').close(), localStorage.removeItem('modal_analise_aberto'), location.reload();"
                 c-post="{{ url_for('upload.cancelar_analise') }}">
                 Cancelar análise
@@ -118,6 +127,7 @@
     </main>
 
     <script>
+
         document.addEventListener("DOMContentLoaded", function() {
             if (localStorage.getItem('modal_analise_aberto') === 'true') {
                 document.getElementById('mensagem_analise').showModal();
@@ -127,23 +137,39 @@
                     const upload_id = localStorage.getItem('upload_id');
 
                     if (upload_id) {
-                        fetch(`/upload/status_analise/${upload_id}`)
+                        fetch(`/upload/${upload_id}/progress`)
                             .then(response => response.json())
                             .then(data => {
+                                // Atualiza o texto do progresso
+                                document.getElementById('progress-text').innerText = `Progresso: ${data.progress.toFixed(0)}%`;
+
+                                // Atualiza a largura da barra de progresso
+                                const progressBar = document.getElementById('progress-bar');
+                                progressBar.style.width = `${data.progress}%`;
+
                                 if (data.status === 'concluido') {
+                                    clearInterval(statusInterval);
                                     document.getElementById('mensagem_analise').close();
-                                    localStorage.removeItem('modal_analise_aberto'); // Remove a informação do localstorage
-                                    localStorage.removeItem('upload_id'); // Remove a informação do localstorage
+                                    localStorage.removeItem('modal_analise_aberto'); // Remove a informação do localStorage
+                                    localStorage.removeItem('upload_id'); // Remove a informação do localStorage
+                                    location.reload();
+                                } else if (data.status === 'cancelado') {
+                                    clearInterval(statusInterval);
+                                    document.getElementById('mensagem_analise').close();
+                                    localStorage.removeItem('modal_analise_aberto');
+                                    localStorage.removeItem('upload_id');
+                                    alert('Análise cancelada.');
                                     location.reload();
                                 }
                             })
-                            .catch(error => console.error('Erro ao verificar o status da análise:', error));
+                            .catch(error => {
+                                console.error('Erro ao verificar o status da análise:', error);
+                                clearInterval(statusInterval); // Para o intervalo em caso de erro
+                            });
                     }
                 }
-
-                setInterval(verificarStatusAnalise, 5000); // Chama a função pra verificar o status a cada 5 segundos
+                setInterval(verificarStatusAnalise, 1000); // Chama a função pra verificar o status a cada 1 segundo
             }
-
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape') {
                     event.preventDefault();
