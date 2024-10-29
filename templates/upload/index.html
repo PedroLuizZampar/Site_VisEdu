@@ -130,49 +130,48 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             if (localStorage.getItem('modal_analise_aberto') === 'true') {
-                document.getElementById('mensagem_analise').showModal();
+                const modalAnalise = document.getElementById('mensagem_analise');
+                modalAnalise.showModal();
+                
+                const upload_id = localStorage.getItem('upload_id');
+                
+                if (upload_id) {
+                    const statusInterval = setInterval(async () => {
+                        try {
+                            const response = await fetch(`/upload/${upload_id}/progress`);
+                            const data = await response.json();
 
-                function verificarStatusAnalise() {
+                            // Atualiza o texto do progresso e a largura da barra
+                            document.getElementById('progress-text').innerText = `Progresso: ${data.progress.toFixed(0)}%`;
+                            document.getElementById('progress-bar').style.width = `${data.progress}%`;
 
-                    const upload_id = localStorage.getItem('upload_id');
-
-                    if (upload_id) {
-                        fetch(`/upload/${upload_id}/progress`)
-                            .then(response => response.json())
-                            .then(data => {
-                                // Atualiza o texto do progresso
-                                document.getElementById('progress-text').innerText = `Progresso: ${data.progress.toFixed(0)}%`;
-
-                                // Atualiza a largura da barra de progresso
-                                const progressBar = document.getElementById('progress-bar');
-                                progressBar.style.width = `${data.progress}%`;
-
-                                if (data.status === 'concluido') {
-                                    clearInterval(statusInterval);
-                                    document.getElementById('mensagem_analise').close();
-                                    localStorage.removeItem('modal_analise_aberto'); // Remove a informação do localStorage
-                                    localStorage.removeItem('upload_id'); // Remove a informação do localStorage
-                                    location.reload();
-                                } else if (data.status === 'cancelado') {
-                                    clearInterval(statusInterval);
-                                    document.getElementById('mensagem_analise').close();
-                                    localStorage.removeItem('modal_analise_aberto');
-                                    localStorage.removeItem('upload_id');
-                                    alert('Análise cancelada.');
-                                    location.reload();
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Erro ao verificar o status da análise:', error);
-                                clearInterval(statusInterval); // Para o intervalo em caso de erro
-                            });
-                    }
+                            // Verifica se o progresso atingiu 100% ou se o status é 'concluido'
+                            if (data.progress >= 100 || data.progress == 0 || data.status === 'concluido') {
+                                clearInterval(statusInterval);  // Encerra o intervalo
+                                modalAnalise.close();  // Fecha o modal
+                                localStorage.removeItem('modal_analise_aberto');
+                                localStorage.removeItem('upload_id');
+                                location.reload();
+                            } else if (data.status === 'cancelado') {
+                                clearInterval(statusInterval);
+                                modalAnalise.close();
+                                localStorage.removeItem('modal_analise_aberto');
+                                localStorage.removeItem('upload_id');
+                                alert('Análise cancelada.');
+                                location.reload();
+                            }
+                        } catch (error) {
+                            console.error('Erro ao verificar o status da análise:', error);
+                            clearInterval(statusInterval); // Para o intervalo em caso de erro
+                            modalAnalise.close(); // Fecha o modal em caso de erro
+                        }
+                    }, 1000);
                 }
-                setInterval(verificarStatusAnalise, 1000); // Chama a função pra verificar o status a cada 1 segundo
             }
+
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape') {
-                    event.preventDefault();
+                    event.preventDefault(); // Impede o fechamento com a tecla Escape
                 }
             });
         });
