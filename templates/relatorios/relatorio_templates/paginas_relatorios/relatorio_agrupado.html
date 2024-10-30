@@ -114,8 +114,7 @@
                                                     <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
                                                     <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
                                                     <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
-                                                    <!-- Aqui exibimos a classe mais comum por aula na coluna -->
-                                                    <td>{{ classe_mais_comum_por_aula[periodo_nome][aula_nome] }}</td>
+                                                    <td>{{ classe_mais_comum[upload.id] }}</td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>

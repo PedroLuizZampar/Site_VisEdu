@@ -102,13 +102,6 @@ def relatorio_agrupado():
     # Agrupa os uploads com base no parâmetro 'agrupado_por'
     uploads_agrupados = agrupar_uploads(uploads, classe_mais_comum, agrupado_por)
 
-    # Se o agrupamento for por aula, calculamos a classe mais comum por aula
-    if agrupado_por == 'aula':
-        contagens_por_aula = calcular_contagens_por_aula(uploads, analises)
-        classe_mais_comum_por_aula = obter_classe_mais_comum_por_aula(contagens_por_aula)
-    else:
-        classe_mais_comum_por_aula = None
-
     # Pré-processa os professores por upload para uso no template
     professores_por_upload = {upload.id: get_professores_for_upload(upload) for upload in uploads}
 
@@ -118,8 +111,7 @@ def relatorio_agrupado():
         classe_mais_comum=classe_mais_comum,
         agrupado_por=agrupado_por,
         professores_por_upload=professores_por_upload,
-        somas_por_upload=somas_por_upload,
-        classe_mais_comum_por_aula=classe_mais_comum_por_aula
+        somas_por_upload=somas_por_upload
     )
 
 def obter_uploads_no_periodo(periodo_inicial, periodo_final):
@@ -224,12 +216,12 @@ def agrupar_por_aula(uploads):
         nome_periodo = periodo.nome_periodo if periodo else 'Sem Período'
 
         # Obtém as aulas que correspondem ao upload
-        aulas = get_aulas_for_upload(upload)
+        aulas = get_aulas_for_upload(upload)  # Mantém a função existente
         if aulas:
             for aula in aulas:
                 if periodo and periodo.id in periodo_aulas and aula.id in periodo_aulas[periodo.id]:
                     indice_aula = periodo_aulas[periodo.id][aula.id]
-                    nome_aula = f"{aula.id}ª Aula"
+                    nome_aula = f"{indice_aula}ª Aula"
 
                     # Inicializa os dicionários aninhados se necessário
                     uploads_agrupados.setdefault(nome_periodo, {}).setdefault(nome_aula, []).append(upload)
@@ -349,85 +341,3 @@ def get_aulas_for_upload(upload):
     )
     # Retorna uma lista de aulas correspondentes
     return aulas
-
-def calcular_contagens_por_aula(uploads, analises):
-    """
-    Calcula as contagens de cada classe para cada aula, com base nas análises.
-    """
-    contagens_por_aula = {}
-    aulas_cache = {}
-    
-    for analise in analises:
-        upload = analise.upload
-        data_analise = upload.data_registro
-        hora_analise = analise.hora_analise
-        
-        # Combina a data do upload com a hora da análise
-        datetime_analise = datetime.combine(data_analise, hora_analise)
-        
-        # Cache de aulas para evitar múltiplas consultas
-        key_cache = (upload.periodo.id if upload.periodo else None, data_analise)
-        if key_cache in aulas_cache:
-            aulas = aulas_cache[key_cache]
-        else:
-            # Busca as aulas do período do upload
-            aulas = Aula.select().where(
-                (Aula.periodo == upload.periodo)
-            )
-            aulas_cache[key_cache] = aulas
-        
-        # Determina a aula em que a análise ocorreu
-        aula_encontrada = None
-        for aula in aulas:
-            datetime_inicio = datetime.combine(data_analise, aula.hora_inicio)
-            datetime_termino = datetime.combine(data_analise, aula.hora_termino)
-            if datetime_inicio <= datetime_analise < datetime_termino:
-                aula_encontrada = aula
-                break
-        
-        if aula_encontrada:
-            nome_periodo = aula_encontrada.periodo.nome_periodo if aula_encontrada.periodo else 'Sem Período'
-            nome_aula = f"{aula_encontrada.id}ª Aula"
-            
-            # Inicializa o dicionário se necessário
-            if nome_periodo not in contagens_por_aula:
-                contagens_por_aula[nome_periodo] = {}
-            if nome_aula not in contagens_por_aula[nome_periodo]:
-                contagens_por_aula[nome_periodo][nome_aula] = {
-                    'Dormindo': 0,
-                    'Prestando Atenção': 0,
-                    'Mexendo no Celular': 0,
-                    'Copiando': 0,
-                    'Disperso': 0,
-                    'Trabalho em Grupo': 0
-                }
-            
-            # Acumula as contagens
-            contagens = contagens_por_aula[nome_periodo][nome_aula]
-            contagens['Dormindo'] += analise.qtde_objeto_dormindo
-            contagens['Prestando Atenção'] += analise.qtde_objeto_prestando_atencao
-            contagens['Mexendo no Celular'] += analise.qtde_objeto_mexendo_celular
-            contagens['Copiando'] += analise.qtde_objeto_copiando
-            contagens['Disperso'] += analise.qtde_objeto_disperso
-            contagens['Trabalho em Grupo'] += analise.qtde_objeto_trabalho_em_grupo
-        else:
-            # Caso a análise não corresponda a nenhuma aula, ignora
-            pass
-
-    return contagens_por_aula
-
-def obter_classe_mais_comum_por_aula(contagens_por_aula):
-    """
-    Determina a classe mais comum por aula, com base nas contagens.
-    """
-    classe_mais_comum_por_aula = {}
-    for nome_periodo, aulas in contagens_por_aula.items():
-        for nome_aula, contagens in aulas.items():
-            if sum(contagens.values()) == 0:
-                max_classe = 'Sem Dados'
-            else:
-                max_classe = max(contagens, key=contagens.get)
-            if nome_periodo not in classe_mais_comum_por_aula:
-                classe_mais_comum_por_aula[nome_periodo] = {}
-            classe_mais_comum_por_aula[nome_periodo][nome_aula] = max_classe
-    return classe_mais_comum_por_aula
