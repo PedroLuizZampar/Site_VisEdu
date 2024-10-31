@@ -11,6 +11,7 @@ from database.models.sala import Sala
 from database.models.analise import Analise
 from database.models.periodo import Periodo
 from database.models.turma import Turma
+from database.models.aula import Aula
 from funcoes_extras import alterando_sessions_para_false
 
 upload_route = Blueprint("upload", __name__)
@@ -147,6 +148,22 @@ def inserir_upload():
         hora_termino_dt = hora_registro_dt + duracao_timedelta
         hora_termino = hora_termino_dt.time()
 
+        aulas = Aula.select().where(periodo == periodo)
+
+        aula_upload = None
+        for aula in aulas:
+            if aula.hora_inicio <= hora_registro <= aula.hora_termino:
+                aula_upload = aula
+                break
+
+        if hora_termino > aula_upload.hora_termino:
+            if os.path.exists(caminho_arquivo):
+                os.remove(caminho_arquivo) # Deleta o arquivo salvo na pasta
+            else:
+                pass
+            flash(f"O vídeo não pode ser salvo, pois excede o tempo de uma aula!", "error")
+            return redirect(request.referrer)
+
         # Criar o registro de upload
         Upload.create(
             nome_arquivo=nome_arquivo,
@@ -194,7 +211,7 @@ def atualizar_upload(upload_id):
     if request.form.get('_method') == 'PUT':
         basepath = os.path.dirname(__file__)
         data = request.form
-        f = request.files['file']
+        f = request.files.get('file')  # Usa .get para evitar KeyError se 'file' não estiver em request.files
 
         # Obtém o upload a ser atualizado
         upload_editado = Upload.get_by_id(upload_id)
@@ -203,7 +220,6 @@ def atualizar_upload(upload_id):
 
         # Aplica secure_filename no novo nome do arquivo
         novo_nome_arquivo = secure_filename(data['nome_arquivo'])
-        new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', novo_nome_arquivo))
 
         # Recuperar a instância da Sala e do Período com base no nome fornecido no formulário
         sala = Sala.get(Sala.nome_sala == data['sala'])
@@ -219,51 +235,107 @@ def atualizar_upload(upload_id):
             hora_registro = datetime.strptime(data['hora_registro'], "%H:%M:%S").time()
         except ValueError:
             hora_registro = datetime.strptime(data['hora_registro'], "%H:%M").time()
-            
+
         if not (periodo.hora_inicio <= hora_registro <= periodo.hora_termino):
             flash(f"A hora de registro ({data['hora_registro']}) está fora do período selecionado!", "error")
             return redirect(request.referrer)
 
-        # Se não há arquivo novo sendo enviado
-        if not f:  
-            # Se o nome do arquivo mudou, renomeie o arquivo antigo
+        # Obter a duração do vídeo e o caminho do arquivo
+        if f and allowed_file(f.filename):
+            # Novo arquivo enviado
+            if novo_nome_arquivo == old_name:
+                # Substitui o arquivo antigo diretamente
+                temp_filename = old_name
+                temp_caminho_arquivo = old_caminho_arquivo
+            else:
+                # Novo arquivo com nome diferente
+                temp_filename = novo_nome_arquivo
+                temp_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', temp_filename))
+                if os.path.exists(temp_caminho_arquivo) and temp_caminho_arquivo != old_caminho_arquivo:
+                    # Se já existe um arquivo com esse nome (e não é o antigo), gera um nome único
+                    temp_filename = gerar_nome_unico(os.path.dirname(temp_caminho_arquivo), temp_filename)
+                    temp_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', temp_filename))
+            f.save(temp_caminho_arquivo)
+
+            # Obter a duração do novo vídeo
+            video = VideoFileClip(temp_caminho_arquivo)
+            duracao = video.duration  # Duração em segundos
+            video.close()  # Fechar o arquivo para liberar recursos
+        else:
+            # Nenhum novo arquivo enviado
             if old_name != novo_nome_arquivo:
-                new_filename = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), novo_nome_arquivo)
-                new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', new_filename))
-                os.rename(old_caminho_arquivo, new_caminho_arquivo)
-                upload_editado.nome_arquivo = new_filename
-                upload_editado.caminho_arquivo = new_caminho_arquivo
+                # Renomear o arquivo antigo para o novo nome após validação
+                temp_filename = novo_nome_arquivo
+                temp_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', temp_filename))
+                if os.path.exists(temp_caminho_arquivo) and temp_caminho_arquivo != old_caminho_arquivo:
+                    # Se já existe um arquivo com esse nome (e não é o antigo), gera um nome único
+                    temp_filename = gerar_nome_unico(os.path.dirname(temp_caminho_arquivo), temp_filename)
+                    temp_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', temp_filename))
+            else:
+                temp_filename = old_name
+                temp_caminho_arquivo = old_caminho_arquivo
 
-        # Se há um novo arquivo
-        elif f:  
-            # Apaga o arquivo antigo
-            if os.path.exists(old_caminho_arquivo):
-                os.remove(old_caminho_arquivo)
-
-            new_filename = gerar_nome_unico(os.path.dirname(old_caminho_arquivo), novo_nome_arquivo)
-            new_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', new_filename))
-            f.save(new_caminho_arquivo)
-            upload_editado.nome_arquivo = new_filename
-            upload_editado.caminho_arquivo = new_caminho_arquivo
-
-        video = VideoFileClip(new_caminho_arquivo)
-        duracao = video.duration  # Duração em segundos
-        video.close()  # Fechar o arquivo para liberar recursos
-
-        upload_editado.duracao = duracao
+            # Obter a duração do vídeo existente
+            video = VideoFileClip(old_caminho_arquivo)
+            duracao = video.duration  # Duração em segundos
+            video.close()  # Fechar o arquivo para liberar recursos
 
         # Calcular a hora de término com base na duração
-        try:
-            hora_registro_dt = datetime.combine(datetime.today(), datetime.strptime(data['hora_registro'], "%H:%M:%S").time())
-        except:
-            hora_registro_dt = datetime.combine(datetime.today(), datetime.strptime(data['hora_registro'], "%H:%M").time())
+        hora_registro_dt = datetime.combine(datetime.today(), hora_registro)
         duracao_timedelta = timedelta(seconds=duracao)
         hora_termino_dt = hora_registro_dt + duracao_timedelta
         hora_termino = hora_termino_dt.time()
 
-        upload_editado.hora_termino = hora_termino
+        # Verificar se o upload cabe na aula
+        aulas = Aula.select().where(Aula.periodo == periodo)
+        aula_upload = None
+        for aula in aulas:
+            if aula.hora_inicio <= hora_registro <= aula.hora_termino:
+                aula_upload = aula
+                break
 
-        # Atualiza os demais campos
+        if not aula_upload:
+            # Não encontrou uma aula correspondente
+            if f and allowed_file(f.filename):
+                # Se novo arquivo foi salvo, deletar arquivo temporário
+                if os.path.exists(temp_caminho_arquivo) and temp_caminho_arquivo != old_caminho_arquivo:
+                    os.remove(temp_caminho_arquivo)
+            flash(f"A hora de registro ({data['hora_registro']}) não corresponde a nenhuma aula!", "error")
+            return redirect(request.referrer)
+
+        if hora_termino > aula_upload.hora_termino:
+            # O vídeo excede o tempo da aula
+            if f and allowed_file(f.filename):
+                # Deleta o arquivo temporário
+                if os.path.exists(temp_caminho_arquivo) and temp_caminho_arquivo != old_caminho_arquivo:
+                    os.remove(temp_caminho_arquivo)
+            flash(f"O vídeo não pode ser salvo, pois excede o tempo de uma aula!", "error")
+            return redirect(request.referrer)
+
+        # Validação passou, agora atualizar o upload
+        if f and allowed_file(f.filename):
+            # Deleta o arquivo antigo somente agora, se o caminho for diferente
+            if os.path.exists(old_caminho_arquivo) and old_caminho_arquivo != temp_caminho_arquivo:
+                os.remove(old_caminho_arquivo)
+            # Se o arquivo foi salvo em um caminho temporário diferente, já está pronto
+            final_caminho_arquivo = temp_caminho_arquivo
+            new_filename = temp_filename
+        else:
+            if old_name != novo_nome_arquivo:
+                # Renomeia o arquivo antigo para o novo nome
+                if os.path.exists(old_caminho_arquivo):
+                    os.rename(old_caminho_arquivo, temp_caminho_arquivo)
+                final_caminho_arquivo = temp_caminho_arquivo
+                new_filename = temp_filename
+            else:
+                final_caminho_arquivo = old_caminho_arquivo
+                new_filename = old_name
+
+        # Atualiza os campos do upload
+        upload_editado.nome_arquivo = new_filename
+        upload_editado.caminho_arquivo = final_caminho_arquivo
+        upload_editado.duracao = duracao
+        upload_editado.hora_termino = hora_termino
         upload_editado.sala = sala
         upload_editado.periodo = periodo
         upload_editado.turma = turma
