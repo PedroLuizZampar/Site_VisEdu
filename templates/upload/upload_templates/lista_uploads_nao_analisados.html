@@ -1,11 +1,16 @@
 <div class="div-table">
     <div class="actions-list">
-        <button class="add-button"
+        <button class="upload-button"
             c-get="{{ url_for('upload.form_upload') }}"
             onclick="document.getElementById('modal').showModal()"
             c-target="#modal">
             <span class="tooltip-text">Adicionar um novo upload</span>
             <i class="fa-solid fa-upload" style="color: #ffffff;"></i>
+        </button>
+        <button class="add-button"
+            onclick="iniciarAnaliseTodos(); location.reload()">
+            <i class="fa-solid fa-robot" style="color: #ffffff;"></i>
+            <span class="tooltip-text">Analisar todos</span>
         </button>
     </div>
 

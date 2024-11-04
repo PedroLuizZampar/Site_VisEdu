@@ -431,73 +431,14 @@ def analisar_upload(upload_id):
     # Obter o número total de frames do vídeo
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    # Função para processar cada frame do vídeo
-    def identificar(frame, frame_count):
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = model.predict(frame_rgb)[0]  # Obtém apenas o primeiro resultado
-        high_conf_boxes = []
-
-        # Variáveis para contar as detecções
-        qtde_objetos = 0
-        qtde_objeto_dormindo = 0
-        qtde_objeto_prestando_atencao = 0
-        qtde_objeto_mexendo_celular = 0
-        qtde_objeto_copiando = 0
-        qtde_objeto_disperso = 0
-        qtde_objeto_trabalho_em_grupo = 0
-
-        if results.boxes:  # Se há detecções
-            for box in results.boxes:
-                obj_class = box.cls.item()
-                conf = box.conf.item()
-                if conf >= 0.2:
-                    high_conf_boxes.append(box)
-                    qtde_objetos += 1
-
-                    # Incrementa as contagens com base na classe do objeto
-                    if obj_class == 0:
-                        qtde_objeto_dormindo += 1
-                    elif obj_class == 1:
-                        qtde_objeto_prestando_atencao += 1
-                    elif obj_class == 2:
-                        qtde_objeto_mexendo_celular += 1
-                    elif obj_class == 3:
-                        qtde_objeto_copiando += 1
-                    elif obj_class == 4:
-                        qtde_objeto_disperso += 1
-                    elif obj_class == 5:
-                        qtde_objeto_trabalho_em_grupo += 1
-
-            # Calcular o tempo decorrido desde o início do vídeo
-            time_offset_seconds = frame_count / fps
-            time_offset = timedelta(seconds=time_offset_seconds)
-
-            # Combinar data e hora de registro do upload
-            datetime_registro = datetime.combine(upload.data_registro, upload.hora_registro)
-
-            # Calcular a hora da análise a partir do tempo de gravação decorrido
-            datetime_analise = datetime_registro + time_offset
-            hora_analise = datetime_analise.time()
-
-            Analise.create(
-                nome_analise=f"Análise do Frame {frame_count}",
-                upload=upload,
-                hora_analise=hora_analise,
-                qtde_objetos=qtde_objetos,
-                qtde_objeto_dormindo=qtde_objeto_dormindo,
-                qtde_objeto_prestando_atencao=qtde_objeto_prestando_atencao,
-                qtde_objeto_mexendo_celular=qtde_objeto_mexendo_celular,
-                qtde_objeto_copiando=qtde_objeto_copiando,
-                qtde_objeto_disperso=qtde_objeto_disperso,
-                qtde_objeto_trabalho_em_grupo=qtde_objeto_trabalho_em_grupo
-            )
-
     if not cap.isOpened():
         flash("Erro ao abrir o vídeo!")
         return redirect(request.referrer)
 
     frame_count = 0
-    frame_interval = 1800  # Ajuste conforme necessário
+    frame_interval = 1800
+
+    progress_dict['progress'] = 0  # Inicializa o progresso
 
     while not cancelado and cap.isOpened():
         ret, frame = cap.read()
@@ -506,14 +447,14 @@ def analisar_upload(upload_id):
 
         frame_count += 1
         if frame_count % frame_interval == 0:
-            identificar(frame, frame_count)
+            identificar(frame, frame_count, fps, upload, model)
 
         # Calcular a porcentagem de progresso
         progress = (frame_count / total_frames) * 100
-        progress_dict[upload_id] = progress
+        progress_dict['progress'] = progress
 
     cap.release()
-    progress_dict.pop(upload_id, None)  # Remove o progresso do upload atual
+    progress_dict.pop('progress', None)  # Remove o progresso atual
 
     if not cancelado:
         atualizar_status(upload_id)
@@ -522,12 +463,165 @@ def analisar_upload(upload_id):
     else:
         flash("Análise interrompida pelo usuário.")
         return jsonify({"upload_id": upload_id})
+    
+@upload_route.route('/analise_todos', methods=["POST"])
+def analisar_todos():
+    """ Passa todos os vídeos para a IA fazer a análise """
+    global cancelado
+    cancelado = False
 
-@upload_route.route('/<int:upload_id>/progress', methods=['GET'])
-def get_progress(upload_id):
+    # Obter todos os uploads
+    uploads = Upload.select().where(Upload.is_analisado == 0)
+
+    if not uploads:
+        flash("Nenhum upload encontrado para análise.")
+        return redirect(request.referrer)
+
+    basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
+    model_path = os.path.abspath(os.path.join(basepath, 'ai_models', 'best.onnx'))
+
+    # Carrega o modelo pré-treinado uma vez
+    model = YOLO(model_path)
+
+    progress_dict['progress'] = 0  # Inicializa o progresso
+
+    # Calcula o total de frames de todos os uploads
+    total_frames_all_uploads = 0
+    for upload in uploads:
+        video_path = os.path.expanduser(upload.caminho_arquivo)
+        cap = cv2.VideoCapture(video_path)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        total_frames_all_uploads += total_frames
+        cap.release()
+
+    total_frames_processed = 0
+
+    for idx, upload in enumerate(uploads):
+        upload_id = upload.id
+
+        deletar_analise(upload_id)  # Apaga as análises anteriores caso tenha
+        video_path = os.path.expanduser(upload.caminho_arquivo)
+
+        cap = cv2.VideoCapture(video_path)
+        fps = cap.get(cv2.CAP_PROP_FPS)  # Verifica quantos FPS tem no vídeo
+
+        if not fps or fps == 0:
+            flash(f"Erro ao obter FPS do vídeo do upload {upload_id}!")
+            continue  # Pula para o próximo upload
+
+        # Obter o número total de frames do vídeo
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        if not cap.isOpened():
+            flash(f"Erro ao abrir o vídeo do upload {upload_id}!")
+            continue  # Pula para o próximo upload
+
+        frame_count = 0
+        frame_interval = 1800  # Ajuste conforme necessário
+
+        while not cancelado and cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            frame_count += 1
+            total_frames_processed += 1
+
+            if frame_count % frame_interval == 0:
+                identificar(frame, frame_count, fps, upload, model)
+
+            # Atualiza o progresso total
+            progress = (total_frames_processed / total_frames_all_uploads) * 100
+            progress_dict['progress'] = progress
+
+        cap.release()
+
+        if not cancelado:
+            atualizar_status(upload_id)
+            flash(f"Análise do upload {upload_id} concluída!")
+        else:
+            flash(f"Análise do upload {upload_id} interrompida pelo usuário.")
+            break  # Interrompe a análise de todos os uploads
+
+    progress_dict.pop('progress', None)  # Remove o progresso ao finalizar
+    flash("Análise de todos os uploads concluída!")
+    return jsonify({"status": "Análise de todos os uploads concluída"})
+
+# Função para processar cada frame do vídeo
+def identificar(frame, frame_count, fps, upload, model):
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    results = model.predict(frame_rgb)[0]  # Obtém apenas o primeiro resultado
+    high_conf_boxes = []
+
+    # Variáveis para contar as detecções
+    qtde_objetos = 0
+    qtde_objeto_dormindo = 0
+    qtde_objeto_prestando_atencao = 0
+    qtde_objeto_mexendo_celular = 0
+    qtde_objeto_copiando = 0
+    qtde_objeto_disperso = 0
+    qtde_objeto_trabalho_em_grupo = 0
+
+    if results.boxes:  # Se há detecções
+        for box in results.boxes:
+            obj_class = box.cls.item()
+            conf = box.conf.item()
+            if conf >= 0.2:
+                high_conf_boxes.append(box)
+                qtde_objetos += 1
+
+                # Incrementa as contagens com base na classe do objeto
+                if obj_class == 0:
+                    qtde_objeto_dormindo += 1
+                elif obj_class == 1:
+                    qtde_objeto_prestando_atencao += 1
+                elif obj_class == 2:
+                    qtde_objeto_mexendo_celular += 1
+                elif obj_class == 3:
+                    qtde_objeto_copiando += 1
+                elif obj_class == 4:
+                    qtde_objeto_disperso += 1
+                elif obj_class == 5:
+                    qtde_objeto_trabalho_em_grupo += 1
+
+        # Calcular o tempo decorrido desde o início do vídeo
+        time_offset_seconds = frame_count / fps
+        time_offset = timedelta(seconds=time_offset_seconds)
+
+        # Combinar data e hora de registro do upload
+        datetime_registro = datetime.combine(upload.data_registro, upload.hora_registro)
+
+        # Calcular a hora da análise a partir do tempo de gravação decorrido
+        datetime_analise = datetime_registro + time_offset
+        hora_analise = datetime_analise.time()
+
+        Analise.create(
+            nome_analise=f"Análise do Frame {frame_count}",
+            upload=upload,
+            hora_analise=hora_analise,
+            qtde_objetos=qtde_objetos,
+            qtde_objeto_dormindo=qtde_objeto_dormindo,
+            qtde_objeto_prestando_atencao=qtde_objeto_prestando_atencao,
+            qtde_objeto_mexendo_celular=qtde_objeto_mexendo_celular,
+            qtde_objeto_copiando=qtde_objeto_copiando,
+            qtde_objeto_disperso=qtde_objeto_disperso,
+            qtde_objeto_trabalho_em_grupo=qtde_objeto_trabalho_em_grupo
+        )
+
+@upload_route.route('/progress', methods=['GET'])
+def get_progress():
     """ Retorna o progresso da análise em andamento """
-    progress = progress_dict.get(upload_id, 0)
-    return jsonify({'progress': progress})
+    # Não precisamos mais do upload_id
+    progress = progress_dict.get('progress', 0)
+
+    # Determina o status com base no progresso
+    status = 'em andamento'
+    if progress >= 100:
+        status = 'concluido'
+    elif cancelado:
+        status = 'cancelado'
+
+    return jsonify({'progress': progress, 'status': status})
 
 @upload_route.route('/cancelar_analise', methods=["POST"])
 def cancelar_analise():
