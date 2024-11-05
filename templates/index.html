@@ -68,16 +68,7 @@
             <img src="../static/images/LogoFundoRemovido.png" alt="Logo">
         </div>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                const toggleButton = document.querySelector('.menu-toggle');
-                const navBar = document.querySelector('.NavBar');
-                
-                toggleButton.addEventListener('click', function() {
-                    navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
-                });
-            });
-        </script>
+        <script src="../static/scripts/navbar.js"></script>
         <script src="{{ url_for('static', filename='cru.js') }}"></script>
     </main>
 </body>

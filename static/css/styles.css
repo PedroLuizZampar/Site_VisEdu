@@ -24,6 +24,10 @@ main {
     align-items: center;
 }
 
+.content:not(.content-relatorio) {
+    max-height: 70vh;
+}
+
 /* SCROLLBAR */
 
 html::-webkit-scrollbar, .modal-body::-webkit-scrollbar, .div-table::-webkit-scrollbar {
@@ -130,8 +134,8 @@ dialog {
     top: 20px;
     right: 20px;
     cursor: pointer;
-    font-size: 30px;
-    color: #1E314E;
+    font-size: 36px;
+    color: rgb(230, 55, 55);
 }
 
 .bloco-botoes-modal {
@@ -275,7 +279,6 @@ canvas {
 
 .div-table {
     width: 100%;
-    max-height: 600px;
     overflow-y: auto; /* Adiciona a barra de rolagem quando necessário */
 }
 
@@ -305,10 +308,44 @@ canvas {
 
 .table td {
     text-align: center;
-    padding: 20px 10px;
     border-top: 0.1px solid rgb(211, 211, 211);
     border-right: rgb(211, 211, 211) 0.1px solid;
     background-color: #fff;
+}
+
+.table td:not(.td-aula-professor) {
+    padding: 20px 10px;
+}
+
+.td-aula-professor select:focus {
+    outline: none;
+}
+
+.select-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.select-wrapper select {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: none;
+    background-color: transparent;
+}
+
+.select-wrapper .icon-overlay {
+    position: absolute;
+    right: 8px;
+    top: 40px;
+    color: #011c30;
+    pointer-events: none;
 }
 
 .table td.td-actions {
@@ -519,6 +556,7 @@ dialog form .bloco-informacoes select:not(dialog form td select) {
 
 dialog form td select {
     width: 100px;
+    text-align: center;
 }
 
 dialog form .bloco-informacoes input {

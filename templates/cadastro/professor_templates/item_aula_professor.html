@@ -1,13 +1,18 @@
 <tr>
     <td>{{ i }}ª Aula</td>
     {% for day in ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira'] %}
-        <td>
-            <select name="{{ day_abbr[day] }}-{{ i }}">
-                <option value=""></option>
-                {% for turma in turmas %}
-                    {% include 'options/option_turma.html' %}
-                {% endfor %}
-            </select>
+        <td class="td-aula-professor">
+            <!-- Envolvendo o select e o ícone dentro de uma div -->
+            <div class="select-wrapper" style="position: relative; width: 100%; height: 60px;">
+                <select name="{{ day_abbr[day] }}-{{ i }}" style="width: 100%; height: 100%; border: none;">
+                    <option value=""></option>
+                    {% for turma in turmas %}
+                        {% include 'options/option_turma.html' %}
+                    {% endfor %}
+                </select>
+                <!-- Ícone sobreposto -->
+                <i class="fa-solid fa-pencil icon-overlay" style="color: #011c30; font-size: 12px;"></i>
+            </div>
         </td>
     {% endfor %}
 </tr>

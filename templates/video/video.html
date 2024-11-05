@@ -1,10 +1,9 @@
 <div>
-    <video width="80%" controls>
+    {% if modal %}
+        <i class="fa-solid fa-xmark close" onclick="document.getElementById('video').close()"></i>
+    {% endif %}
+    <video width="80%" style="margin: 36px 0;" controls>
         <source src="{{ url_for('upload.uploaded_file', filename=nome_arquivo) }}?t={{ timestamp }}" controls type="video/mp4">
         Seu navegador não suporta a tag de vídeo.
     </video>
 </div>
-
-{% if modal %}
-    <button onclick="document.getElementById('video').close()">Fechar</button>
-{% endif %}

@@ -76,7 +76,7 @@
         <div class="div-baixar-pdf">
             <button id="baixar" class="baixar-pdf">Baixar PDF</button>
         </div>
-        <section class="content">
+        <section class="content content-relatorio">
             <div style="width: 95%;">
                 {% if agrupado_por == 'aula' %}
                     {% for periodo_nome, aulas_dict in grouped_uploads.items() %}
@@ -111,9 +111,9 @@
                                                             Sem professor
                                                         {% endif %}
                                                     </td>
-                                                    <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
-                                                    <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
-                                                    <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
+                                                    <td>{{ upload.sala.nome_sala if upload.sala else 'Sem sala' }}</td>
+                                                    <td>{{ upload.periodo.nome_periodo if upload.periodo else 'Sem período' }}</td>
+                                                    <td>{{ upload.turma.nome_turma if upload.turma else 'Sem turma' }}</td>
                                                     <td>{{ classe_mais_comum[upload.id] }}</td>
                                                 </tr>
                                             {% endfor %}
@@ -160,9 +160,9 @@
                                                 Sem professor
                                             {% endif %}
                                         </td>
-                                        <td>{{ upload.sala.nome_sala if upload.sala else '' }}</td>
-                                        <td>{{ upload.periodo.nome_periodo if upload.periodo else '' }}</td>
-                                        <td>{{ upload.turma.nome_turma if upload.turma else '' }}</td>
+                                        <td>{{ upload.sala.nome_sala if upload.sala else 'Sem sala' }}</td>
+                                        <td>{{ upload.periodo.nome_periodo if upload.periodo else 'Sem periodo' }}</td>
+                                        <td>{{ upload.turma.nome_turma if upload.turma else 'Sem turma' }}</td>
                                         <td>
                                             {% if agrupado_por == 'classificacoes' %}
                                                 {{ somas_por_upload[upload.id] }}
@@ -201,31 +201,9 @@
         </dialog>
 
     </main>
+
+    <script src="../static/scripts/navbar.js"></script>
+    <script src="../static/scripts/baixar_pdf.js"></script>
     <script src="{{ url_for('static', filename='cru.js') }}"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const toggleButton = document.querySelector('.menu-toggle');
-            const navBar = document.querySelector('.NavBar');
-            
-            toggleButton.addEventListener('click', function() {
-                navBar.classList.toggle('active'); // Alterna a classe 'active' na navbar para mostrar/esconder o menu
-            });
-        });
-    </script>
-
-    <script>
-        document.getElementById("baixar").addEventListener("click", () => {
-            const elemento = document.querySelector(".content");
-            const opcoes = {
-                margin:       1,
-                filename:     'meu-documeto.pdf',
-                image:        { type: 'png', quality: 1 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opcoes).from(elemento).save();
-        });
-    </script>
 </body>
 </html>
