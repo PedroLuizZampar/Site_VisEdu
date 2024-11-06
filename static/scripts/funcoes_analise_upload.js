@@ -1,4 +1,5 @@
 function iniciarAnaliseTodos() {
+    location.reload()
     document.getElementById('mensagem_analise').showModal();
     localStorage.setItem('modal_analise_aberto', 'true');
     fetch(`/upload/analise_todos`, {
@@ -20,7 +21,7 @@ function iniciarAnaliseTodos() {
         } else if (data.status === "concluido") {
             // Se a análise foi iniciada com sucesso, exibe o modal de análise
             document.getElementById('mensagem_analise').showModal();
-            localStorage.setItem('modal_analise_aberto', 'true');
+            localStorage.setItem('modal_analise_aberto', 'false');
         }
     })
     .catch(error => {
