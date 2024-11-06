@@ -88,7 +88,7 @@
         </dialog>
 
         <!-- Modal erro -->
-        <dialog id="error" class="modal">
+        <dialog id="error" class="modal" style="width: 60%;">
 
             <!-- Mensagens de Flash -->
             {% with messages = get_flashed_messages(with_categories=True) %}
@@ -102,6 +102,7 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
+            <p></p>
             <button onclick="getElementById('error').close()">Ok</button>
         </dialog>
 

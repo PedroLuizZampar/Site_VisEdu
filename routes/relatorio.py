@@ -37,36 +37,23 @@ def relatorio_geral():
     periodo_inicial = data["periodo_inicial"]
     periodo_final = data["periodo_final"]
 
-    # Obtém os uploads no período especificado que já foram analisados
-    uploads = Upload.select().where(
-        (Upload.data_registro >= periodo_inicial) & 
-        (Upload.data_registro <= periodo_final) & 
-        (Upload.is_analisado == True)
-    )
+    # Converte as strings para objetos datetime
+    periodo_inicial = datetime.strptime(periodo_inicial, "%Y-%m-%d")
+    periodo_final = datetime.strptime(periodo_final, "%Y-%m-%d")
+
+    # Verifica se o período final é maior que o período inicial
+    if periodo_final < periodo_inicial:
+        flash("O período final deve ser maior que o período inicial!", "error")
+        return redirect(request.referrer)
+
+    # Obtém uploads no período especificado que já foram analisados
+    uploads = obter_uploads_no_periodo(periodo_inicial, periodo_final)
 
     # Obtém as análises relacionadas aos uploads
-    analises = Analise.select().where(Analise.upload_id.in_([upload.id for upload in uploads]))
-
-    # Dicionário para armazenar as contagens de cada classe por upload
-    classes_por_upload = {upload.id: {
-        'Dormindo': 0,
-        'Prestando Atenção': 0,
-        'Mexendo no Celular': 0,
-        'Copiando': 0,
-        'Disperso': 0,
-        'Trabalho em Grupo': 0
-    } for upload in uploads}
+    analises = obter_analises_dos_uploads(uploads)
 
     # Calcula as contagens de cada classe para cada upload
-    for analise in analises:
-        upload_id = analise.upload_id
-        counts = classes_por_upload[upload_id]
-        counts['Dormindo'] += analise.qtde_objeto_dormindo
-        counts['Prestando Atenção'] += analise.qtde_objeto_prestando_atencao
-        counts['Mexendo no Celular'] += analise.qtde_objeto_mexendo_celular
-        counts['Copiando'] += analise.qtde_objeto_copiando
-        counts['Disperso'] += analise.qtde_objeto_disperso
-        counts['Trabalho em Grupo'] += analise.qtde_objeto_trabalho_em_grupo
+    classes_por_upload = calcular_contagens_por_upload(uploads, analises)
 
     return render_template(
         "relatorios/relatorio_templates/paginas_relatorios/relatorio_geral.html", 
@@ -86,6 +73,15 @@ def relatorio_agrupado():
     periodo_inicial = dados["periodo_inicial"]
     periodo_final = dados["periodo_final"]
     agrupado_por = dados["agrupado_por"]
+
+    # Converte as strings para objetos datetime
+    periodo_inicial = datetime.strptime(periodo_inicial, "%Y-%m-%d")
+    periodo_final = datetime.strptime(periodo_final, "%Y-%m-%d")
+
+    # Verifica se o período final é maior que o período inicial
+    if periodo_final < periodo_inicial:
+        flash("O período final deve ser maior que o período inicial!", "error")
+        return redirect(request.referrer)
 
     # Obtém uploads no período especificado que já foram analisados
     uploads = obter_uploads_no_periodo(periodo_inicial, periodo_final)

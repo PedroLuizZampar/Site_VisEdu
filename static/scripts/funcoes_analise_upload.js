@@ -1,7 +1,4 @@
 function iniciarAnaliseTodos() {
-    document.getElementById('mensagem_analise').showModal();
-    localStorage.setItem('modal_analise_aberto', 'true');
-
     fetch(`/upload/analise_todos`, {
         method: 'POST',
         headers: {
@@ -10,10 +7,24 @@ function iniciarAnaliseTodos() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Análise iniciada:', data);
+        if (data.status === "erro") {
+            // Exibe a mensagem de erro no modal de erro
+            const modalErro = document.getElementById('error');
+            const mensagemErro = data.mensagem; // Mensagem de erro vinda do backend
+            modalErro.querySelector("p").innerText = mensagemErro;  // Coloca a mensagem no <p> do modal
+            modalErro.showModal();  // Exibe o modal de erro
+        } else if (data.status === "concluido") {
+            // Se a análise foi iniciada com sucesso, exibe o modal de análise
+            document.getElementById('mensagem_analise').showModal();
+            localStorage.setItem('modal_analise_aberto', 'true');
+        }
     })
     .catch(error => {
         console.error('Erro ao iniciar a análise:', error);
+        // Aqui você pode mostrar uma mensagem genérica no modal de erro em caso de erro na requisição
+        const modalErro = document.getElementById('error');
+        modalErro.querySelector("p").innerText = "Ocorreu um erro ao tentar iniciar a análise. Tente novamente mais tarde.";
+        modalErro.showModal();  // Exibe o modal de erro
     });
 }
 

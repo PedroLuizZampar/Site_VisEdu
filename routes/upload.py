@@ -474,8 +474,7 @@ def analisar_todos():
     uploads = Upload.select().where(Upload.is_analisado == 0)
 
     if not uploads:
-        flash("Nenhum upload encontrado para análise.")
-        return redirect(request.referrer)
+        return jsonify({"status": "erro", "mensagem": "Nenhum upload encontrado para análise."}), 400
 
     basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
     model_path = os.path.abspath(os.path.join(basepath, 'ai_models', 'best.onnx'))
@@ -545,7 +544,7 @@ def analisar_todos():
 
     progress_dict.pop('progress', None)  # Remove o progresso ao finalizar
     flash("Análise de todos os uploads concluída!")
-    return jsonify({"status": "Análise de todos os uploads concluída"})
+    return jsonify({"status": "concluido", "mensagem": "Análise de todos os uploads concluída!"})
 
 # Função para processar cada frame do vídeo
 def identificar(frame, frame_count, fps, upload, model):
