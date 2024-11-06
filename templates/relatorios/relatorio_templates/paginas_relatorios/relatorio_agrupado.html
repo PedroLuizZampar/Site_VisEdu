@@ -74,7 +74,7 @@
         </button>
         
         <div class="div-baixar-pdf">
-            <button id="baixar" class="baixar-pdf">Baixar PDF</button>
+            <button id="baixar" class="baixar-pdf" onclick="baixarPDF(`relatorio-agrupado-por-{{agrupado_por}}`)">Baixar PDF</button>
         </div>
         <section class="content content-relatorio">
             <div style="width: 95%;">
@@ -126,54 +126,57 @@
                 {% else %}
                 <h4 style="font-size: 28px; text-align: center;">Agrupamento por {{ agrupado_por|capitalize  if agrupado_por|capitalize != "Classificacoes" else "Classificações" }}</h4>
                     {% for grouping_key, uploads in grouped_uploads.items() %}
-                        <h2>{{ grouping_key }}</h2>
-                        <table class="tabela-relatorio">
-                            <thead>
-                                <tr class="tr-cabecalho-relatorio">
-                                    <th style="border-top-left-radius: 16px; width: 5%;">#</th>
-                                    <th style="width: 10%;">Upload</th>
-                                    <th style="width: 10%;">Professor(es)</th>
-                                    <th style="width: 10%;">Sala</th>
-                                    <th style="width: 10%;">Período</th>
-                                    <th style="width: 10%;">Turma</th>
-                                    
-                                    <th style="border-top-right-radius: 16px; width: 10%">
-                                        {% if agrupado_por == 'classificacoes' %}
-                                            Contagem
-                                        {% else %}
-                                            Ação mais detectada
-                                        {% endif %}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for upload in uploads %}
-                                    <tr class="tr-corpo-relatorio">
-                                        <td>{{ upload.id }}</td>
-                                        <td>{{ upload.nome_arquivo }}</td>
-                                        <td>
-                                            {% if professores_por_upload[upload.id] %}
-                                                {% for professor in professores_por_upload[upload.id] %}
-                                                    {{ professor }}<br>
-                                                {% endfor %}
-                                            {% else %}
-                                                Sem professor
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ upload.sala.nome_sala if upload.sala else 'Sem sala' }}</td>
-                                        <td>{{ upload.periodo.nome_periodo if upload.periodo else 'Sem periodo' }}</td>
-                                        <td>{{ upload.turma.nome_turma if upload.turma else 'Sem turma' }}</td>
-                                        <td>
+                        <h2>{{ grouping_key }}{% if not uploads %} (Sem análises) {% endif %}</h2>
+                        {% if uploads %}
+                            <table class="tabela-relatorio">
+                                <thead>
+                                    <tr class="tr-cabecalho-relatorio">
+                                        <th style="border-top-left-radius: 16px; width: 5%;">#</th>
+                                        <th style="width: 10%;">Upload</th>
+                                        <th style="width: 10%;">Professor(es)</th>
+                                        <th style="width: 10%;">Sala</th>
+                                        <th style="width: 10%;">Período</th>
+                                        <th style="width: 10%;">Turma</th>
+                                        
+                                        <th style="border-top-right-radius: 16px; width: 10%">
                                             {% if agrupado_por == 'classificacoes' %}
-                                                {{ somas_por_upload[upload.id] }}
+                                                Contagem
                                             {% else %}
-                                                {{ classe_mais_comum[upload.id] }}
+                                                Ação mais detectada
                                             {% endif %}
-                                        </td>
+                                        </th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for upload in uploads %}
+                                        <tr class="tr-corpo-relatorio">
+                                            <td>{{ upload.id }}</td>
+                                            <td>{{ upload.nome_arquivo }}</td>
+                                            <td>
+                                                {% if professores_por_upload[upload.id] %}
+                                                    {% for professor in professores_por_upload[upload.id] %}
+                                                        {{ professor }}<br>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    Sem professor
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ upload.sala.nome_sala if upload.sala else 'Sem sala' }}</td>
+                                            <td>{{ upload.periodo.nome_periodo if upload.periodo else 'Sem periodo' }}</td>
+                                            <td>{{ upload.turma.nome_turma if upload.turma else 'Sem turma' }}</td>
+                                            <td>
+                                                {% if agrupado_por == 'classificacoes' %}
+                                                    {{ somas_por_upload[upload.id] }}
+                                                {% else %}
+                                                    {{ classe_mais_comum[upload.id] }}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                        <hr style="border: 1px solid #ececec;">
                     {% endfor %}
                 {% endif %}
             </div>

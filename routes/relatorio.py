@@ -49,6 +49,10 @@ def relatorio_geral():
     # Obtém uploads no período especificado que já foram analisados
     uploads = obter_uploads_no_periodo(periodo_inicial, periodo_final)
 
+    if not uploads:
+        flash("Nenhuma análise encontrada no período!", "error")
+        return redirect(request.referrer)
+
     # Obtém as análises relacionadas aos uploads
     analises = obter_analises_dos_uploads(uploads)
 
@@ -85,6 +89,10 @@ def relatorio_agrupado():
 
     # Obtém uploads no período especificado que já foram analisados
     uploads = obter_uploads_no_periodo(periodo_inicial, periodo_final)
+
+    if not uploads:
+        flash("Nenhuma análise encontrada no período!", "error")
+        return redirect(request.referrer)
 
     # Obtém as análises relacionadas aos uploads
     analises = obter_analises_dos_uploads(uploads)

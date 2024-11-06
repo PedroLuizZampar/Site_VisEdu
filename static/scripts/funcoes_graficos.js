@@ -99,8 +99,8 @@ function grafico_media_comportamentos(uploadId) {
             });
         });
 
-    // Adiciona o botão de download após criar o gráfico
-    addDownloadButton();
+        // Adiciona o botão de download após criar o gráfico
+        addDownloadButton("grafico-media-comportamentos");
 }
 
 function grafico_contagem_alunos_comportamentos(uploadId) {
@@ -204,7 +204,7 @@ function grafico_contagem_alunos_comportamentos(uploadId) {
         });
 
         // Adiciona o botão de download após criar o gráfico
-        addDownloadButton();
+        addDownloadButton("grafico-contagem-comportamentos");
 }
 
 function fecharModalRelatorio() {
@@ -215,14 +215,14 @@ function fecharModalRelatorio() {
     document.getElementById('relatorio').close(); // Fecha o modal
 }
 
-function addDownloadButton() {
+function addDownloadButton(nomeRelatorio) {
     const buttonContainer = document.getElementById('botoes-modal-relatorio');
     buttonContainer.style.textAlign = 'center';
     buttonContainer.style.marginTop = '20px';
 
     const downloadButton = document.createElement('button');
     downloadButton.textContent = 'Baixar PDF';
-    downloadButton.onclick = downloadPDF;
+    downloadButton.onclick = () => downloadPDF(nomeRelatorio);
     downloadButton.style.padding = '10px 20px';
     downloadButton.style.fontSize = '16px';
     downloadButton.style.cursor = 'pointer';
@@ -232,10 +232,21 @@ function addDownloadButton() {
     document.getElementById('canvas_grafico').parentNode.insertBefore(buttonContainer, document.getElementById('canvas_grafico').nextSibling);
 }
 
-function downloadPDF() {
+function downloadPDF(nomeRelatorio) {
     const canvas = document.getElementById('canvas_grafico');
     
     html2canvas(canvas).then(canvas => {
+
+        const dataAtual = new Date();
+        
+        const dia = dataAtual.getDate();
+        const mes = dataAtual.getMonth() + 1;
+        const ano = dataAtual.getFullYear();
+        
+        const horas = dataAtual.getHours();
+        const minutos = dataAtual.getMinutes();
+        const segundos = dataAtual.getSeconds();
+
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jspdf.jsPDF();
         const imgProps = pdf.getImageProperties(imgData);
@@ -243,6 +254,6 @@ function downloadPDF() {
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('analise_comportamentos.pdf');
+        pdf.save(`${nomeRelatorio}-${ano}-${mes}-${dia}-${horas}-${minutos}-${segundos}.pdf`);
     });
 }

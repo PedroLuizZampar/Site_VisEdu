@@ -608,6 +608,7 @@ dialog form .bloco-informacoes input {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-collapse: collapse;
     border-radius: 16px;
+    margin-bottom: 20px;
 }
 
 .tr-cabecalho-relatorio {
