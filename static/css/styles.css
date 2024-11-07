@@ -410,30 +410,31 @@ header {
     justify-content: space-between;
 }
 
-.LogoArea{
+.LogoArea {
     width: 10%;
 }
 
-.logoArea img{
+.logoArea img {
     width: 80px;
     height: 80px;
     padding-left: 30px;
 }
 
-.tabArea{
+.tabArea {
     height: 100%;
     display: flex;
+    position: relative;
 }
 
-.NavBarSection{
+.NavBarSection {
     font-size: 22px;
     text-decoration: none;
     text-transform: none;
-    color:#E5F4FF;
-    
+    color: #E5F4FF;
 }
 
 .NavBarItem {
+    position: relative;
     width: 120px;
     font-size: 22px;
     text-decoration: none;
@@ -457,19 +458,58 @@ header {
     color: #8dcfff;
 }
 
-.NavBarItem:has(.NavBarSection:hover) {
-    border-bottom: 5px solid #4EB6FF;
-}
-
-.NavBarItem.hovered {
-    border-bottom: 5px solid #4EB6FF;
-}
-
 .menu-toggle {
     display: none;
 }
 
-/* Estilos para o toggle da navbar em resoluções menores */
+/* Estilos para o container das opções */
+.options-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos para o menu de opções */
+.optionsMenu {
+    position: absolute;
+    top: 100%; /* Aparece abaixo do item "Opções" */
+    right: 30px;
+    background-color: #011f36;
+    color: #E5F4FF;
+    min-width: 160px;
+    z-index: 100;
+    flex-direction: column;
+    max-height: 0; /* Altura inicial zero para a animação */
+    overflow: hidden;
+    opacity: 0; /* Transparente inicialmente */
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.optionsMenu a {
+    font-size: 16px;
+    width: 85%;
+    margin: auto;
+    padding: 10px 0;
+    text-decoration: none;
+    color: #E5F4FF;
+    display: block;
+    text-align: center;
+    border-bottom: 5px solid transparent;
+    transition: border-bottom 0.25s, color 0.25s;
+}
+
+.optionsMenu a:hover {
+    border-bottom: 5px solid #8dcfff;
+    color: #8dcfff;
+    transition: border-bottom 0.25s, color 0.25s;
+}
+
+/* Mostra o menu de opções quando ativo */
+.options-container.active .optionsMenu {
+    max-height: 500px; /* Altura máxima para a animação */
+    opacity: 1; /* Torna o menu visível */
+}
+
 @media (max-width: 1000px) {
     .logoArea {
         height: 100%;
@@ -484,14 +524,47 @@ header {
     }
 
     .tabArea {
-        display: none;
+        display: flex;
         position: absolute;
-        top: 100%; /* Posiciona a tabArea logo abaixo da NavBar */
+        top: 100%;
         left: 0;
         width: 100%;
         background-color: #011f36;
         flex-direction: column;
         z-index: 100;
+        max-height: 0; /* Inicialmente escondido */
+        overflow: hidden;
+        opacity: 0; /* Escondido inicialmente */
+        height: fit-content; /* Ajuste automático ao conteúdo */
+        transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+    }
+
+    .tabArea a,
+    .tabArea .options-container {
+        display: block;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    /* Definindo atraso para fade-in dos links ao abrir o menu */
+    .NavBar.active .tabArea a:nth-child(1) {
+        transition-delay: 0.1s;
+        opacity: 1;
+    }
+
+    .NavBar.active .tabArea a:nth-child(2) {
+        transition-delay: 0.2s;
+        opacity: 1;
+    }
+
+    .NavBar.active .tabArea a:nth-child(3) {
+        transition-delay: 0.3s;
+        opacity: 1;
+    }
+
+    .NavBar.active .tabArea .options-container {
+        transition-delay: 0.4s;
+        opacity: 1;
     }
 
     .NavBarItem {
@@ -506,9 +579,6 @@ header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-    }
-
-    .menu-toggle {
         position: absolute;
         right: 50px;
         top: 50px;
@@ -517,9 +587,39 @@ header {
         color: #E5F4FF;
     }
 
+    /* Estilo para exibir gradualmente a área do menu */
     .NavBar.active .tabArea {
-        display: flex; /* Exibe o menu quando o botão for clicado */
-        height: auto;
+        opacity: 1; /* Torna o menu visível */
+        max-height: 100vh; /* Limite da expansão para a altura da viewport */
+    }
+
+    /* Animação ao fechar o menu */
+    .NavBar:not(.active) .tabArea {
+        opacity: 0; /* Esconde o menu */
+        max-height: 0; /* Colapsa o menu */
+        transition: opacity 0.3s ease, max-height 0.3s ease;
+    }
+
+    /* Ajustes para o menu de opções no mobile */
+    .optionsMenu {
+        position: static;
+        background-color: #011f36;
+        width: 100%;
+        align-items: center;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+    }
+
+    .options-container.active .optionsMenu {
+        max-height: 500px;
+        opacity: 1;
+    }
+
+    .optionsMenu a {
+        text-align: center;
+        width: 160px;
     }
 }
 
@@ -538,7 +638,6 @@ dialog form .bloco-informacoes input {
     width: 100%;
     margin: 5px 0;
     text-align: left;
-    
 }
 
 dialog form .bloco-informacoes input, .bloco-informacoes select {
