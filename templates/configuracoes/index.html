@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../static/images/logoNavBarSemFundo.png">
+</head>
+<body>
+    <header>
+        <div class="NavBar">
+            <div class="logoArea">
+                <a href="/">
+                    <img src="../static/images/logoNavBarSemFundo.png" alt="">
+                </a>
+            </div>
+            <div class="tabArea">
+                <a class="NavBarItem" href="/cadastro">Cadastro</a>
+                <a class="NavBarItem" href="/upload">Uploads</a>
+                <a class="NavBarItem" href="/relatorio">Relatórios</a>
+                <div class="options-container">
+                    <a class="NavBarItem options-toggle selected-item-menu" href="#" style="height: 96%;">
+                        Opções 
+                        <i class="fa-solid fa-caret-down"></i>
+                    </a>
+                    <!-- Menu que aparece abaixo das opções -->
+                    <div class="optionsMenu">
+                        <a class="active" href="/configuracoes">Configurações</a>
+                        <a href="/sobre_nos">Sobre Nós</a>
+                        <a href="/login">Sair</a>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="content"
+            c-container="{{ url_for('configuracoes.lista_configuracoes') }}">
+
+        </section>
+
+        <script src="../static/scripts/navbar.js"></script>
+        <script src="{{ url_for('static', filename='cru.js') }}"></script>
+    </main>
+</body>
+</html>

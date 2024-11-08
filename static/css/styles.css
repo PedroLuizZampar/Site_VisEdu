@@ -28,6 +28,10 @@ main {
     max-height: 70vh;
 }
 
+.bloco-configuracoes {
+    display: flex;
+}
+
 /* SCROLLBAR */
 
 html::-webkit-scrollbar, .modal-body::-webkit-scrollbar, .div-table::-webkit-scrollbar {
@@ -146,6 +150,7 @@ dialog {
 
 dialog video {
     max-height: 700px;
+    border-radius: 16px;
 }
 
 .modal-body {
@@ -508,6 +513,11 @@ header {
     border-bottom: 5px solid #8dcfff;
     color: #8dcfff;
     transition: border-bottom 0.25s, color 0.25s;
+}
+
+.optionsMenu a.active {
+    border-bottom: 5px solid #8dcfff;
+    color: #8dcfff;
 }
 
 /* Mostra o menu de opções quando ativo */

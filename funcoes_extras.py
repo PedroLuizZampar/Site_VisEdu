@@ -21,6 +21,7 @@ def alterando_sessions_para_false():
     session['visualizando_cadastros'] = False
     session['visualizando_uploads'] = False
     session['visalizando_index'] = False
+    session['visualizando_config'] = False
 
 def atualizando_turma_upload():
     # Cria um dicionário onde a chave é uma tupla (sala, período) e o valor é o objeto turma correspondente
