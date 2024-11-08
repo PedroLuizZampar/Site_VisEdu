@@ -10,6 +10,7 @@ from routes.aula import aula_route
 from routes.professor import professor_route
 from routes.relatorio import relatorio_route
 from database.database import db
+from database.models.configuracoes import Configuracoes
 from database.models.upload import Upload
 from database.models.sala import Sala
 from database.models.analise import Analise
@@ -39,6 +40,7 @@ def configure_routes(app):
 
 def configure_db():
     db.connect()
+    db.create_tables([Configuracoes])
     db.create_tables([Periodo])
     db.create_tables([Aula])
     db.create_tables([Sala])

@@ -6,6 +6,7 @@ from moviepy.editor import VideoFileClip
 from datetime import datetime, timedelta
 from flask import Blueprint, url_for, render_template, redirect, send_from_directory, flash, jsonify, session, request
 from werkzeug.utils import secure_filename
+from database.models.configuracoes import Configuracoes
 from database.models.upload import Upload
 from database.models.sala import Sala
 from database.models.analise import Analise
@@ -17,6 +18,7 @@ from funcoes_extras import alterando_sessions_para_false
 upload_route = Blueprint("upload", __name__)
 
 cancelado = False
+frame_interval = 0
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 AI_FOLDER = os.path.join(os.getcwd(), 'static', 'ai_models')
@@ -410,6 +412,7 @@ def atualizar_status(upload_id):
 def analisar_upload(upload_id):
     """ Passa o vídeo para a IA fazer a análise """
     global cancelado
+    global frame_interval
     cancelado = False
 
     deletar_analise(upload_id)  # Apaga as análises anteriores caso tenha
@@ -434,9 +437,14 @@ def analisar_upload(upload_id):
     if not cap.isOpened():
         flash("Erro ao abrir o vídeo!")
         return redirect(request.referrer)
+    
+    configs = Configuracoes.select()
+
+    for config in configs:
+        if config.id == 1:
+            frame_interval = config.intervalo_frames
 
     frame_count = 0
-    frame_interval = 1800
 
     progress_dict['progress'] = 0  # Inicializa o progresso
 
@@ -514,9 +522,14 @@ def analisar_todos():
         if not cap.isOpened():
             flash(f"Erro ao abrir o vídeo do upload {upload_id}!")
             continue  # Pula para o próximo upload
+    
+        configs = Configuracoes.select()
+
+        for config in configs:
+            if config.id == 1:
+                frame_interval = config.intervalo_frames
 
         frame_count = 0
-        frame_interval = 1800  # Ajuste conforme necessário
 
         while not cancelado and cap.isOpened():
             ret, frame = cap.read()
