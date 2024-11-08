@@ -448,6 +448,12 @@ header {
     transition: border-bottom 0.25s, color 0.25s;
 }
 
+.NavBarItem i {
+    font-size: 16px;
+    margin: 0px -5px 0px 5px;
+    transition: transform 0.3s ease;
+}
+
 .selected-item-menu {
     border-bottom: 5px solid #4EB6FF;
     color: #8dcfff;
@@ -508,6 +514,11 @@ header {
 .options-container.active .optionsMenu {
     max-height: 500px; /* Altura máxima para a animação */
     opacity: 1; /* Torna o menu visível */
+}
+
+/* Rotaçãodo ícone quando o container está ativo */
+.options-container.active .NavBarItem i {
+    transform: rotate(180deg);
 }
 
 @media (max-width: 1000px) {
@@ -573,6 +584,12 @@ header {
         padding: 10px 0;
         width: 240px;
         margin: 10px auto;
+    }
+
+    .NavBarItem i {
+        font-size: 16px;
+        margin: 0px -10px 0px 10px;
+        transition: transform 0.3s ease;
     }
 
     .menu-toggle {
