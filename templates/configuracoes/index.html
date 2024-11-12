@@ -41,11 +41,15 @@
     <main>
         <section class="content"
             c-container="{{ url_for('configuracoes.lista_configuracoes') }}">
-
         </section>
 
         <script src="../static/scripts/navbar.js"></script>
         <script src="{{ url_for('static', filename='cru.js') }}"></script>
     </main>
+
+    <!-- Modal formulários -->
+    <dialog id="modal"
+        style="width: 50%;">
+    </dialog>
 </body>
 </html>

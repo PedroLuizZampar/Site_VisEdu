@@ -1,0 +1,26 @@
+<div class="modal-body">
+    <h1>Editar Configurações</h1>
+    <form enctype="multipart/form-data" method="POST"
+        action="{{ url_for('configuracoes.atualizar_configuracoes', configuracao_id=configuracao.id) }}"
+        c-callback="fecharModal">
+
+        <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
+
+        <div class="bloco-informacoes">
+            <label for="qtde_frames">Quantidade de quadros dos vídeos: </label>
+            <input type="number" name="qtde_frames" value="{{ configuracao.qtde_padrao_frames_video }}" required >
+        </div>
+
+        <div class="bloco-informacoes">
+            <label for="delay">Delay entre registros (em segundos): </label>
+            <input type="number" name="delay" value="{{ (configuracao.intervalo_frames / configuracao.qtde_padrao_frames_video) | int  }}" required >
+        </div>
+
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close()">Cancelar</button>
+            <button type="submit">
+                Atualizar Configurações
+            </button>
+        </div>
+    </form>
+</div>

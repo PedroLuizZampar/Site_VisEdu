@@ -1,5 +1,22 @@
 <h1 style="text-align: center;">Tela de Configurações</h1>
+                
+<button class="add-button"
+    c-get="{{ url_for('configuracoes.form_configuracoes') }}"
+    style="margin-bottom: 40px"
+    onclick="document.getElementById('modal').showModal()"
+    c-target="#modal">
+    <i class="fa-solid fa-pen-to-square" style="color: #ffffff;"></i>
+    <span class="tooltip-text">Editar configurações</span>
+</button>
 
-<div class="bloco-configuracoes">
-    Delay entre registros (em segundos): <div>{{ configuracao.intervalo_frames }}</div>
+<div style="display: flex; justify-content: start; width: 100%;">
+    <div class="bloco-configuracoes">
+        Quantidade de quadros dos vídeos: <div class="valor-configuracao">{{ configuracao.qtde_padrao_frames_video }}</div>
+    </div>
+</div>
+
+<div style="display: flex; justify-content: start; width: 100%;">
+    <div class="bloco-configuracoes">
+        Delay entre registros (em segundos): <div class="valor-configuracao">{{ (configuracao.intervalo_frames / configuracao.qtde_padrao_frames_video) | int  }}</div>
+    </div>
 </div>
