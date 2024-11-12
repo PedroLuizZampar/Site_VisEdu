@@ -30,6 +30,18 @@ main {
 
 .bloco-configuracoes {
     display: flex;
+    margin: 0px 2%;
+    height: fit-content;
+    align-items: center;
+    font-size: 18px;
+}
+
+.valor-configuracao {
+    margin: 16px 16px;
+    padding: 8px 16px;
+    border: 1px solid #07172e;
+    border-radius: 20px;
+    background-color: #E5F4FF;
 }
 
 /* SCROLLBAR */
