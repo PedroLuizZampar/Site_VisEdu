@@ -1,0 +1,25 @@
+<div class="modal-body">
+    <h1>{% if upload %}Editar Upload{% else %}Nova Upload{% endif %}</h1>
+
+    <form enctype="multipart/form-data" method="POST"
+        action="{{ url_for('configuracoes.verificar_fps') }}"
+        c-callback="fecharModal"
+        >
+        <input type="hidden" name="_method" value="PUT"> <!-- Permite o formulário realizar um método PUT -->
+
+        <div class="bloco-select-file">
+            <input id="file" class="input_file" type="file" name="file" accept="video/*" {% if upload %} {% else %} required {% endif %}>
+        </div>
+        
+        <div class="result">
+
+        </div>
+
+        <div class="bloco-botoes-modal">
+            <button type="button" onclick="document.getElementById('modal').close();">Cancelar</button>
+            <button type="submit">
+                {% if upload %}Atualizar upload{% else %}Adicionar upload{% endif %}
+            </button>
+        </div>    
+    </form>
+</div>

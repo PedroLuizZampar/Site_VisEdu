@@ -11,6 +11,19 @@
 
 <div style="display: flex; justify-content: start; width: 100%;">
     <div class="bloco-configuracoes">
+        Descobrir quantidade de frames por segundo
+        <button class="add-button"
+            c-get="{{ url_for('configuracoes.form_verificar_fps') }}"
+            onclick="document.getElementById('modal').showModal()"
+            c-target="#modal">
+            <span class="tooltip-text">Testar com um vídeo</span>
+            <i class="fa-solid fa-upload" style="color: #ffffff;"></i>
+        </button>
+    </div>
+</div>
+
+<div style="display: flex; justify-content: start; width: 100%;">
+    <div class="bloco-configuracoes">
         Quantidade de quadros dos vídeos: <div class="valor-configuracao">{{ configuracao.qtde_padrao_frames_video }}</div>
     </div>
 </div>

@@ -26,6 +26,7 @@ def configure_all(app):
     configure_routes(app)
     configure_db()
     create_periodos()
+    create_configs()
 
 def configure_routes(app):
     app.register_blueprint(home_route) # Prefix = "/"
@@ -71,3 +72,12 @@ def create_periodos():
                 Periodo.create(nome_periodo=nome_periodo, hora_inicio=time(19, 30, 00), hora_termino=time(23, 55, 00), qtde_aulas=1)
                 Aula.create(periodo=Periodo.select().where(Periodo.nome_periodo == nome_periodo), hora_inicio=time(19, 30, 00), hora_termino=time(20, 20, 00))
             cont += 1
+
+def create_configs():
+    # Verifica se já existem registros na tabela Configuracoes
+    if Configuracoes.select().count() == 0:
+        # Insere valores padrão
+        Configuracoes.create(
+            qtde_padrao_frames_video=30,
+            intervalo_frames=1800
+        )
