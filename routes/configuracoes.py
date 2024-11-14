@@ -74,7 +74,8 @@ def verificar_fps():
         cap.release()  # Libera o vídeo
         os.remove(temp_path)  # Remove o arquivo temporário
 
-        flash(f"FPS do vídeo: {fps}\nTotal de frames: {total_frames}", "error")
+        flash(f"FPS do vídeo: {fps:.0f}\nTotal de frames: {total_frames:.0f}", "error")
+        flash(f"Total de frames: {total_frames:.0f}", "error")
         return redirect(request.referrer)
     else:
         flash("Nenhum arquivo foi enviado.", "error")
