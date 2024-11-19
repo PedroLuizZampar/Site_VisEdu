@@ -1,5 +1,6 @@
 import os, time
 import cv2
+import shutil
 from peewee import DoesNotExist, fn
 from ultralytics import YOLO
 from moviepy.editor import VideoFileClip
@@ -144,6 +145,19 @@ def inserir_upload():
         duracao = video.duration  # Duração em segundos
         video.close()  # Fechar o arquivo para liberar recursos
 
+        # Carrega o vídeo
+        cap = cv2.VideoCapture(caminho_arquivo)
+
+        # Verifica se o vídeo foi carregado corretamente
+        if not cap.isOpened():
+            flash("Erro na leitura do vídeo", "error")
+            os.remove(caminho_arquivo)
+            return redirect(request.referrer)
+
+        # Obtém o FPS e o número total de frames
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        cap.release()  # Libera o vídeo
+
         # Calcular a hora de término com base na duração
         hora_registro_dt = datetime.strptime(data['hora_registro'], "%H:%M")
         duracao_timedelta = timedelta(seconds=duracao)
@@ -176,7 +190,8 @@ def inserir_upload():
             hora_registro=data['hora_registro'],
             caminho_arquivo=caminho_arquivo,
             duracao=duracao,
-            hora_termino=hora_termino
+            hora_termino=hora_termino,
+            fps=fps
         )
 
         return redirect(url_for('upload.tela_uploads'))
@@ -210,6 +225,8 @@ def atualizar_upload(upload_id):
 
     """ Atualiza o upload """
 
+    fps = None
+
     if request.form.get('_method') == 'PUT':
         basepath = os.path.dirname(__file__)
         data = request.form
@@ -242,42 +259,41 @@ def atualizar_upload(upload_id):
             flash(f"A hora de registro ({data['hora_registro']}) está fora do período selecionado!", "error")
             return redirect(request.referrer)
 
-        # Obter a duração do vídeo e o caminho do arquivo
+        # Lida com novo arquivo enviado
         if f and allowed_file(f.filename):
-            # Novo arquivo enviado
-            if novo_nome_arquivo == old_name:
-                # Substitui o arquivo antigo diretamente
-                temp_filename = old_name
-                temp_caminho_arquivo = old_caminho_arquivo
-            else:
-                # Novo arquivo com nome diferente
-                temp_filename = novo_nome_arquivo
-                temp_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', temp_filename))
-                if os.path.exists(temp_caminho_arquivo) and temp_caminho_arquivo != old_caminho_arquivo:
-                    # Se já existe um arquivo com esse nome (e não é o antigo), gera um nome único
-                    temp_filename = gerar_nome_unico(os.path.dirname(temp_caminho_arquivo), temp_filename)
-                    temp_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', temp_filename))
+            # Salva em um diretório temporário
+            temp_dir = os.path.join(basepath, os.pardir, 'tmp')
+            if not os.path.exists(temp_dir):
+                os.makedirs(temp_dir)
+
+            # Cria um nome de arquivo temporário único
+            temp_filename = gerar_nome_unico(temp_dir, secure_filename(f.filename))
+            temp_caminho_arquivo = os.path.join(temp_dir, temp_filename)
             f.save(temp_caminho_arquivo)
 
-            # Obter a duração do novo vídeo
+            # Obtém a duração do novo vídeo
             video = VideoFileClip(temp_caminho_arquivo)
             duracao = video.duration  # Duração em segundos
             video.close()  # Fechar o arquivo para liberar recursos
-        else:
-            # Nenhum novo arquivo enviado
-            if old_name != novo_nome_arquivo:
-                # Renomear o arquivo antigo para o novo nome após validação
-                temp_filename = novo_nome_arquivo
-                temp_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', temp_filename))
-                if os.path.exists(temp_caminho_arquivo) and temp_caminho_arquivo != old_caminho_arquivo:
-                    # Se já existe um arquivo com esse nome (e não é o antigo), gera um nome único
-                    temp_filename = gerar_nome_unico(os.path.dirname(temp_caminho_arquivo), temp_filename)
-                    temp_caminho_arquivo = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads', temp_filename))
-            else:
-                temp_filename = old_name
-                temp_caminho_arquivo = old_caminho_arquivo
 
-            # Obter a duração do vídeo existente
+            # Carrega o vídeo para obter o FPS
+            cap = cv2.VideoCapture(temp_caminho_arquivo)
+
+            # Verifica se o vídeo foi carregado corretamente
+            if not cap.isOpened():
+                flash("Erro na leitura do vídeo", "error")
+                os.remove(temp_caminho_arquivo)
+                return redirect(request.referrer)
+
+            # Obtém o FPS e libera o vídeo
+            fps = cap.get(cv2.CAP_PROP_FPS)
+            cap.release()
+        else:
+            # Nenhum novo arquivo enviado, usa o arquivo antigo
+            temp_caminho_arquivo = old_caminho_arquivo
+            temp_filename = old_name
+
+            # Obtém a duração do vídeo existente
             video = VideoFileClip(old_caminho_arquivo)
             duracao = video.duration  # Duração em segundos
             video.close()  # Fechar o arquivo para liberar recursos
@@ -299,8 +315,8 @@ def atualizar_upload(upload_id):
         if not aula_upload:
             # Não encontrou uma aula correspondente
             if f and allowed_file(f.filename):
-                # Se novo arquivo foi salvo, deletar arquivo temporário
-                if os.path.exists(temp_caminho_arquivo) and temp_caminho_arquivo != old_caminho_arquivo:
+                # Deleta o arquivo temporário
+                if os.path.exists(temp_caminho_arquivo):
                     os.remove(temp_caminho_arquivo)
             flash(f"A hora de registro ({data['hora_registro']}) não corresponde a nenhuma aula!", "error")
             return redirect(request.referrer)
@@ -309,26 +325,41 @@ def atualizar_upload(upload_id):
             # O vídeo excede o tempo da aula
             if f and allowed_file(f.filename):
                 # Deleta o arquivo temporário
-                if os.path.exists(temp_caminho_arquivo) and temp_caminho_arquivo != old_caminho_arquivo:
+                if os.path.exists(temp_caminho_arquivo):
                     os.remove(temp_caminho_arquivo)
             flash(f"O vídeo não pode ser salvo, pois excede o tempo de uma aula!", "error")
             return redirect(request.referrer)
 
         # Validação passou, agora atualizar o upload
         if f and allowed_file(f.filename):
-            # Deleta o arquivo antigo somente agora, se o caminho for diferente
-            if os.path.exists(old_caminho_arquivo) and old_caminho_arquivo != temp_caminho_arquivo:
+            # Deleta o arquivo antigo se existir
+            if os.path.exists(old_caminho_arquivo):
                 os.remove(old_caminho_arquivo)
-            # Se o arquivo foi salvo em um caminho temporário diferente, já está pronto
-            final_caminho_arquivo = temp_caminho_arquivo
-            new_filename = temp_filename
+            # Move o arquivo temporário para o destino final
+            final_dir = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads'))
+            final_caminho_arquivo = os.path.join(final_dir, novo_nome_arquivo)
+
+            # Garante que o nome do arquivo final seja único, se necessário
+            if os.path.exists(final_caminho_arquivo):
+                novo_nome_arquivo = gerar_nome_unico(final_dir, novo_nome_arquivo)
+                final_caminho_arquivo = os.path.join(final_dir, novo_nome_arquivo)
+
+            shutil.move(temp_caminho_arquivo, final_caminho_arquivo)
+            new_filename = novo_nome_arquivo
         else:
             if old_name != novo_nome_arquivo:
                 # Renomeia o arquivo antigo para o novo nome
+                final_dir = os.path.abspath(os.path.join(basepath, os.pardir, 'uploads'))
+                final_caminho_arquivo = os.path.join(final_dir, novo_nome_arquivo)
+
+                # Garante que o nome do arquivo final seja único, se necessário
+                if os.path.exists(final_caminho_arquivo) and final_caminho_arquivo != old_caminho_arquivo:
+                    novo_nome_arquivo = gerar_nome_unico(final_dir, novo_nome_arquivo)
+                    final_caminho_arquivo = os.path.join(final_dir, novo_nome_arquivo)
+
                 if os.path.exists(old_caminho_arquivo):
-                    os.rename(old_caminho_arquivo, temp_caminho_arquivo)
-                final_caminho_arquivo = temp_caminho_arquivo
-                new_filename = temp_filename
+                    os.rename(old_caminho_arquivo, final_caminho_arquivo)
+                new_filename = novo_nome_arquivo
             else:
                 final_caminho_arquivo = old_caminho_arquivo
                 new_filename = old_name
@@ -343,6 +374,9 @@ def atualizar_upload(upload_id):
         upload_editado.turma = turma
         upload_editado.data_registro = data['data_registro']
         upload_editado.hora_registro = data['hora_registro']
+
+        if fps:
+            upload_editado.fps = fps
 
         upload_editado.save()  # Salva as alterações no banco
 
@@ -412,8 +446,8 @@ def atualizar_status(upload_id):
 def analisar_upload(upload_id):
     """ Passa o vídeo para a IA fazer a análise """
     global cancelado
-    global frame_interval
     cancelado = False
+    delay_registros = 0
 
     deletar_analise(upload_id)  # Apaga as análises anteriores caso tenha
 
@@ -442,9 +476,10 @@ def analisar_upload(upload_id):
 
     for config in configs:
         if config.id == 1:
-            frame_interval = config.intervalo_frames
+            delay_registros = config.intervalo_analise_em_segundos
 
     frame_count = 0
+    frame_interval = round(delay_registros * fps)
 
     progress_dict['progress'] = 0  # Inicializa o progresso
 
@@ -477,6 +512,7 @@ def analisar_todos():
     """ Passa todos os vídeos para a IA fazer a análise """
     global cancelado
     cancelado = False
+    delay_registros = 0
 
     # Obter todos os uploads
     uploads = Upload.select().where(Upload.is_analisado == 0)
@@ -527,9 +563,10 @@ def analisar_todos():
 
         for config in configs:
             if config.id == 1:
-                frame_interval = config.intervalo_frames
+                delay_registros = config.intervalo_analise_em_segundos
 
         frame_count = 0
+        frame_interval = round(delay_registros * fps)
 
         while not cancelado and cap.isOpened():
             ret, frame = cap.read()

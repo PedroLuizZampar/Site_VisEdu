@@ -37,8 +37,7 @@ def atualizar_configuracoes(configuracao_id):
 
         configuracao_editada = configuracao
 
-        configuracao_editada.qtde_padrao_frames_video = data['qtde_frames']
-        configuracao_editada.intervalo_frames = int(data['delay']) * int(data['qtde_frames'])
+        configuracao_editada.intervalo_analise_em_segundos = data['delay']
 
         configuracao_editada.save()
 

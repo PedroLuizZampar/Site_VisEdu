@@ -24,12 +24,6 @@
 
 <div style="display: flex; justify-content: start; width: 100%;">
     <div class="bloco-configuracoes">
-        Quantidade de quadros por segundo dos vídeos: <div class="valor-configuracao">{{ configuracao.qtde_padrao_frames_video }}</div>
-    </div>
-</div>
-
-<div style="display: flex; justify-content: start; width: 100%;">
-    <div class="bloco-configuracoes">
-        Delay entre registros (em segundos): <div class="valor-configuracao">{{ (configuracao.intervalo_frames / configuracao.qtde_padrao_frames_video) | int  }}</div>
+        Delay entre registros (em segundos): <div class="valor-configuracao">{{ configuracao.intervalo_analise_em_segundos  }}</div>
     </div>
 </div>

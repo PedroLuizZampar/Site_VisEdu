@@ -78,6 +78,5 @@ def create_configs():
     if Configuracoes.select().count() == 0:
         # Insere valores padrão
         Configuracoes.create(
-            qtde_padrao_frames_video=30,
-            intervalo_frames=1800
+            intervalo_analise_em_segundos=30
         )

@@ -171,8 +171,8 @@ dialog video {
 }
 
 .modal-relatorio {
-    height: 700px;
-    width: 1200px;
+    height: 80vh;
+    width: 80vw;
 }
 
 .modal-relatorio .modal-body {
@@ -194,7 +194,6 @@ dialog video {
 
 canvas {
     padding: 30px;
-    width: 10%;
 }
 
 /* TOOLTIPS */

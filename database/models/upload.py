@@ -1,4 +1,4 @@
-from peewee import Model, CharField, DateField, TimeField, BooleanField, DecimalField, ForeignKeyField
+from peewee import Model, CharField, DateField, TimeField, BooleanField, DecimalField, ForeignKeyField, IntegerField
 from database.database import db
 from database.models.sala import Sala
 from database.models.periodo import Periodo
@@ -14,6 +14,7 @@ class Upload(Model):
     caminho_arquivo = CharField()
     duracao = DecimalField()
     hora_termino = TimeField()
+    fps = IntegerField()
     is_analisado = BooleanField(default=False)
 
     class Meta:
