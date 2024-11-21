@@ -447,7 +447,6 @@ def analisar_upload(upload_id):
     """ Passa o vídeo para a IA fazer a análise """
     global cancelado
     cancelado = False
-    delay_registros = 0
 
     deletar_analise(upload_id)  # Apaga as análises anteriores caso tenha
 
@@ -465,7 +464,6 @@ def analisar_upload(upload_id):
         flash("Erro ao obter FPS do vídeo!")
         return redirect(request.referrer)
 
-    # Obter o número total de frames do vídeo
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     if not cap.isOpened():
@@ -474,27 +472,30 @@ def analisar_upload(upload_id):
     
     configs = Configuracoes.select()
 
-    for config in configs:
-        if config.id == 1:
-            delay_registros = config.intervalo_analise_em_segundos
-
-    frame_count = 0
+    # Obtém o intervalo em segundos para análise
+    delay_registros = next((config.intervalo_analise_em_segundos for config in configs if config.id == 1), 0)
     frame_interval = round(delay_registros * fps)
 
     progress_dict['progress'] = 0  # Inicializa o progresso
 
-    while not cancelado and cap.isOpened():
+    frame_count = 0
+
+    while not cancelado and frame_count < total_frames:
+        # Pular diretamente para o próximo frame de interesse
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count)
+
         ret, frame = cap.read()
         if not ret:
             break
 
-        frame_count += 1
-        if frame_count % frame_interval == 0:
-            identificar(frame, frame_count, fps, upload, model)
+        identificar(frame, frame_count, fps, upload, model)
 
         # Calcular a porcentagem de progresso
         progress = (frame_count / total_frames) * 100
         progress_dict['progress'] = progress
+
+        # Incrementa o contador para o próximo frame de interesse
+        frame_count += frame_interval
 
     cap.release()
     progress_dict.pop('progress', None)  # Remove o progresso atual
@@ -512,7 +513,6 @@ def analisar_todos():
     """ Passa todos os vídeos para a IA fazer a análise """
     global cancelado
     cancelado = False
-    delay_registros = 0
 
     # Obter todos os uploads
     uploads = Upload.select().where(Upload.is_analisado == 0)
@@ -558,30 +558,31 @@ def analisar_todos():
         if not cap.isOpened():
             flash(f"Erro ao abrir o vídeo do upload {upload_id}!")
             continue  # Pula para o próximo upload
-    
+
         configs = Configuracoes.select()
 
-        for config in configs:
-            if config.id == 1:
-                delay_registros = config.intervalo_analise_em_segundos
-
-        frame_count = 0
+        # Obtém o intervalo em segundos para análise
+        delay_registros = next((config.intervalo_analise_em_segundos for config in configs if config.id == 1), 0)
         frame_interval = round(delay_registros * fps)
 
-        while not cancelado and cap.isOpened():
+        frame_count = 0
+
+        while not cancelado and frame_count < total_frames:
+            # Pular diretamente para o próximo frame de interesse
+            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count)
+
             ret, frame = cap.read()
             if not ret:
                 break
 
-            frame_count += 1
-            total_frames_processed += 1
-
-            if frame_count % frame_interval == 0:
-                identificar(frame, frame_count, fps, upload, model)
+            identificar(frame, frame_count, fps, upload, model)
 
             # Atualiza o progresso total
+            total_frames_processed += frame_interval
             progress = (total_frames_processed / total_frames_all_uploads) * 100
             progress_dict['progress'] = progress
+
+            frame_count += frame_interval  # Incrementa para o próximo frame de interesse
 
         cap.release()
 
@@ -593,8 +594,12 @@ def analisar_todos():
             break  # Interrompe a análise de todos os uploads
 
     progress_dict.pop('progress', None)  # Remove o progresso ao finalizar
-    flash("Análise de todos os uploads concluída!")
-    return jsonify({"status": "concluido", "mensagem": "Análise de todos os uploads concluída!"})
+    if not cancelado:
+        flash("Análise de todos os uploads concluída!")
+        return jsonify({"status": "concluido", "mensagem": "Análise de todos os uploads concluída!"})
+    else:
+        flash("Análise interrompida pelo usuário.")
+        return jsonify({"status": "cancelado", "mensagem": "Análise interrompida pelo usuário!"})
 
 # Função para processar cada frame do vídeo
 def identificar(frame, frame_count, fps, upload, model):
@@ -661,7 +666,7 @@ def identificar(frame, frame_count, fps, upload, model):
 def get_progress():
     """ Retorna o progresso da análise em andamento """
     # Não precisamos mais do upload_id
-    progress = progress_dict.get('progress', 0)
+    progress = progress_dict.get('progress', 100)
 
     # Determina o status com base no progresso
     status = 'em andamento'

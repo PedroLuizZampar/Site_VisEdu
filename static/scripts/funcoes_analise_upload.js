@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById('progress-bar').style.width = `${data.progress}%`;
 
                 // Verifica se o progresso atingiu 100% ou se o status é 'concluido'
-                if (data.progress >= 100 || data.progress == 0 || data.status === 'concluido') {
+                if (data.progress >= 100 || data.status === 'concluido') {
                     clearInterval(statusInterval);  // Encerra o intervalo
                     modalAnalise.close();  // Fecha o modal
                     localStorage.removeItem('modal_analise_aberto');
