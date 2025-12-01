@@ -14,7 +14,7 @@ filelock==3.16.1
 Flask==3.0.3
 Flask-SocketIO==5.3.6
 flatbuffers==24.3.25
-fonttools==4.54.1
+fonttools==4.61.0
 fsspec==2024.9.0
 h11==0.14.0
 humanfriendly==10.0
