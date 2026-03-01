@@ -36,7 +36,7 @@ opencv-python==4.10.0.84
 packaging==24.1
 pandas==2.2.3
 peewee==3.17.6
-pillow==10.4.0
+pillow==12.1.1
 proglog==0.1.10
 protobuf==5.28.2
 psutil==6.0.0
